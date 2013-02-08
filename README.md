@@ -13,9 +13,12 @@ Here are the instruction to deploy the nuxeo demo set of data on a fresh nuxeo i
 ## Prepare your server
 
 
-If not done, install Nuxeo with DM, DAM and Social Collab.
+If not done, install Nuxeo with PostgreSQL on ubuntu.
 See here for installation instructions on Ubuntu.
 http://doc.nuxeo.com/x/3oON
+
+If you prefer, you can also use one of the Nuxeo VM
+http://www.nuxeo.com/en/downloads (run the installation wizard before going further)
 
 Once Nuxeo is installed with autoconfiguration of the postgres database, it has created a nuxeo role in postgres that need to be modified for the deployment script to run.
 
