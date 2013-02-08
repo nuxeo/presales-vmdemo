@@ -52,7 +52,7 @@ chmod +x ./* || exit 1
 echo "All scripts downloaded"
 echo "Updating the init variable scripts with the correct variables"
 
-sed -i -e s@'export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-/etc/nuxeo}'@'export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-'$PWD'}'@ 99-initScriptVariables.sh || exit 1
+sed -i -e s@'export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-/etc/nuxeo}'@'export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-'${NUXEO_DEMO_PARENT_DIR}'}'@ 99-initScriptVariables.sh || exit 1
 
 echo "Fetching demo data from Nuxeo Servers"
 ./01-updateFullDemoFromFromWeb.sh || exit 1
