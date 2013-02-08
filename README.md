@@ -41,6 +41,9 @@ chmod +x 00-DownloadAndSetUpFullNuxeoDemo.sh;
 
 - it will download all the data, and restart the server 
 
+`unzip package must be already installed on your server so that the script can run, and it is not installed by default on nuxeo VMs, to install it:
+sudo apt-get install unzip`
+
 You can connect to your server
 
 Have fun with the demo!!!
