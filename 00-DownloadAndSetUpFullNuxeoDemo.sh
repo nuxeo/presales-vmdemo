@@ -36,16 +36,16 @@ cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/scripts || exit 1
 
 echo "Getting demo scripts"
 
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/01-updateFullDemoFromFromWeb.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/02-updateBackupDataFromWeb.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/03-updateBackupTemplatesFromWeb.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/04-updateBackupPackagesFromWeb.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/05-updateAndPrepareDistribFromWeb.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/99-initScriptVariables.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalEn.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalFR.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-restart.sh" || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-showLog.sh" || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/01-updateFullDemoFromFromWeb.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/02-updateBackupDataFromWeb.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/03-updateBackupTemplatesFromWeb.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/04-updateBackupPackagesFromWeb.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/05-updateAndPrepareDistribFromWeb.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/99-initScriptVariables.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalEn.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalFR.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-restart.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-showLog.sh" --no-check-certificate || exit 1
 
 chmod +x ./* || exit 1
 
