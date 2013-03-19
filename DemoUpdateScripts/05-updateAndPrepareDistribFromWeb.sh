@@ -92,6 +92,9 @@ if test -e ${NUXEO_DEMO_PARENT_DIR}/instance.clid
 then
 	echo "Instance.clid found, copying it on the server, and hotfixing the server"
 	cp ${NUXEO_DEMO_PARENT_DIR}/instance.clid ${NUXEO_DATA_DIR}
+	# Try 3 times to avoid time-out issues
+	${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-hotfix --accept=true
+	${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-hotfix --accept=true
 	${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-hotfix --accept=true || exit 1
 else
 	echo "No instance.clid found, the hotfixes will not be installed on the server. Altough not mandatory, it is highly recommanded. The instance.clid is looked for in the parent of the nuxeo_demo folder. In your case in:"

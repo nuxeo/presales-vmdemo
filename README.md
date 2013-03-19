@@ -21,11 +21,11 @@ http://www.nuxeo.com/en/downloads (run the installation wizard before going furt
 
 Once Nuxeo is installed with autoconfiguration of the postgres database, it has created a nuxeo role in postgres that need to be modified for the deployment script to run.
 
-- connect to a terminal and type : 
+- connect to a terminal and type::
 
-$ sudo su - postgres;
+	$ sudo su - postgres;
 
-$ psql -p 5433;  
+	$ psql -p 5433;  
 
 $ ALTER ROLE nuxeo WITH CREATEDB;
 
