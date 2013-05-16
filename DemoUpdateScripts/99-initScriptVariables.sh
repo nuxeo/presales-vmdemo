@@ -19,7 +19,10 @@ export NUXEO_DEMO_PACKAGES=${NUXEO_DEMO_PACKAGES:-packages}
 
 # Variables used by subscripts : 
 #The distribution download link
-export NUXEO_DISTRIB=${NUXEO_DISTRIB:-nuxeo-cap-5.6-tomcat}
+
+#Calculated dynamically in the 05-UpdateAndPrepareDistrib
+#export NUXEO_DISTRIB=${NUXEO_DISTRIB:-nuxeo-cap-5.6-tomcat}
+
 export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/releases/nuxeo-5.6/}
 
 export NUXEO_CONF=${NUXEO_CONF:-/etc/nuxeo/nuxeo.conf}
