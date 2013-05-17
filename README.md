@@ -58,6 +58,8 @@ You can connect to your server
 
 Have fun with the demo!!!
 
+- Please note that 00-DownloadAndSetUpFullNuxeoDemo.sh will launch a demo on the last release of Nuxeo, others demos are available.
+
 ### Update logic and Getting hotfixes for you demo server.
 #### Update and reset logic
 

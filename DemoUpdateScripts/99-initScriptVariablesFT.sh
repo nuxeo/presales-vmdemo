@@ -23,7 +23,7 @@ export NUXEO_DEMO_PACKAGES=${NUXEO_DEMO_PACKAGES:-packages}
 #Calculated dynamically in the 05-UpdateAndPrepareDistrib
 #export NUXEO_DISTRIB=${NUXEO_DISTRIB:-nuxeo-cap-5.6-tomcat}
 
-export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/snapshot/}
+export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/snapshots/}
 
 export NUXEO_CONF=${NUXEO_CONF:-/etc/nuxeo/nuxeo.conf}
 export NUXEO_SERVER_DIR=${NUXEO_SERVER_DIR:-/var/lib/nuxeo/server}
