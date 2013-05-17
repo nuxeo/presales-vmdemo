@@ -86,8 +86,8 @@ echo $NUXEO_CONF
 
 echo "Initializing server and installing default packages (dm, dam, social collab)"
 ${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-init
-${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-remove nuxeo-cmf
-${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-list | grep downloaded |cut -f2|cut -d ' ' -f1 |xargs ${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-install
+${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-remove ${NUXEO_DEFAULT_PACKAGE_TO_REMOVE} || exit 1
+${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-list | grep downloaded |cut -f2|cut -d ' ' -f1 |xargs ${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-install || exit 1
 
 if test -e ${NUXEO_DEMO_PARENT_DIR}/instance.clid
 then

@@ -22,6 +22,8 @@ export NUXEO_DEMO_PACKAGES=${NUXEO_DEMO_PACKAGES:-packages}
 
 #Calculated dynamically in the 05-UpdateAndPrepareDistrib
 #export NUXEO_DISTRIB=${NUXEO_DISTRIB:-nuxeo-cap-5.6-tomcat}
+#default packages to remove separated by spaces, ex :nuxeo-cmf nuxeo-social-collaboration
+export NUXEO_DEFAULT_PACKAGE_TO_REMOVE=${NUXEO_DEFAULT_PACKAGE_TO_REMOVE:- nuxeo-social-collaboration nuxeo-cmf}
 
 export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/snapshots/}
 
