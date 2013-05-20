@@ -80,6 +80,8 @@ rm -R ${NUXEO_SERVER_DIR}/*
 echo "Copying fresh distrib"
 mv ${NUXEO_DISTRIB}/* ${NUXEO_SERVER_DIR}/
 rmdir ${NUXEO_DISTRIB}
+#Remove older ZIP tomcat
+find nuxeo*-tomcat.zip -type f -not -name ${NUXEO_DISTRIB}.zip| xargs rm
 
 echo $NUXEO_SERVER_DIR
 echo $NUXEO_CONF
