@@ -25,7 +25,7 @@ then
 fi
 
 echo "getting fresh distrib from Nuxeo servers"
-export NUXEO_DISTRIB=$(wget -q -O - "${NUXEO_DISTRIB_DOWNLOAD_LINK}?O=D" | grep -m 1 -o -E "nuxeo-cap-5.[^.]*-tomcat" | head -n 1)
+export NUXEO_DISTRIB=$(wget -q -O - "${NUXEO_DISTRIB_DOWNLOAD_LINK}?O=D" | grep -m 1 -o -E "nuxeo-cap-5.[0-9][^a-z]*-tomcat" | head -n 1)
 wget -N "${NUXEO_DISTRIB_DOWNLOAD_LINK}${NUXEO_DISTRIB}.zip"|| exit 1
 
 if test -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution
