@@ -46,10 +46,11 @@ cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/${LANGUAGE}/binaries ${DA
 wait
 echo 'Data reset' 
 
-echo 'Installation of addons'
-${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-install --accept=true --nodeps ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_PACKAGES}/*
-wait
-
+if test -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_PACKAGES}
+then
+	echo 'Installation of addons'	
+	${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-install --accept=true --nodeps ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/
+fi
 wait
 ${NUXEO_SERVER_DIR}/bin/nuxeoctl start
 
