@@ -33,6 +33,22 @@ fi
 mkdir ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR} || exit 1
 mkdir ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/scripts
 
+#Getting a reset script for easy reset without going into the script folder
+cd ${NUXEO_DEMO_PARENT_DIR}
+echo 'Getting reset script from github'
+wget -O reset_${NUXEO_DEMO_DIR}.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/MaintenanceScripts/resetGeneric.sh" --no-check-certificate || exit 1
+chmod +x reset_${NUXEO_DEMO_DIR}.sh || exit 1
+sed -i -e s@'cd /etc/nuxeo_snapshot_demo/scripts'@'cd '${NUXEO_DEMO_PARENT_DIR}'/'${NUXEO_DEMO_DIR}'/scripts'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
+sed -i -e s@'./000-resetLocal.sh'@'./000-resetLocalEn.sh'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
+
+#Getting an update and reset script for easy reset without going into the script folder
+
+echo 'Getting update and reset script from github'
+wget -O update_and_reset_${NUXEO_DEMO_DIR}.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/MaintenanceScripts/resetAndUpdateGeneric.sh" --no-check-certificate || exit 1
+chmod +x update_and_reset_${NUXEO_DEMO_DIR}.sh || exit 1
+sed -i -e s@'cd /etc/nuxeo_snapshot_demo/scripts'@'cd '${NUXEO_DEMO_PARENT_DIR}'/'${NUXEO_DEMO_DIR}'/scripts'@ update_and_reset_${NUXEO_DEMO_DIR}.sh || exit 1
+sed -i -e s@'./000-resetLocal.sh'@'./000-resetLocalEn.sh'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
+
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/scripts || exit 1
 
 echo "Getting demo scripts"
