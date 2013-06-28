@@ -12,16 +12,16 @@ select choice in "LTS_EN" "LTS_FR" "Fast_track_EN" "DAM_EN"; do
     	case $choice in
         	LTS_EN )	NUXEO_DEMO_DIR=nuxeo_LTS_en_demo
 						initScript=99-initScriptVariablesLTS_EN.sh
-			;;
+			break;;
         	LTS_FR )	NUXEO_DEMO_DIR=nuxeo_LTS_fr_demo
 						initScript=99-initScriptVariablesLTS_FR.sh
-			;;
+			break;;
 			Fast_track_EN )	NUXEO_DEMO_DIR=nuxeo_FT_en_demo
 						initScript=99-initScriptVariablesFT.sh
-			;;
+			break;;
 			DAM_EN )	NUXEO_DEMO_DIR=nuxeo_DAM_en_demo
 						initScript=99-initScriptVariablesDAM.sh
-			;;
+			break;;
     	esac
 done
 
