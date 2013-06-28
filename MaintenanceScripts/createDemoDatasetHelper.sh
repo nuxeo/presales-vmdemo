@@ -3,7 +3,7 @@
 # This script has been designed to help creating a new standard demo dataset.
 
 
-LANGUAGE=en #Not very useful but kept for compatibility reasons
+
 
 echo '========================================'
 echo 'Welcome in Nuxeo demo dataset helper!'
@@ -12,7 +12,7 @@ echo 'If you have never reset your demo, preliminary manuel steps should be done
 
 read -p 'Please enter a name for your demo snapshot (a folder will be created with that name).' NUXEO_DEMO_DIR
 #The name of the demo folder (will be created if does not exist)
-NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_snapshot_demo}
+NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_demo_dataset}
 
 
 #The Folder where to put the demo folder (by default the folder where the script is run)
@@ -73,8 +73,6 @@ fi
 
 mkdir ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_DATAS}
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_DATAS}
-mkdir ${LANGUAGE}
-cd ${LANGUAGE}
 
 if test ! -e ${NUXEO_CONF}
 then

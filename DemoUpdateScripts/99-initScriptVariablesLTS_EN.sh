@@ -4,11 +4,11 @@
 #The Folder where to put the demo folder
 export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-/etc/nuxeo}
 #The name of the demo folder (will be created if does not exist)
-export NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_DAM_en_demo}
+export NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_LTS_en_demo}
 
 #Variables used by the scripts (should not be edited by the user)
 #Nuxeo demo data backup site
-export NUXEO_DEMO_SITE=${NUXEO_DEMO_SITE:-https://clients.nuxeo.com/NUXEODEMO/VM/nuxeo_DAM_en_demo/}
+export NUXEO_DEMO_SITE=${NUXEO_DEMO_SITE:-https://clients.nuxeo.com/NUXEODEMO/VM/nuxeo_LTS_en_demo/}
 
 
 #Nuxeo demos scripts, data, templates
@@ -22,10 +22,13 @@ export NUXEO_DEMO_PACKAGES=${NUXEO_DEMO_PACKAGES:-packages}
 
 #Calculated dynamically in the 05-UpdateAndPrepareDistrib
 #export NUXEO_DISTRIB=${NUXEO_DISTRIB:-nuxeo-cap-5.6-tomcat}
-#default packages to remove separated by spaces, ex :nuxeo-cmf nuxeo-social-collaboration
-export NUXEO_DEFAULT_PACKAGE_TO_REMOVE=${NUXEO_DEFAULT_PACKAGE_TO_REMOVE:- nuxeo-social-collaboration nuxeo-cmf}
 
-export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/snapshots/}
+#default packages to remove separated by spaces, ex :nuxeo-cmf nuxeo-social-collaboration
+export NUXEO_DEFAULT_PACKAGE_TO_REMOVE=${NUXEO_DEFAULT_PACKAGE_TO_REMOVE:- nuxeo-cmf}
+
+export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/releases/nuxeo-5.6/}
+
+
 
 export NUXEO_CONF=${NUXEO_CONF:-/etc/nuxeo/nuxeo.conf}
 export NUXEO_SERVER_DIR=${NUXEO_SERVER_DIR:-/var/lib/nuxeo/server}

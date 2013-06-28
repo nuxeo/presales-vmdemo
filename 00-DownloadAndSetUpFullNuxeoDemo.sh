@@ -4,12 +4,27 @@ echo ${PWD}
 #The Folder where to put the demo folder (by default the folder where the script is run)
 NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-$PWD}
 #The name of the demo folder (will be created if does not exist)
-NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_demo}
+#NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_demo}
 
 
-#wget "https://clients.nuxeo.com/NUXEODEMO/VM/nuxeo_demo.tar.gz"
-#echo "unzipping demo data"
-#tar xvzf nuxeo_demo.tar.gz
+echo "Please choose the number of the demo dataset you want to deploy (you can have several datasets side-by-side, if you choose a demo that you already have, it will first remove it)"
+select choice in "LTS_EN" "LTS_FR" "Fast_track_EN" "DAM_EN"; do
+    	case $choice in
+        	LTS_EN )	NUXEO_DEMO_DIR=nuxeo_LTS_en_demo
+						initScript=99-initScriptVariablesLTS_EN.sh
+			;;
+        	LTS_FR )	NUXEO_DEMO_DIR=nuxeo_LTS_fr_demo
+						initScript=99-initScriptVariablesLTS_FR.sh
+			;;
+			Fast_track_EN )	NUXEO_DEMO_DIR=nuxeo_FT_en_demo
+						initScript=99-initScriptVariablesFT.sh
+			;;
+			DAM_EN )	NUXEO_DEMO_DIR=nuxeo_DAM_en_demo
+						initScript=99-initScriptVariablesDAM.sh
+			;;
+    	esac
+done
+
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}
 then
@@ -38,7 +53,6 @@ echo 'Getting reset script from github'
 wget -O reset_${NUXEO_DEMO_DIR}.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/MaintenanceScripts/resetGeneric.sh" --no-check-certificate || exit 1
 chmod +x reset_${NUXEO_DEMO_DIR}.sh || exit 1
 sed -i -e s@'cd /etc/nuxeo_snapshot_demo/scripts'@'cd '${NUXEO_DEMO_PARENT_DIR}'/'${NUXEO_DEMO_DIR}'/scripts'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
-sed -i -e s@'./000-resetLocal.sh'@'./000-resetLocalEn.sh'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
 
 #Getting an update and reset script for easy reset without going into the script folder
 
@@ -46,7 +60,6 @@ echo 'Getting update and reset script from github'
 wget -O update_and_reset_${NUXEO_DEMO_DIR}.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/MaintenanceScripts/resetAndUpdateGeneric.sh" --no-check-certificate || exit 1
 chmod +x update_and_reset_${NUXEO_DEMO_DIR}.sh || exit 1
 sed -i -e s@'cd /etc/nuxeo_snapshot_demo/scripts'@'cd '${NUXEO_DEMO_PARENT_DIR}'/'${NUXEO_DEMO_DIR}'/scripts'@ update_and_reset_${NUXEO_DEMO_DIR}.sh || exit 1
-sed -i -e s@'./000-resetLocal.sh'@'./000-resetLocalEn.sh'@ reset_${NUXEO_DEMO_DIR}.sh || exit 1
 
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/scripts || exit 1
 
@@ -57,11 +70,14 @@ wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/02-u
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/03-updateBackupTemplatesFromWeb.sh" --no-check-certificate || exit 1
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/04-updateBackupPackagesFromWeb.sh" --no-check-certificate || exit 1
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/05-updateAndPrepareDistribFromWeb.sh" --no-check-certificate || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/99-initScriptVariables.sh" --no-check-certificate || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalEn.sh" --no-check-certificate || exit 1
-wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalFR.sh" --no-check-certificate || exit 1
+wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocal.sh" --no-check-certificate || exit 1
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-restart.sh" --no-check-certificate || exit 1
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-showLog.sh" --no-check-certificate || exit 1
+
+
+wget -O 99-initScriptVariables.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/${initScript}" --no-check-certificate || exit 1
+
+
 
 chmod +x ./* || exit 1
 
@@ -74,7 +90,7 @@ echo "Fetching demo data from Nuxeo Servers"
 ./01-updateFullDemoFromFromWeb.sh || exit 1
 wait
 echo "Resetting the server with the demo data. The server will stop if you close the window after (juste restart the server in that case)"
-./000-resetLocalEn.sh
+./000-resetLocal.sh
 
 
 

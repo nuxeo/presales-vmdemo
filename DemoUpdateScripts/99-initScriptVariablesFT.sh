@@ -4,11 +4,11 @@
 #The Folder where to put the demo folder
 export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-/etc/nuxeo}
 #The name of the demo folder (will be created if does not exist)
-export NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_FT_demo}
+export NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_FT_en_demo}
 
 #Variables used by the scripts (should not be edited by the user)
 #Nuxeo demo data backup site
-export NUXEO_DEMO_SITE=${NUXEO_DEMO_SITE:-https://clients.nuxeo.com/NUXEODEMO/VM/nuxeo_FT_demo/}
+export NUXEO_DEMO_SITE=${NUXEO_DEMO_SITE:-https://clients.nuxeo.com/NUXEODEMO/VM/nuxeo_FT_en_demo/}
 
 
 #Nuxeo demos scripts, data, templates

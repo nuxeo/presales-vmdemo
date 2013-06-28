@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script reset the server with local demo data, no web connection is required.
 
-LANGUAGE=en
+
 if test ! ${VARIABLES_INITIALIZED}
 then
 	echo "Initializing variables"	
@@ -9,7 +9,7 @@ then
 fi
 
 
-ResetDumpDemoDB=${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/${LANGUAGE}/demo.dump
+ResetDumpDemoDB=${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/demo.dump
 
 echo 'reseting nuxeo.conf'
 cp ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/nuxeo.conf.backup /etc/nuxeo/nuxeo.conf || exit 1
@@ -42,7 +42,7 @@ cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/server/* ${NUXEO_S
 cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/data/* ${DATA_DIR}/ || exit 1
 wait
 echo 'Server recreated, copying demo data' 
-cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/${LANGUAGE}/binaries ${DATA_DIR} || exit 1
+cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/binaries ${DATA_DIR} || exit 1
 wait
 echo 'Data reset' 
 
@@ -51,6 +51,8 @@ then
 	echo 'Installation of addons'	
 	${NUXEO_SERVER_DIR}/bin/nuxeoctl mp-install --accept=true --nodeps ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_PACKAGES}/*
 fi
+wait
+
 wait
 ${NUXEO_SERVER_DIR}/bin/nuxeoctl start
 

@@ -5,7 +5,7 @@
 
 
 #Variables
-LANGUAGE=en #Not very useful but kept for compatibility reasons
+
 echo '========================================'
 echo 'Welcome in Nuxeo demo snapshot creator!'
 echo 'The script requires to get a script from Nuxeo Servers, so you should be connected to the web'
@@ -54,7 +54,7 @@ cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/scripts || exit 1
 echo "Getting reset scripts from Github"
 
 wget "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/99-initScriptVariables.sh" --no-check-certificate || exit 1
-wget -O 000-resetLocal.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocalEn.sh" --no-check-certificate || exit 1
+wget -O 000-resetLocal.sh "https://raw.github.com/nuxeo/presales-vmdemo/master/DemoUpdateScripts/000-resetLocal.sh" --no-check-certificate || exit 1
 
 chmod +x ./* || exit 1
 
@@ -71,8 +71,6 @@ fi
 
 mkdir ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_DATAS}
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_DATAS}
-mkdir ${LANGUAGE}
-cd ${LANGUAGE}
 
 DB_NAME=`grep "^nuxeo.db.name=" $NUXEO_CONF | cut -d= -f2`
 DB_PORT=`grep "^nuxeo.db.port=" $NUXEO_CONF | cut -d= -f2`
