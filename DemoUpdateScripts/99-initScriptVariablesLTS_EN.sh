@@ -26,7 +26,7 @@ export NUXEO_DEMO_PACKAGES=${NUXEO_DEMO_PACKAGES:-packages}
 #default packages to remove separated by spaces, ex :nuxeo-cmf nuxeo-social-collaboration
 export NUXEO_DEFAULT_PACKAGE_TO_REMOVE=${NUXEO_DEFAULT_PACKAGE_TO_REMOVE:- nuxeo-cmf}
 
-export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/releases/nuxeo-5.6/}
+export NUXEO_DISTRIB_DOWNLOAD_LINK=${NUXEO_DISTRIB_DOWNLOAD_LINK:-http://community.nuxeo.com/static/releases/nuxeo-5.8/}
 
 
 
