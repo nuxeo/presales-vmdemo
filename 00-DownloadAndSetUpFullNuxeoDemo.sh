@@ -8,27 +8,34 @@ NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-$PWD}
 
 
 echo "Please choose the number of the demo dataset you want to deploy (you can have several datasets side-by-side, if you choose a demo that you already have, it will first remove it)"
-select choice in "LTS_EN" "LTS_FR" "Fast_track_EN" "DAM_EN"; do
+select choice in "LTS_EN" "LTS_FR" "Fast_track_EN" "DAM_EN" "Case_Management_EN" ; do
     	case $choice in
         	LTS_EN )	NUXEO_DEMO_DIR=nuxeo_LTS_en_demo
-						initScript=99-initScriptVariablesLTS_EN.sh
-			break;;
+				initScript=99-initScriptVariablesLTS_EN.sh
+				break;;
+
         	LTS_FR )	NUXEO_DEMO_DIR=nuxeo_LTS_fr_demo
-						initScript=99-initScriptVariablesLTS_FR.sh
-			break;;
-			Fast_track_EN )	NUXEO_DEMO_DIR=nuxeo_FT_en_demo
-						initScript=99-initScriptVariablesFT.sh
-			break;;
-			DAM_EN )	NUXEO_DEMO_DIR=nuxeo_DAM_en_demo
-						initScript=99-initScriptVariablesDAM.sh
-			break;;
+				initScript=99-initScriptVariablesLTS_FR.sh
+				break;;
+
+		Fast_track_EN )	NUXEO_DEMO_DIR=nuxeo_FT_en_demo
+				initScript=99-initScriptVariablesFT.sh
+				break;;
+
+		DAM_EN )	NUXEO_DEMO_DIR=nuxeo_DAM_en_demo
+				initScript=99-initScriptVariablesDAM.sh
+				break;;
+
+		Case_Management_EN )	NUXEO_DEMO_DIR=nuxeo_CM_en_demo
+					initScript=99-initScriptVariablesCM.sh
+					break;;
     	esac
 done
 
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}
 then
-	echo "The folder to store the demo materials does not seems to exit. Please edit the file to point to an existing folder."
+	echo "The folder to store the demo materials does not seem to exist. Please edit the file to point to an existing folder."
 	exit 1
 fi
 
@@ -89,7 +96,7 @@ sed -i -e s@'export NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-/etc/nuxeo}'@
 echo "Fetching demo data from Nuxeo Servers"
 ./01-updateFullDemoFromFromWeb.sh || exit 1
 wait
-echo "Resetting the server with the demo data. The server will stop if you close the window after (juste restart the server in that case)"
+echo "Resetting the server with the demo data. The server will stop if you close the window after (just restart the server in that case)"
 ./000-resetLocal.sh
 
 

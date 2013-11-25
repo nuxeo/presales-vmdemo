@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script gets demo templates from Nuxeo server and extract them so they can by use by nuxeo.conf.
+# This script gets demo templates from Nuxeo server and extracts them so they can be used by nuxeo.conf.
 
 if test ! ${VARIABLES_INITIALIZED}
 then

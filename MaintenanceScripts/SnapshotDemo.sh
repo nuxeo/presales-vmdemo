@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# This script file intends at creating a snapshot of a Nuxeo demo server. While other demo data sets are designed to be as flexible as possible to add or remove package, change server version, this snapshot will copy the server and the data as there are. To update a snpashot demo created with this script, you should reset your demo, update it and recreate a new snapshot.
+# This script file intends at creating a snapshot of a Nuxeo demo server. While other demo data sets are designed to be as flexible as possible to add or remove package, change server version, this snapshot will copy the server and the data as there are. To update a snapshot demo created with this script, you should reset your demo, update it and recreate a new snapshot.
 
 
 
 #Variables
 
 echo '========================================'
-echo 'Welcome in Nuxeo demo snapshot creator!'
-echo 'The script requires to get a script from Nuxeo Servers, so you should be connected to the web'
-echo 'If you have never reset your demo, preliminary manuel steps should be done on the database, take a look at https://github.com/nuxeo/presales-vmdemo for more informations'
-read -p 'Please enter a name for your demo snapshot (a folder will be created with that name).' NUXEO_DEMO_DIR
+echo 'Welcome to Nuxeo demo snapshot creator!'
+echo 'The script needs to get a script from Nuxeo Servers, so you should be connected to the web'
+echo 'If you have never reset your demo, preliminary manual steps should be done on the database, take a look at https://github.com/nuxeo/presales-vmdemo for more information'
+read -p 'Please enter a name for your demo snapshot (a folder will be created with that name): ' NUXEO_DEMO_DIR
 
 #The Folder where to put the demo folder (by default the folder where the script is run)
 NUXEO_DEMO_PARENT_DIR=${NUXEO_DEMO_PARENT_DIR:-$PWD}
@@ -20,13 +20,13 @@ NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_snapshot_demo}
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}
 then
-	echo "The folder to store the demo materials does not seems to exit. Please edit the file to point to an existing folder."
+	echo "The folder to store the demo materials does not seems to exist. Please edit the file to point to an existing folder."
 	exit 1
 fi
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}
 then 
-	echo "No previous snapshot with the same name: "
+	echo "No previous snapshot with the name: "
 	echo ${NUXEO_DEMO_DIR}
 	echo "Trying to create it"
 else
@@ -43,7 +43,7 @@ else
 	rm -r ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}
 fi
 
-echo 'Creating snpahsot dir'
+echo 'Creating snapshot dir'
 mkdir ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR} || exit 1
 
 echo 'Creating script dir to store reset script'

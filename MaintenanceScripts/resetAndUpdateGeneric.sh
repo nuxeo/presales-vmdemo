@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script file intends at updating the data of the demo and then reset it. The demo path should be updated automatically when the demo is created.
+# This script file will update the data of the demo and then reset it. The demo path should be updated automatically when the demo is created.
 
 cd /etc/nuxeo_snapshot_demo/scripts
 ./01-updateFullDemoFromFromWeb.sh
