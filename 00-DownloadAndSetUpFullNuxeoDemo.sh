@@ -27,7 +27,7 @@ select choice in "LTS_EN" "LTS_FR" "Fast_track_EN" "DAM_EN" "Case_Management_EN"
 				break;;
 
 		Case_Management_EN )	NUXEO_DEMO_DIR=nuxeo_CM_en_demo
-					initScript=99-initScriptVariablesCM.sh
+					initScript=99-initScriptVariablesCM_EN.sh
 					break;;
     	esac
 done
