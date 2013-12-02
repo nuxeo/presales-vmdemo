@@ -9,6 +9,10 @@ fi
 
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR} || exit 1
 
+
+# check if templates file exists on demo site server
+wget -S --spider  "${NUXEO_DEMO_SITE}${NUXEO_DEMO_TEMPLATES}.tar.gz"|| exit 1 
+
 wget -N "${NUXEO_DEMO_SITE}${NUXEO_DEMO_TEMPLATES}.tar.gz"|| exit 1
 
 if test -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_TEMPLATES}
@@ -21,4 +25,6 @@ echo "Extracting templates"
 tar xzf ${NUXEO_DEMO_TEMPLATES}.tar.gz || exit 1
 wait
 echo "Templates extracted"
+
+
 
