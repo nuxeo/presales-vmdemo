@@ -6,11 +6,11 @@
 
 
 echo '========================================'
-echo 'Welcome to Nuxeo demo dataset helper!'
+echo 'Welcome in Nuxeo demo dataset helper!'
 echo 'The script requires to get a script from Nuxeo Servers, so you should be connected to the web'
-echo 'If you have never reset your demo, preliminary manual steps should be done on the database, take a look at https://github.com/nuxeo/presales-vmdemo for more information'
+echo 'If you have never reset your demo, preliminary manuel steps should be done on the database, take a look at https://github.com/nuxeo/presales-vmdemo for more informations'
 
-read -p 'Please enter a name for your demo snapshot (a folder will be created with that name): ' NUXEO_DEMO_DIR
+read -p 'Please enter a name for your demo snapshot (a folder will be created with that name).' NUXEO_DEMO_DIR
 #The name of the demo folder (will be created if does not exist)
 NUXEO_DEMO_DIR=${NUXEO_DEMO_DIR:-nuxeo_demo_dataset}
 
@@ -25,13 +25,13 @@ echo "Getting necessary scripts from Github"
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}
 then
-	echo "The folder to store the demo materials does not seems to exist. Please edit the file to point to an existing folder."
+	echo "The folder to store the demo materials does not seems to exit. Please edit the file to point to an existing folder."
 	exit 1
 fi
 
 if test ! -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}
 then 
-	echo "No previous dataset with the name: "
+	echo "No previous dataset with the same name: "
 	echo ${NUXEO_DEMO_DIR}
 	echo "Trying to create it"
 else
@@ -94,6 +94,14 @@ mkdir binaries
 cd binaries
 cp -R ${DATA_DIR}/binaries/* ./ || exit 1
 
+if test -d ${DATA_DIR}/elasticsearch/
+then
+	cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/${NUXEO_DEMO_DATAS}
+	mkdir elasticsearch
+	cd elasticsearch
+	cp -R ${DATA_DIR}/elasticsearch/* ./ || exit 1
+fi
+
 cd ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR} || exit 1
 echo 'Zipping the data'
 echo ${NUXEO_DEMO_PARENT_DIR}'/'${NUXEO_DEMO_DIR}'/'${NUXEO_DEMO_DATAS}
@@ -111,7 +119,7 @@ select yn in "Yes" "No"; do
     	esac
 done
 
-read -p 'Please give the full path of the templates (something looking like: /etc/nuxeo/myTemplates): ' ORIGINAL_TEMPLATES
+read -p 'Please give the full path of the templates (something looking like: /etc/nuxeo/myTemplates).' ORIGINAL_TEMPLATES
 echo ${ORIGINAL_TEMPLATES}
 
 mkdir ${NUXEO_DEMO_TEMPLATES}

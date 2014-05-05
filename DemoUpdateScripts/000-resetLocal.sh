@@ -43,6 +43,12 @@ cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/data/* ${DATA_DIR}
 wait
 echo 'Server recreated, copying demo data' 
 cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/binaries ${DATA_DIR} || exit 1
+
+if test -d ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/elasticsearch/
+then
+	cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/elasticsearch ${DATA_DIR} || exit 1
+fi
+
 wait
 echo 'Data reset' 
 
