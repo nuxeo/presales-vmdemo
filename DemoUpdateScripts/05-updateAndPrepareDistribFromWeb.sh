@@ -109,7 +109,7 @@ mkdir distribution/server || exit 1
 mkdir distribution/data || exit 1
 
 cp -r $NUXEO_SERVER_DIR/* distribution/server/ || exit 1
-cp -r ${NUXEO_DATA_DIR}/* distribution/data/ || exit 1
+cp -r ${NUXEO_DATA_DIR}/* distribution/data/
 cp ${NUXEO_CONF} nuxeo.conf.backup || exit 1
 
 echo "A fresh updated server is now available in demo data. A proper reset should be done now to reset the server"
