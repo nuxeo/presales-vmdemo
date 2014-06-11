@@ -39,7 +39,7 @@ wait
 echo 'Server and Data deleted'
 echo 'Server Creation'
 cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/server/* ${NUXEO_SERVER_DIR}/ || exit 1
-cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/data/* ${DATA_DIR}/ || exit 1
+cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/distribution/data/* ${DATA_DIR}/ 
 wait
 echo 'Server recreated, copying demo data' 
 cp -R ${NUXEO_DEMO_PARENT_DIR}/${NUXEO_DEMO_DIR}/datas/binaries ${DATA_DIR} || exit 1
