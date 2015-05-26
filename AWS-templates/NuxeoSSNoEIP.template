@@ -1,0 +1,82 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "Nuxeo installation.",
+
+  "Parameters": {
+    "InstanceType": {
+      "Description": "Type of EC2 instance to launch",
+      "Type": "String",
+      "Default": "c3.large"
+    },
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type": "String"
+    }
+  },
+
+  "Mappings": {
+    "AWSInstanceType2Arch": {
+      "t1.micro"    : { "Arch": "64" },
+      "m1.small"    : { "Arch" : "64" },
+      "m1.large"    : { "Arch" : "64" },
+      "m1.xlarge"   : { "Arch" : "64" },
+      "m2.xlarge"   : { "Arch" : "64" },
+      "m2.2xlarge"  : { "Arch" : "64" },
+      "m2.4xlarge"  : { "Arch" : "64" },
+      "c1.medium"   : { "Arch" : "64" },
+      "c1.xlarge"   : { "Arch" : "64" },
+      "cc1.4xlarge" : { "Arch" : "64" },
+      "c3.large"    : { "Arch" : "64" }
+    }, 
+	"AWSRegionArch2AMI": {
+      "us-west-1": { "64": "ami-56120b13" },
+      "us-west-2": { "64": "ami-23ebb513" },
+      "us-east-1": { "64": "ami-84562dec" },
+      "eu-west-1": { "64": "ami-394ecc4e" },
+      "eu-central-1": { "64": "ami-9c380b81" },
+      "ap-northeast-1": { "64": "ami-18b6aa19" },
+      "ap-southeast-1": { "64": "ami-c2381390" },
+      "ap-southeast-2": { "64": "ami-b1eb9e8b" },
+      "sa-east-1": { "64": "ami-73f5496e" }
+    }
+  },
+
+  "Resources": {
+
+    "nuxeoinstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": { "Ref": "InstanceType" },
+        "SecurityGroups": [ { "Ref": "nuxeo" }, "default"  ],
+        "KeyName": { "Ref": "KeyName" },
+        "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
+                            { "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ] },
+        "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_SS_presales\n\n" }
+    }
+    },
+
+
+    "nuxeo": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Allow ports 22 (SSH) and 80 (HTTP)",
+        "SecurityGroupIngress": [ {
+          "IpProtocol": "tcp",
+          "FromPort": "22",
+          "ToPort": "22",
+          "CidrIp": "0.0.0.0/0"
+        },
+        {
+          "IpProtocol": "tcp",
+          "FromPort": "80",
+          "ToPort": "80",
+          "CidrIp": "0.0.0.0/0"
+        } ]
+      }
+    }
+
+  }
+
+}
+
