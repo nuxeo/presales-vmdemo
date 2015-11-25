@@ -72,7 +72,7 @@
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                            	{ "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ]
                    },
-        "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://nuxeo.s3.amazonaws.com/scripts/Nuxeo_single-20140804-120323\n\n" } 
+        "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n" } 
       }
     },
 
