@@ -72,6 +72,10 @@
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                            	{ "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ]
                    },
+        "Tags": [
+            { "Key": "billing-category", "Value": "presales" },
+            { "Key": "billing-subcategory", "Value": {"Ref": "AWS::StackName"} }
+        ],
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n" } 
       }
     },
@@ -85,6 +89,10 @@
         "KeyName": { "Ref": "KeyName" },
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                             { "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ] },
+        "Tags": [
+            { "Key": "billing-category", "Value": "presales" },
+            { "Key": "billing-subcategory", "Value": {"Ref": "AWS::StackName"} }
+        ],
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_FT_presales\n\n" }
       }
     },
@@ -98,6 +106,10 @@
         "KeyName": { "Ref": "KeyName" },
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                             { "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ] },
+        "Tags": [
+            { "Key": "billing-category", "Value": "presales" },
+            { "Key": "billing-subcategory", "Value": {"Ref": "AWS::StackName"} }
+        ],
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_SS_presales\n\n" }
       }
     },
