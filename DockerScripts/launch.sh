@@ -29,8 +29,8 @@ mail.transport.host=smtp.gmail.com \n \
 mail.transport.port=587 \n \
 mail.transport.auth=true \n \
 mail.transport.usetls=true \n \
-mail.transport.username=ecm.study@gmail.com \n \
-mail.transport.password=Nuxeo2009 \n \
-mail.transport.user=ecm.study@gmail.com \n \
-mail.from=ecm.study@gmail.com" \
+mail.transport.username=YOUREMAIL@gmail.com \n \
+mail.transport.password=PASSWORD \n \
+mail.transport.userYOUREMAIL@gmail.com \n \
+mail.from=YOUREMAIL@gmail.com" \
 nuxeo:latest
