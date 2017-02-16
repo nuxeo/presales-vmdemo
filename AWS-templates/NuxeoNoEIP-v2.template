@@ -7,7 +7,8 @@
     "InstanceType": {
       "Description": "Type of EC2 instance to launch",
       "Type": "String",
-      "Default": "c3.large"
+      "Default": "c3.large",
+      "AllowedValues": ["c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge"],
     },
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access",
@@ -40,7 +41,7 @@
       "c3.2xlarge"  : { "Arch" : "64" },
       "c3.4xlarge"  : { "Arch" : "64" },
       "c3.8xlarge"  : { "Arch" : "64" }
-    }, 
+    },
     "AWSRegionArch2AMI": {
       "us-west-1": { "64": "ami-56120b13" },
       "us-west-2": { "64": "ami-23ebb513" },
@@ -76,7 +77,7 @@
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value": {"Ref": "AWS::StackName"} }
         ],
-        "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n" } 
+        "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n" }
       }
     },
 
@@ -136,4 +137,3 @@
   }
 
 }
-
