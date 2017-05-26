@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -x
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
