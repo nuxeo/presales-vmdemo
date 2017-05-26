@@ -24,11 +24,9 @@ echo "Please wait a few minutes for you instance installation to complete" > /va
 aptitude -q -y install openssh-server openssh-client vim
 
 # Install Java 8
-aptitude -q -y install openjdk-7-jdk
-wget -q -O/tmp/jdk-8-linux-x64.tgz --no-check-certificate --header 'Cookie: oraclelicense=accept-securebackup-cookie' 'http://download.oracle.com/otn-pub/java/jdk/8u40-b26/jdk-8u40-linux-x64.tar.gz'
-tar xzf /tmp/jdk-8-linux-x64.tgz -C /usr/lib/jvm
-rm /tmp/jdk-8-linux-x64.tgz
-ln -s /usr/lib/jvm/jdk1.8.0_40 /usr/lib/jvm/java-8
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
 
 update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-8/jre/bin/java 1081
 update-alternatives --install /usr/bin/javaws javaws /usr/lib/jvm/java-8/jre/bin/javaws 1081
@@ -38,7 +36,7 @@ update-alternatives --set java /usr/lib/jvm/java-8/jre/bin/java
 update-alternatives --set javaws /usr/lib/jvm/java-8/jre/bin/java
 update-alternatives --set jexec /usr/lib/jvm/java-8/lib/jexec
 
-# Install nuxeo 
+# Install nuxeo
 aptitude -q -y install nuxeo
 
 # Update some defaults
