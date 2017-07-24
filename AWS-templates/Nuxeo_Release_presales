@@ -5,11 +5,13 @@ echo '*       soft    nofile      4096' >> /etc/security/limits.conf
 echo '*       hard    nofile      8192' >> /etc/security/limits.conf
 
 # Add the nuxeo repository to the repository list
-echo "deb http://apt.nuxeo.org/ trusty releases" > /etc/apt/sources.list.d/nuxeo.list
+code=$(lsb_release -cs)
+echo "deb http://apt.nuxeo.org/ $code releases" > /etc/apt/sources.list.d/nuxeo.list
+
 # Register the nuxeo key
 wget -q -O- http://apt.nuxeo.org/nuxeo.key | apt-key add -
 
-# Pre-accept Sun Java license & set Nuxeo options
+# Pre-accept Nuxeo options
 echo nuxeo nuxeo/bind-address select 127.0.0.1 | debconf-set-selections
 echo nuxeo nuxeo/http-port select 8080 | debconf-set-selections
 echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selections
@@ -30,14 +32,6 @@ sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get -y update
 sudo apt-get -y install oracle-java8-installer
 sudo apt-get -y install oracle-java8-set-default
-
-#update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-8/jre/bin/java 1081
-#update-alternatives --install /usr/bin/javaws javaws /usr/lib/jvm/java-8/jre/bin/javaws 1081
-#update-alternatives --install /usr/bin/jexec jexec /usr/lib/jvm/java-8/lib/jexec 1081
-
-#update-alternatives --set java /usr/lib/jvm/java-8/jre/bin/java
-#update-alternatives --set javaws /usr/lib/jvm/java-8/jre/bin/java
-#update-alternatives --set jexec /usr/lib/jvm/java-8/lib/jexec
 
 # Install nuxeo
 aptitude -q -y install nuxeo
