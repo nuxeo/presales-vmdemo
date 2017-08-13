@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
@@ -8,11 +8,10 @@ echo '*       hard    nofile      8192' >> /etc/security/limits.conf
 code=$(lsb_release -cs)
 echo "deb http://apt.nuxeo.org/ $code releases" > /etc/apt/sources.list.d/nuxeo.list
 echo "deb http://apt.nuxeo.org/ $code fasttracks" >> /etc/apt/sources.list.d/nuxeo.list
-
 # Register the nuxeo key
 wget -q -O- http://apt.nuxeo.org/nuxeo.key | apt-key add -
 
-# Pre-accept Nuxeo options
+# Pre-accept Sun Java license & set Nuxeo options
 echo nuxeo nuxeo/bind-address select 127.0.0.1 | debconf-set-selections
 echo nuxeo nuxeo/http-port select 8080 | debconf-set-selections
 echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selections
@@ -20,22 +19,18 @@ echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selectio
 # Upgrade packages and install ssh, vim
 export DEBIAN_FRONTEND=noninteractive
 locale-gen en_US.UTF-8
-aptitude update
-aptitude -q -y safe-upgrade
-aptitude -q -y install apache2
-echo "Please wait a few minutes for you instance installation to complete" > /var/www/index.html
-aptitude -q -y install openssh-server openssh-client vim
+update-locale LANG=en_US.UTF-8
+apt-get update
+apt-get -q -y upgrade
+apt-get -q -y install apache2
+echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
+apt-get -q -y install openssh-server openssh-client vim
 
 # Install Java 8
-echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
-echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
-sudo add-apt-repository -y ppa:webupd8team/java
-sudo apt-get -y update
-sudo apt-get -y install oracle-java8-installer
-sudo apt-get -y install oracle-java8-set-default
+apt-get -q -y install openjdk-8-jdk
 
-# Install nuxeo
-aptitude -q -y install nuxeo
+# Install Nuxeo
+apt-get -q -y install nuxeo
 
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
@@ -62,12 +57,6 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     ProxyPass        /nuxeo/ http://localhost:8080/nuxeo/
     ProxyPassReverse /nuxeo/ http://localhost:8080/nuxeo/
     ProxyPreserveHost On
-
-    # WSS
-    ProxyPass        /_vti_bin/     http://localhost:8080/_vti_bin/
-    ProxyPass        /_vti_inf.html http://localhost:8080/_vti_inf.html
-    ProxyPassReverse /_vti_bin/     http://localhost:8080/_vti_bin/
-    ProxyPassReverse /_vti_inf.html http://localhost:8080/_vti_inf.html
 
 </VirtualHost>
 EOF
