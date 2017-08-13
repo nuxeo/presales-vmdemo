@@ -16,7 +16,7 @@ echo nuxeo nuxeo/bind-address select 127.0.0.1 | debconf-set-selections
 echo nuxeo nuxeo/http-port select 8080 | debconf-set-selections
 echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selections
 
-# Upgrade packages and install ssh, vim
+# Upgrade packages and install apache, ssh, ...
 export DEBIAN_FRONTEND=noninteractive
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
