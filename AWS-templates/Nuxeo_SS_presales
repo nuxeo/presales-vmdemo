@@ -83,3 +83,6 @@ a2enmod proxy proxy_http rewrite
 a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
+
+sudo apt-get install ffmpeg
+sudo apt-get install x264 x265
