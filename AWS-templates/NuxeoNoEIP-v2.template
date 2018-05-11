@@ -23,6 +23,11 @@
     "Customer":{
       "Type": "String",
       "Description": "Prospect name, or 'generic' if this is a generic demo"
+    },
+    "Contact":{
+      "Type": "String",
+      "Default": "presales@nuxeo.com",
+      "Description": "Contact email address"
     }
   },
 
@@ -78,6 +83,7 @@
                            	{ "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ]
                    },
         "Tags": [
+            { "Key": "contact", "Value":  { "Ref": "Contact" } },
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
