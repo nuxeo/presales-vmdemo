@@ -101,6 +101,7 @@
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                             { "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ] },
         "Tags": [
+            { "Key": "contact", "Value":  { "Ref": "Contact" } },
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
@@ -118,6 +119,7 @@
         "ImageId": { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref": "AWS::Region" },
                             { "Fn::FindInMap": [ "AWSInstanceType2Arch", { "Ref": "InstanceType" }, "Arch" ] } ] },
         "Tags": [
+            { "Key": "contact", "Value":  { "Ref": "Contact" } },
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
