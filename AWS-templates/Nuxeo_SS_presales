@@ -86,3 +86,4 @@ apache2ctl -k graceful
 
 sudo apt-get install ffmpeg
 sudo apt-get install x264 x265
+sudo apt-get install figlet
