@@ -36,6 +36,7 @@ echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee 
 apt-get update && apt-get -q -y install elasticsearch
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
+service elasticsearch start
 
 #install docker
 apt-get -q -y remove docker docker-engine docker.io
@@ -47,6 +48,19 @@ apt-get -q -y install docker-ce
 
 # Install Nuxeo
 apt-get -q -y install nuxeo
+service nuxeo stop
+
+#add nuxeo user to docker group
+sudo usermod -aG docker nuxeo
+
+#skip wizard
+sed -i 'nuxeo.wizard.done=true' /etc/nuxeo/nuxeo.conf
+#enable dev mode
+sed -i 'org.nuxeo.dev=true' /etc/nuxeo/nuxeo.conf
+#use standalone elasticsearch
+sed -i 'elasticsearch.addressList=http://localhost:9200' /etc/nuxeo/nuxeo.conf
+#enable remote debugging
+sed -i 'JAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
