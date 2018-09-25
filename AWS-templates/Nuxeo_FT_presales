@@ -37,6 +37,14 @@ apt-get update && apt-get -q -y install elasticsearch
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
 
+#install docker
+apt-get -q -y remove docker docker-engine docker.io
+apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+apt-get -q -y install docker-ce
+
 # Install Nuxeo
 apt-get -q -y install nuxeo
 
@@ -91,4 +99,4 @@ a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
 
-sudo apt-get install -y ffmpeg x264 x265 figlet 
+sudo apt-get install -y ffmpeg x264 x265 figlet
