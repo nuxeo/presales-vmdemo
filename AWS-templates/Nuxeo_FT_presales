@@ -54,13 +54,13 @@ service nuxeo stop
 sudo usermod -aG docker nuxeo
 
 #skip wizard
-sed -i 'nuxeo.wizard.done=true' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.wizard.done=true' /etc/nuxeo/nuxeo.conf
 #enable dev mode
-sed -i 'org.nuxeo.dev=true' /etc/nuxeo/nuxeo.conf
+sed -i '1iorg.nuxeo.dev=true' /etc/nuxeo/nuxeo.conf
 #use standalone elasticsearch
-sed -i 'elasticsearch.addressList=http://localhost:9200' /etc/nuxeo/nuxeo.conf
+sed -i '1ielasticsearch.addressList=http://localhost:9200' /etc/nuxeo/nuxeo.conf
 #enable remote debugging
-sed -i 'JAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
+sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
