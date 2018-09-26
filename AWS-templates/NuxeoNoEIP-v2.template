@@ -389,6 +389,39 @@
           }
         ]
       }
+    },
+    "ReleaseHostRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Condition": "CreateNuxeoRelease",
+      "Properties" : {
+        "HostedZoneId" : "/hostedzone/Z1Z5JJ6G4B6J7L",
+        "Name" : { "Fn::Join" : [ "", [{"Ref" : "AWS::StackName"}, ".", "cloud.nuxeo.com."]]},
+        "Type" : "CNAME",
+        "TTL" : "900",
+        "ResourceRecords" : [ { "Fn::GetAtt" : [ "NuxeoInstanceRelease", "PublicDnsName" ] } ]
+      }
+    },
+    "FastTrackHostRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Condition": "CreateNuxeoFastTrack",
+      "Properties" : {
+        "HostedZoneId" : "/hostedzone/Z1Z5JJ6G4B6J7L",
+        "Name" : { "Fn::Join" : [ "", [{"Ref" : "AWS::StackName"}, ".", "cloud.nuxeo.com."]]},
+        "Type" : "CNAME",
+        "TTL" : "900",
+        "ResourceRecords" : [ { "Fn::GetAtt" : [ "NuxeoInstanceFastTrack", "PublicDnsName" ] } ]
+      }
+    },
+    "SnapshotHostRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Condition": "CreateNuxeoSnapshot",
+      "Properties" : {
+        "HostedZoneId" : "/hostedzone/Z1Z5JJ6G4B6J7L",
+        "Name" : { "Fn::Join" : [ "", [{"Ref" : "AWS::StackName"}, ".", "cloud.nuxeo.com."]]},
+        "Type" : "CNAME",
+        "TTL" : "900",
+        "ResourceRecords" : [ { "Fn::GetAtt" : [ "NuxeoInstanceSnapShot", "PublicDnsName" ] } ]
+      }
     }
   }
 }
