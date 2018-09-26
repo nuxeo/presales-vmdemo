@@ -130,7 +130,7 @@
     "NuxeoSecurity": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "GroupDescription": "Allow ports 22 (SSH) and 80 (HTTP)",
+        "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
         "SecurityGroupIngress": [ {
           "IpProtocol": "tcp",
           "FromPort": "22",
@@ -142,7 +142,14 @@
           "FromPort": "80",
           "ToPort": "80",
           "CidrIp": "0.0.0.0/0"
-        } ]
+        },
+        {
+          "IpProtocol": "tcp",
+          "FromPort": "443",
+          "ToPort": "443",
+          "CidrIp": "0.0.0.0/0"
+        } 
+       ]
       }
     }
 
