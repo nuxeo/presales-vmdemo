@@ -64,6 +64,9 @@ sed -i '1ielasticsearch.addressList=http://localhost:9200' /etc/nuxeo/nuxeo.conf
 sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 #set nuxeo application public dns
 sed -i '1inuxeo.url='$STACK_ID'.cloud.nuxeo.com' /etc/nuxeo/nuxeo.conf
+#add s3 bucket property
+sed -i '1inuxeo.s3storage.bucket='$STACK_ID /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
 
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
