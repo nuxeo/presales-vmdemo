@@ -115,3 +115,20 @@ apache2ctl -k graceful
 
 sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli
 apt-get -y clean
+
+#set up nuxeo user
+cat << EOF > /var/lib/nuxeo/server/.profile
+export NUXEO_CONF=/etc/nuxeo/nuxeo.conf
+cd /var/lib/nuxeo/server/bin
+echo  "Hi, nuxeo user. NUXEO_CONF is defined, and you are in /bin, ready to ./nuxeoctl"
+alias ll='ls -al'
+alias la='ls -a'
+alias ..='cd ..'
+# Added by Josh
+export TERM="xterm-color"
+export PS1='\[\e[0;33m\]\u\[\e[0m\]@\[\e[0;32m\]\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0m\]\$ '
+alias dir='ls -alFGh'
+alias hs='history'
+alias mytail='tail -f /var/log/nuxeo/server.log'
+EOF
+chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
