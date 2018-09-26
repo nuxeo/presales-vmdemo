@@ -54,6 +54,7 @@ service nuxeo stop
 sudo usermod -aG docker nuxeo
 
 #skip wizard
+sed -i '/nuxeo.wizard.done=false/d' /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.wizard.done=true' /etc/nuxeo/nuxeo.conf
 #enable dev mode
 sed -i '1iorg.nuxeo.dev=true' /etc/nuxeo/nuxeo.conf
