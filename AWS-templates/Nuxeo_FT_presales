@@ -131,3 +131,14 @@ alias hs='history'
 alias mytail='tail -f /var/log/nuxeo/server.log'
 EOF
 chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
+
+#set up ubuntu user
+cat << EOF >> /ubuntu/home/.profile
+export TERM="xterm-color"
+export PS1='\[\e[0;33m\]\u\[\e[0m\]@\[\e[0;32m\]\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0m\]\$ '
+alias dir='ls -alFGh'
+alias hs='history'
+alias mytail='tail -F /var/log/nuxeo/server.log'
+alias vilog='vi /var/log/nuxeo/server.log'
+alias mydu='du -sh */'
+EOF
