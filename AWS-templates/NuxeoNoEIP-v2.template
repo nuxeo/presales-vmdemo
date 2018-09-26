@@ -339,6 +339,31 @@
           }
         ]
       }
+    },
+    "S3Bucket" : {
+      "Type" : "AWS::S3::Bucket",
+      "Properties" : {
+        "BucketName" : {
+          "Fn::Sub": ["${name}-bucket", { "name": {"Ref" : "AWS::StackName" }}]
+        },
+        "Tags": [{
+            "Key": "contact",
+            "Value": {
+              "Ref": "Contact"
+            }
+          },
+          {
+            "Key": "billing-category",
+            "Value": "presales"
+          },
+          {
+            "Key": "billing-subcategory",
+            "Value": {
+              "Ref": "Customer"
+            }
+          }
+        ]
+      }
     }
   }
 }
