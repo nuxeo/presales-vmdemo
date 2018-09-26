@@ -233,7 +233,7 @@
           "Ref": "InstanceProfile"
         },
         "UserData": {
-          "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_FT_presales\n\n"
+          "Fn::Base64": "#!/bin/bash\n\nexport STACK_ID=${AWS::StackId}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_FT_presales\n\n"
         }
       }
     },
