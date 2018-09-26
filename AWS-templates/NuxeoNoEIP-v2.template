@@ -87,6 +87,9 @@
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
+        "IamInstanceProfile" : {
+          "Ref" : "InstanceProfile"
+        },
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n" }
       }
     },
@@ -105,6 +108,9 @@
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
+        "IamInstanceProfile" : {
+          "Ref" : "InstanceProfile"
+        },
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_FT_presales\n\n" }
       }
     },
@@ -123,7 +129,43 @@
             { "Key": "billing-category", "Value": "presales" },
             { "Key": "billing-subcategory", "Value":  { "Ref": "Customer" } }
         ],
+        "IamInstanceProfile" : {
+          "Ref" : "InstanceProfile"
+        },
         "UserData": { "Fn::Base64": "#!/bin/bash\n\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_SS_presales\n\n" }
+      }
+    },
+
+    "InstanceProfile" : {
+      "Type" : "AWS::IAM::InstanceProfile",
+      "Properties" : {
+        "Path" : "/",
+        "Roles" : [
+          {
+            "Ref" : "InstanceRole"
+          }
+        ]
+      }
+    },
+
+    "InstanceRole" : {
+      "Type" : "AWS::IAM::Role",
+      "Properties" : {
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Principal" : {
+                "Service" : ["ec2.amazonaws.com"]
+              },
+              "Action" : [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path" : "/"
       }
     },
 
@@ -148,7 +190,7 @@
           "FromPort": "443",
           "ToPort": "443",
           "CidrIp": "0.0.0.0/0"
-        } 
+        }
        ]
       }
     }
