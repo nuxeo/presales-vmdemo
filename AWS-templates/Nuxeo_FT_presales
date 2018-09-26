@@ -114,3 +114,4 @@ a2ensite nuxeo
 apache2ctl -k graceful
 
 sudo apt-get install -y ffmpeg x264 x265 figlet awscli
+apt-get -y clean
