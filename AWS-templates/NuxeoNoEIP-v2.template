@@ -175,7 +175,8 @@
             "Value": {
               "Ref": "Customer"
             }
-          }
+          },
+          {"Key" : "Name", "Value" : {"Ref" : "AWS::StackName" }}
         ],
         "IamInstanceProfile": {
           "Ref": "InstanceProfile"
@@ -225,7 +226,8 @@
             "Value": {
               "Ref": "Customer"
             }
-          }
+          },
+          {"Key" : "Name", "Value" : {"Ref" : "AWS::StackName" }}
         ],
         "IamInstanceProfile": {
           "Ref": "InstanceProfile"
@@ -275,7 +277,8 @@
             "Value": {
               "Ref": "Customer"
             }
-          }
+          },
+          {"Key" : "Name", "Value" : {"Ref" : "AWS::StackName" }}
         ],
         "IamInstanceProfile": {
           "Ref": "InstanceProfile"
