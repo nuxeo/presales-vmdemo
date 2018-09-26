@@ -315,6 +315,31 @@
       }
     },
 
+    "InstancePolicy" : {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : "S3BucketsPolicy",
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement" : [
+            {
+              "Effect": "Allow",
+              "Action": "s3:*",
+              "Resource": [
+                { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "S3Bucket" }]]},
+                { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "S3Bucket" } , "/*" ]]}
+              ]
+            }
+          ]
+        },
+        "Roles" : [
+          {
+            "Ref" : "InstanceRole"
+          }
+        ]
+      }
+    },
+
     "NuxeoSecurity": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
