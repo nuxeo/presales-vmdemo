@@ -7,8 +7,12 @@
     "InstanceType": {
       "Description": "Type of EC2 instance to launch",
       "Type": "String",
-      "Default": "c3.large",
-      "AllowedValues": ["c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge"]
+      "Default": "t3.medium",
+      "AllowedValues": [
+        "t3.micro","t3.small","t3.medium",
+        "m5.large","m5.xlarge","m5.2xlarge",
+        "c5.large", "c5.xlarge", "c5.2xlarge", "c5.4xlarge", "c5.8xlarge"
+      ]
     },
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access",
@@ -33,55 +37,37 @@
 
   "Mappings": {
     "AWSInstanceType2Arch": {
-      "t2.micro": {
+      "t3.micro": {
         "Arch": "64"
       },
-      "t2.small": {
+      "t3.small": {
         "Arch": "64"
       },
-      "t2.medium": {
+      "t3.medium": {
         "Arch": "64"
       },
-      "m3.medium": {
+      "m5.large": {
         "Arch": "64"
       },
-      "m3.large": {
+      "m5.xlarge": {
         "Arch": "64"
       },
-      "m3.xlarge": {
+      "m5.2xlarge": {
         "Arch": "64"
       },
-      "m3.2xlarge": {
+      "c5.large": {
         "Arch": "64"
       },
-      "c4.large": {
+      "c5.xlarge": {
         "Arch": "64"
       },
-      "c4.xlarge": {
+      "c5.2xlarge": {
         "Arch": "64"
       },
-      "c4.2xlarge": {
+      "c5.4xlarge": {
         "Arch": "64"
       },
-      "c4.4xlarge": {
-        "Arch": "64"
-      },
-      "c4.8xlarge": {
-        "Arch": "64"
-      },
-      "c3.large": {
-        "Arch": "64"
-      },
-      "c3.xlarge": {
-        "Arch": "64"
-      },
-      "c3.2xlarge": {
-        "Arch": "64"
-      },
-      "c3.4xlarge": {
-        "Arch": "64"
-      },
-      "c3.8xlarge": {
+      "c5.8xlarge": {
         "Arch": "64"
       }
     },
@@ -113,6 +99,24 @@
       "sa-east-1": {
         "64": "ami-34afc458"
       }
+    },
+    "AWSRegionSubnet": {
+      "ap-northeast-1": {
+        "vpc": "vpc-73016014",
+        "subnet": "vpc-73016014"
+      },
+      "eu-west-1": {
+        "vpc": "vpc-5420e830",
+        "subnet": "subnet-dbc879bf"
+      },
+      "us-east-1": {
+        "vpc": "vpc-4fbd6528",
+        "subnet": "subnet-dda7ea85"
+      },
+      "us-west-1": {
+        "vpc": "vpc-420fa925",
+        "subnet": "subnet-5d71ff06"
+      }
     }
   },
 
@@ -143,9 +147,9 @@
         "InstanceType": {
           "Ref": "InstanceType"
         },
-        "SecurityGroups": [{
+        "SecurityGroupIds": [{
           "Ref": "NuxeoSecurity"
-        }, "default"],
+        }],
         "KeyName": {
           "Ref": "KeyName"
         },
@@ -159,6 +163,9 @@
               }, "Arch"]
             }
           ]
+        },
+        "SubnetId": {
+          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
         },
         "Tags": [{
             "Key": "contact",
@@ -199,9 +206,9 @@
         "InstanceType": {
           "Ref": "InstanceType"
         },
-        "SecurityGroups": [{
-          "Ref": "NuxeoSecurity"
-        }, "default"],
+        "SecurityGroupIds": [{
+          "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
+        }],
         "KeyName": {
           "Ref": "KeyName"
         },
@@ -215,6 +222,9 @@
               }, "Arch"]
             }
           ]
+        },
+        "SubnetId": {
+          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
         },
         "Tags": [{
             "Key": "contact",
@@ -267,9 +277,9 @@
         "InstanceType": {
           "Ref": "InstanceType"
         },
-        "SecurityGroups": [{
+        "SecurityGroupIds": [{
           "Ref": "NuxeoSecurity"
-        }, "default"],
+        }],
         "KeyName": {
           "Ref": "KeyName"
         },
@@ -283,6 +293,9 @@
               }, "Arch"]
             }
           ]
+        },
+        "SubnetId": {
+          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
         },
         "Tags": [{
             "Key": "contact",
@@ -376,6 +389,9 @@
     "NuxeoSecurity": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
+        "VpcId": {
+          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"vpc"]
+        },
         "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
         "SecurityGroupIngress": [{
             "IpProtocol": "tcp",
