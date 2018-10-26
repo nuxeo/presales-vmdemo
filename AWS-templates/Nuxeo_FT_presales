@@ -114,7 +114,7 @@ cat > /etc/apache2/mods-available/deflate.conf <<EOF
 </IfModule>
 EOF
 
-a2enmod proxy proxy_http rewrite
+a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
