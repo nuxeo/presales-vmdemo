@@ -103,7 +103,7 @@
     "AWSRegionSubnet": {
       "ap-northeast-1": {
         "vpc": "vpc-73016014",
-        "subnet": "vpc-73016014"
+        "subnet": "subnet-f3daebba"
       },
       "eu-west-1": {
         "vpc": "vpc-5420e830",
