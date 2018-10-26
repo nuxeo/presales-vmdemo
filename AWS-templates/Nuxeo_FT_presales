@@ -122,6 +122,9 @@ apache2ctl -k graceful
 sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli
 apt-get -y clean
 
+#fix imagemagick Policy
+wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
+
 #set up nuxeo user
 cat << EOF > /var/lib/nuxeo/server/.profile
 export NUXEO_CONF=/etc/nuxeo/nuxeo.conf
