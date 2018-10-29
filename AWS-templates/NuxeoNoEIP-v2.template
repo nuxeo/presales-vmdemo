@@ -376,7 +376,9 @@
                 "Fn::Join": ["", ["arn:aws:s3:::", {
                   "Ref": "S3Bucket"
                 }, "/*"]]
-              }
+              },
+              "arn:aws:s3:::presales-instance-resources",
+              "arn:aws:s3:::presales-instance-resources/*"
             ]
           }]
         },
