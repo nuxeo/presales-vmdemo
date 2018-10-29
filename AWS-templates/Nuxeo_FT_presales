@@ -36,6 +36,8 @@ echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee 
 apt-get update && apt-get -q -y install elasticsearch
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
+/usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
+/usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu
 service elasticsearch start
 
 #install docker
