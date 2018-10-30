@@ -26,6 +26,9 @@ apt-get -q -y install apache2
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 apt-get -q -y install openssh-server openssh-client vim
 
+# Install JA fonts
+apt-get install fonts-takao
+
 # Install Java 8
 apt-get -q -y install openjdk-8-jdk
 
