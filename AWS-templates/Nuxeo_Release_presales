@@ -1,4 +1,5 @@
 #!/bin/bash
+ES_VERSION=5.x
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
@@ -26,38 +27,117 @@ apt-get -q -y install apache2
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 apt-get -q -y install openssh-server openssh-client vim
 
+# Install JA fonts
+apt-get install fonts-takao
+
 # Install Java 8
 apt-get -q -y install openjdk-8-jdk
 
+#install elasticsearch
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+apt-get -q -y install apt-transport-https
+echo "deb https://artifacts.elastic.co/packages/$ES_VERSION/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-$ES_VERSION.list
+apt-get update && apt-get -q -y install elasticsearch
+/bin/systemctl daemon-reload
+/bin/systemctl enable elasticsearch.service
+/usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
+/usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu
+service elasticsearch start
+
+#install docker
+apt-get -q -y remove docker docker-engine docker.io
+apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+apt-get -q -y install docker-ce
+
 # Install Nuxeo
 apt-get -q -y install nuxeo
+service nuxeo stop
+
+#add nuxeo user to docker group
+sudo usermod -aG docker nuxeo
+
+#skip wizard
+sed -i '/nuxeo.wizard.done=false/d' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.wizard.done=true' /etc/nuxeo/nuxeo.conf
+#enable dev mode
+sed -i '1iorg.nuxeo.dev=true' /etc/nuxeo/nuxeo.conf
+#use standalone elasticsearch
+sed -i '1ielasticsearch.addressList=http://localhost:9200' /etc/nuxeo/nuxeo.conf
+#enable remote debugging
+sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
+#set nuxeo application public dns
+sed -i '1inuxeo.url='https://$STACK_ID'.cloud.nuxeo.com' /etc/nuxeo/nuxeo.conf
+#add s3 bucket property
+sed -i '1inuxeo.s3storage.bucket='$STACK_ID /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
 
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
+sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli
+apt-get -y clean
+
+#download ssl certificates
+mkdir /etc/ssl/apache
+aws s3 sync s3://presales-instance-resources/ssl/apache /etc/ssl/apache --region eu-west-1
+
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 <VirtualHost _default_:80>
+
+    ServerName  $STACK_ID.cloud.nuxeo.com
+
+    CustomLog /var/log/apache2/nuxeo_access.log combined
+    ErrorLog /var/log/apache2/nuxeo_error.log
+
+    Redirect permanent / https://$STACK_ID.cloud.nuxeo.com/
+
+</VirtualHost>
+
+<VirtualHost _default_:443 >
+
+    ServerName  $STACK_ID.cloud.nuxeo.com
 
     CustomLog /var/log/apache2/nuxeo_access.log combined
     ErrorLog /var/log/apache2/nuxeo_error.log
 
     DocumentRoot /var/www
 
-    ProxyRequests Off
-    <Proxy *>
+    ProxyRequests   Off
+     <Proxy * >
         Order allow,deny
         Allow from all
-    </Proxy>
+     </Proxy>
 
-    RewriteEngine On
+    RewriteEngine   On
     RewriteRule ^/$ /nuxeo/ [R,L]
     RewriteRule ^/nuxeo$ /nuxeo/ [R,L]
 
-    ProxyPass        /nuxeo/ http://localhost:8080/nuxeo/
+    ProxyPass         /nuxeo/ http://localhost:8080/nuxeo/
     ProxyPassReverse /nuxeo/ http://localhost:8080/nuxeo/
-    ProxyPreserveHost On
+    ProxyPreserveHost   On
 
+    # WSS
+    ProxyPass         /_vti_bin/     http://localhost:8080/_vti_bin/
+    ProxyPass         /_vti_inf.html http://localhost:8080/_vti_inf.html
+    ProxyPassReverse /_vti_bin/     http://localhost:8080/_vti_bin/
+    ProxyPassReverse /_vti_inf.html http://localhost:8080/_vti_inf.html
+
+    RequestHeader   append nuxeo-virtual-host "https://$STACK_ID.cloud.nuxeo.com/"
+
+    SSLEngine   on
+    SSLCertificateFile     /etc/ssl/apache/wildcard_cloud_nuxeo_com_crt.crt
+    SSLCACertificateFile    /etc/ssl/apache/GandiStandardSSLCA2.pem
+    SSLCertificateKeyFile /etc/ssl/apache/cloud.nuxeo.com.key
+
+    ## BEGIN SUPINT-655 ##
+    <Location "/nuxeo/incl">
+      RewriteRule .* - [R=404,L,NC]
+    </Location>
+    ## END SUPINT-655 ##
 </VirtualHost>
 EOF
 
@@ -78,9 +158,39 @@ cat > /etc/apache2/mods-available/deflate.conf <<EOF
 </IfModule>
 EOF
 
-a2enmod proxy proxy_http rewrite
+a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
 
-sudo apt-get install -y ffmpeg x264 x265 figlet 
+#fix imagemagick Policy
+wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
+
+#set up nuxeo user
+cat << EOF > /var/lib/nuxeo/server/.profile
+export NUXEO_CONF=/etc/nuxeo/nuxeo.conf
+cd /var/lib/nuxeo/server/bin
+echo  "Hi, nuxeo user. NUXEO_CONF is defined, and you are in /bin, ready to ./nuxeoctl"
+alias ll='ls -al'
+alias la='ls -a'
+alias ..='cd ..'
+export TERM="xterm-color"
+export PS1='\[\e[0;33m\]\u\[\e[0m\]@\[\e[0;32m\]\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0m\]\$ '
+alias dir='ls -alFGh'
+alias hs='history'
+alias mytail='tail -f /var/log/nuxeo/server.log'
+figlet $STACK_ID.cloud.nuxeo.com
+EOF
+chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
+
+#set up ubuntu user
+cat << EOF >> /home/ubuntu/.profile
+export TERM="xterm-color"
+export PS1='\[\e[0;33m\]\u\[\e[0m\]@\[\e[0;32m\]\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0m\]\$ '
+alias dir='ls -alFGh'
+alias hs='history'
+alias mytail='tail -F /var/log/nuxeo/server.log'
+alias vilog='vi /var/log/nuxeo/server.log'
+alias mydu='du -sh */'
+figlet $STACK_ID.cloud.nuxeo.com
+EOF
