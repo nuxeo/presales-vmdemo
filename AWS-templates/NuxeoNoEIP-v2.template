@@ -110,8 +110,8 @@
         "subnet": "subnet-dbc879bf"
       },
       "us-east-1": {
-        "vpc": "vpc-4fbd6528",
-        "subnet": "subnet-dda7ea85"
+        "vpc": "vpc-01311a6a321841d60",
+        "subnet": "subnet-0d192be7ed6d2faa2"
       },
       "us-west-1": {
         "vpc": "vpc-420fa925",
