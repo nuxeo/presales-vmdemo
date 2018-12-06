@@ -73,7 +73,7 @@ sed -i '1ielasticsearch.addressList=localhost:9200' /etc/nuxeo/nuxeo.conf
 #enable remote debugging
 sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 #set nuxeo application public dns
-sed -i '1inuxeo.url='https://$STACK_ID'.cloud.nuxeo.com' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.url='https://$STACK_ID'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
 #add s3 bucket property
 sed -i '1inuxeo.s3storage.bucket='$STACK_ID-bucket /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
