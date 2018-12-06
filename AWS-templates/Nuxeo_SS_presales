@@ -120,8 +120,10 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     RewriteRule ^/$ /nuxeo/ [R,L]
     RewriteRule ^/nuxeo$ /nuxeo/ [R,L]
 
-    ProxyPass         /nuxeo/ http://localhost:8080/nuxeo/
-    ProxyPassReverse /nuxeo/ http://localhost:8080/nuxeo/
+    ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
+    ProxyPass           /ARender/       http://localhost:8080/ARender/
+    ProxyPassReverse    /nuxeo/         http://localhost:8080/nuxeo/
+    ProxyPassReverse    /ARender/       http://localhost:8080/ARender/
     ProxyPreserveHost   On
 
     # WSS
