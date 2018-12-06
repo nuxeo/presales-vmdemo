@@ -476,7 +476,13 @@
             {
               "AllowedHeaders" : [ "*" ],
               "AllowedMethods" : [ "GET","HEAD" ],
-              "AllowedOrigins" : [ "*" ],
+              "AllowedOrigins" : [{
+                "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
+                  "name": {
+                    "Ref": "AWS::StackName"
+                  }
+                }]
+              }],
               "ExposedHeaders" : [ "ETag" ],
             }
           ]
