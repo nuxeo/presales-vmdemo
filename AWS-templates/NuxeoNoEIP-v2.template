@@ -470,7 +470,17 @@
               "Ref": "Customer"
             }
           }
-        ]
+        ],
+        "CorsConfiguration": {
+          "CorsRules" : [
+            {
+              "AllowedHeaders" : [ "*" ],
+              "AllowedMethods" : [ "GET","HEAD" ],
+              "AllowedOrigins" : [ "*" ],
+              "ExposedHeaders" : [ "ETag" ],
+            }
+          ]
+        }
       }
     },
     "ReleaseHostRecord": {
