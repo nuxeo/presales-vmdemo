@@ -327,7 +327,6 @@
     },
     "HostRecord": {
       "Type": "AWS::Route53::RecordSet",
-      "Condition": "CreateNuxeoRelease",
       "Properties": {
         "HostedZoneId": "/hostedzone/Z1Z5JJ6G4B6J7L",
         "Name": {
