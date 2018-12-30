@@ -10,7 +10,7 @@
       "Default": "t3.medium",
       "AllowedValues": [
         "t3.micro","t3.small","t3.medium","t3.large","t3.xlarge","t3.2xlarge",
-        "m5.large","m5.xlarge","m5.2xlarge","m5.4xlarge"
+        "m5.large","m5.xlarge","m5.2xlarge","m5.4xlarge",
         "c5.large", "c5.xlarge", "c5.2xlarge", "c5.4xlarge", "c5.8xlarge"
       ]
     },
@@ -123,28 +123,8 @@
       }
     }
   },
-
-  "Conditions": {
-    "CreateNuxeoRelease": {
-      "Fn::Equals": [{
-        "Ref": "NuxeoChannel"
-      }, "Release"]
-    },
-    "CreateNuxeoFastTrack": {
-      "Fn::Equals": [{
-        "Ref": "NuxeoChannel"
-      }, "FastTrack"]
-    },
-    "CreateNuxeoSnapshot": {
-      "Fn::Equals": [{
-        "Ref": "NuxeoChannel"
-      }, "Snapshot"]
-    }
-  },
-
   "Resources": {
-
-    "NuxeoInstanceRelease": {
+    "NuxeoInstance": {
       "Condition": "CreateNuxeoRelease",
       "Type": "AWS::EC2::Instance",
       "Properties": {
@@ -200,13 +180,16 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_Release_presales\n\n",
+              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_${channel}_presales\n\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
                 },
                 "region": {
                   "Ref": "AWS::Region"
+                },
+                "channel": {
+                  "Ref": "NuxeoChannel"
                 }
               }
             ]
@@ -214,149 +197,6 @@
         }
       }
     },
-
-    "NuxeoInstanceFastTrack": {
-      "Condition": "CreateNuxeoFastTrack",
-      "Type": "AWS::EC2::Instance",
-      "Properties": {
-        "InstanceType": {
-          "Ref": "InstanceType"
-        },
-        "SecurityGroupIds": [{
-          "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
-        }],
-        "KeyName": {
-          "Ref": "KeyName"
-        },
-        "ImageId": {
-          "Fn::FindInMap": ["AWSRegionArch2AMI", {
-              "Ref": "AWS::Region"
-            },
-            {
-              "Fn::FindInMap": ["AWSInstanceType2Arch", {
-                "Ref": "InstanceType"
-              }, "Arch"]
-            }
-          ]
-        },
-        "SubnetId": {
-          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
-        },
-        "Tags": [{
-            "Key": "contact",
-            "Value": {
-              "Ref": "Contact"
-            }
-          },
-          {
-            "Key": "billing-category",
-            "Value": "presales"
-          },
-          {
-            "Key": "billing-subcategory",
-            "Value": {
-              "Ref": "Customer"
-            }
-          },
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ],
-        "IamInstanceProfile": {
-          "Ref": "InstanceProfile"
-        },
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_FT_presales\n\n",
-              {
-                "stack": {
-                  "Ref": "AWS::StackName"
-                },
-                "region": {
-                  "Ref": "AWS::Region"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-
-    "NuxeoInstanceSnapShot": {
-      "Condition": "CreateNuxeoSnapshot",
-      "Type": "AWS::EC2::Instance",
-      "Properties": {
-        "InstanceType": {
-          "Ref": "InstanceType"
-        },
-        "SecurityGroupIds": [{
-          "Ref": "NuxeoSecurity"
-        }],
-        "KeyName": {
-          "Ref": "KeyName"
-        },
-        "ImageId": {
-          "Fn::FindInMap": ["AWSRegionArch2AMI", {
-              "Ref": "AWS::Region"
-            },
-            {
-              "Fn::FindInMap": ["AWSInstanceType2Arch", {
-                "Ref": "InstanceType"
-              }, "Arch"]
-            }
-          ]
-        },
-        "SubnetId": {
-          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
-        },
-        "Tags": [{
-            "Key": "contact",
-            "Value": {
-              "Ref": "Contact"
-            }
-          },
-          {
-            "Key": "billing-category",
-            "Value": "presales"
-          },
-          {
-            "Key": "billing-subcategory",
-            "Value": {
-              "Ref": "Customer"
-            }
-          },
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ],
-        "IamInstanceProfile": {
-          "Ref": "InstanceProfile"
-        },
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_SS_presales\n\n",
-              {
-                "stack": {
-                  "Ref": "AWS::StackName"
-                },
-                "region": {
-                  "Ref": "AWS::Region"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-
     "InstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -366,7 +206,6 @@
         }]
       }
     },
-
     "InstanceRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -385,7 +224,6 @@
         "Path": "/"
       }
     },
-
     "InstancePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
@@ -415,7 +253,6 @@
         }]
       }
     },
-
     "NuxeoSecurity": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -483,13 +320,13 @@
                   }
                 }]
               }],
-              "ExposedHeaders" : [ "ETag" ],
+              "ExposedHeaders" : [ "ETag" ]
             }
           ]
         }
       }
     },
-    "ReleaseHostRecord": {
+    "HostRecord": {
       "Type": "AWS::Route53::RecordSet",
       "Condition": "CreateNuxeoRelease",
       "Properties": {
@@ -502,41 +339,7 @@
         "Type": "CNAME",
         "TTL": "900",
         "ResourceRecords": [{
-          "Fn::GetAtt": ["NuxeoInstanceRelease", "PublicDnsName"]
-        }]
-      }
-    },
-    "FastTrackHostRecord": {
-      "Type": "AWS::Route53::RecordSet",
-      "Condition": "CreateNuxeoFastTrack",
-      "Properties": {
-        "HostedZoneId": "/hostedzone/Z1Z5JJ6G4B6J7L",
-        "Name": {
-          "Fn::Join": ["", [{
-            "Ref": "AWS::StackName"
-          }, ".", "cloud.nuxeo.com."]]
-        },
-        "Type": "CNAME",
-        "TTL": "900",
-        "ResourceRecords": [{
-          "Fn::GetAtt": ["NuxeoInstanceFastTrack", "PublicDnsName"]
-        }]
-      }
-    },
-    "SnapshotHostRecord": {
-      "Type": "AWS::Route53::RecordSet",
-      "Condition": "CreateNuxeoSnapshot",
-      "Properties": {
-        "HostedZoneId": "/hostedzone/Z1Z5JJ6G4B6J7L",
-        "Name": {
-          "Fn::Join": ["", [{
-            "Ref": "AWS::StackName"
-          }, ".", "cloud.nuxeo.com."]]
-        },
-        "Type": "CNAME",
-        "TTL": "900",
-        "ResourceRecords": [{
-          "Fn::GetAtt": ["NuxeoInstanceSnapShot", "PublicDnsName"]
+          "Fn::GetAtt": ["NuxeoInstance", "PublicDnsName"]
         }]
       }
     }
