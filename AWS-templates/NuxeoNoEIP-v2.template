@@ -125,7 +125,6 @@
   },
   "Resources": {
     "NuxeoInstance": {
-      "Condition": "CreateNuxeoRelease",
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "InstanceType": {
