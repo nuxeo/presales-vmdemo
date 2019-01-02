@@ -243,7 +243,9 @@
                 }, "/*"]]
               },
               "arn:aws:s3:::presales-instance-resources",
-              "arn:aws:s3:::presales-instance-resources/*"
+              "arn:aws:s3:::presales-instance-resources/*",
+              "arn:aws:s3:::dam-demo-assets",
+              "arn:aws:s3:::dam-demo-assets/*"
             ]
           }]
         },
