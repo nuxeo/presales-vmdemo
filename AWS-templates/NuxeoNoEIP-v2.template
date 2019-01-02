@@ -179,7 +179,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nadd-apt-repository ppa:alestic/ppa && apt-get update && apt-get install -y runurl\nrunurl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_${channel}_presales\n\n",
+              "#!/bin/bash\n\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/Nuxeo_${channel}_presales\nbash Nuxeo_${channel}_presales\n\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
