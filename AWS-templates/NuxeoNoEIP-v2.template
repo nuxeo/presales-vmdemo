@@ -46,6 +46,15 @@
       "t3.medium": {
         "Arch": "64"
       },
+      "t3.large": {
+        "Arch": "64"
+      },
+      "t3.xlarge": {
+        "Arch": "64"
+      },
+      "t3.2xlarge": {
+        "Arch": "64"
+      },
       "m5.large": {
         "Arch": "64"
       },
@@ -53,6 +62,9 @@
         "Arch": "64"
       },
       "m5.2xlarge": {
+        "Arch": "64"
+      },
+      "m5.4xlarge": {
         "Arch": "64"
       },
       "c5.large": {
