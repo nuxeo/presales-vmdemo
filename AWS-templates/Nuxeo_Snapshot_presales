@@ -77,8 +77,8 @@ sed -i '1inuxeo.url='https://$STACK_ID'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.
 #add s3 bucket property
 sed -i '1inuxeo.s3storage.bucket='$STACK_ID-bucket /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
-sed -i '1nuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
-sed -i '1nuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 
 
 # Update some defaults
