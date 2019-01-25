@@ -84,7 +84,7 @@ sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli
+sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop
 apt-get -y clean
 
 #download ssl certificates
