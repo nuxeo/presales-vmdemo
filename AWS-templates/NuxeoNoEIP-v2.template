@@ -340,7 +340,7 @@
                   }
                 }]
               }],
-              "ExposedHeaders" : [ "ETag" ]
+              "ExposedHeaders" : [ "ETag","Content-Disposition" ]
             }
           ]
         }
