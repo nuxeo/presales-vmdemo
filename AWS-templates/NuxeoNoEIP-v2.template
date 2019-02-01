@@ -210,7 +210,7 @@
                   "Ref": "NuxeoChannel"
                 },
                 "uploadRole": {
-                  "Fn::GetAtt": ["InstanceRole", "Arn"]
+                  "Fn::GetAtt": ["UploadRole", "Arn"]
                 }
               }
             ]
