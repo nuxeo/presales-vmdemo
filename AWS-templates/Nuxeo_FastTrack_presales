@@ -80,6 +80,11 @@ sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 
+#add s3 direct upload config
+sed -i '1inuxeo.s3storage.useDirectUpload=false' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.transient.roleArn='$UploadRole /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.transient.bucket='$STACK_ID-staging-bucket /etc/nuxeo/nuxeo.conf
+
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
