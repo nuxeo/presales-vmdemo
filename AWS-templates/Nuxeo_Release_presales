@@ -1,6 +1,5 @@
 #!/bin/bash
-#FOR Nuxeo 10.10 => INSTALL 6.5.3+
-ES_VERSION=6.5.x
+ES_VERSION=6.x
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf

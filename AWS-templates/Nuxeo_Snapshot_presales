@@ -1,5 +1,4 @@
 #!/bin/bash
-#FOR Nuxeo 11.1 (== SnamShot as of January 2018) => INSTALL 6.5.3+
 ES_VERSION=6.x
 
 # Increase open files limit
