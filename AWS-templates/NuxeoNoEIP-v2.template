@@ -466,6 +466,22 @@
           "Fn::GetAtt": ["NuxeoInstance", "PublicDnsName"]
         }]
       }
+    },
+    "KibanaRecord": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": "/hostedzone/Z1Z5JJ6G4B6J7L",
+        "Name": {
+          "Fn::Join": ["", ["kibana-",{
+            "Ref": "AWS::StackName"
+          }, ".", "cloud.nuxeo.com."]]
+        },
+        "Type": "CNAME",
+        "TTL": "900",
+        "ResourceRecords": [{
+          "Fn::GetAtt": ["NuxeoInstance", "PublicDnsName"]
+        }]
+      }
     }
   }
 }
