@@ -84,6 +84,8 @@ sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 
 #add s3 direct upload config
 sed -i '1inuxeo.s3storage.useDirectUpload=false' /etc/nuxeo/nuxeo.conf
+#add log
+echo ${UPLOAD_ROLE_ARN//\//\\/}
 sed -i '1inuxeo.s3storage.transient.roleArn='${UPLOAD_ROLE_ARN//\//\\/} /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.transient.bucket='$STACK_ID-staging-bucket /etc/nuxeo/nuxeo.conf
 
