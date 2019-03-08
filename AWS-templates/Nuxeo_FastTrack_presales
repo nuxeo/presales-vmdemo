@@ -1,5 +1,5 @@
 #!/bin/bash
-ES_VERSION=6.x
+ES_VERSION=6.5.4
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
@@ -9,6 +9,7 @@ echo '*       hard    nofile      8192' >> /etc/security/limits.conf
 code=$(lsb_release -cs)
 echo "deb http://apt.nuxeo.org/ $code releases" > /etc/apt/sources.list.d/nuxeo.list
 echo "deb http://apt.nuxeo.org/ $code fasttracks" >> /etc/apt/sources.list.d/nuxeo.list
+
 # Register the nuxeo key
 wget -q -O- http://apt.nuxeo.org/nuxeo.key | apt-key add -
 
@@ -36,8 +37,10 @@ apt-get -q -y install openjdk-8-jdk
 #install elasticsearch
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get -q -y install apt-transport-https
-echo "deb https://artifacts.elastic.co/packages/$ES_VERSION/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-$ES_VERSION.list
-apt-get update && apt-get -q -y install elasticsearch
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.sha512
+shasum -a 512 -c elasticsearch-$ES_VERSION.deb.sha512
+dpkg -i elasticsearch-$ES_VERSION.deb
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
 /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
