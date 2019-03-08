@@ -259,19 +259,53 @@
         "PolicyName": "S3BucketsPolicy",
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [{
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListAllMyBuckets",
+              "Resource": ["arn:aws:s3:::*"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:ListBucketMultipartUploads"
+              ],
+              "Resource": [{
+                  "Fn::Join": ["", ["arn:aws:s3:::", {
+                    "Ref": "S3Bucket"
+                  }]]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:ListBucketMultipartUploads"
+              ],
+              "Resource": [{
+                  "Fn::Join": ["", ["arn:aws:s3:::", {
+                    "Ref": "S3Bucket"
+                  }, "/*"]]
+                }
+              ]
+            },
+            {
             "Effect": "Allow",
-            "Action": "s3:*",
-            "Resource": [{
-                "Fn::Join": ["", ["arn:aws:s3:::", {
-                  "Ref": "S3Bucket"
-                }]]
-              },
-              {
-                "Fn::Join": ["", ["arn:aws:s3:::", {
-                  "Ref": "S3Bucket"
-                }, "/*"]]
-              },
+            "Action": [
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObject"
+            ],
+            "Resource": [
               "arn:aws:s3:::presales-instance-resources",
               "arn:aws:s3:::presales-instance-resources/*",
               "arn:aws:s3:::dam-demo-assets",
