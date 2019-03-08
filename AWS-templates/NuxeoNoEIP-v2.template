@@ -272,16 +272,6 @@
                   "Ref": "S3Bucket"
                 }, "/*"]]
               },
-              {
-                  "Fn::Join": ["", ["arn:aws:s3:::", {
-                    "Ref": "S3UploadBucket"
-                  }]]
-                },
-                {
-                  "Fn::Join": ["", ["arn:aws:s3:::", {
-                    "Ref": "S3UploadBucket"
-                  }, "/*"]]
-                },
               "arn:aws:s3:::presales-instance-resources",
               "arn:aws:s3:::presales-instance-resources/*",
               "arn:aws:s3:::dam-demo-assets",
@@ -325,13 +315,13 @@
             "Action": "s3:*",
             "Resource": [{
                 "Fn::Join": ["", ["arn:aws:s3:::", {
-                  "Ref": "S3UploadBucket"
+                  "Ref": "S3Bucket"
                 }]]
               },
               {
                 "Fn::Join": ["", ["arn:aws:s3:::", {
-                  "Ref": "S3UploadBucket"
-                }, "/*"]]
+                  "Ref": "S3Bucket"
+                }, "/upload/*"]]
               }
             ]
           }]
@@ -400,7 +390,7 @@
           "CorsRules" : [
             {
               "AllowedHeaders" : [ "*" ],
-              "AllowedMethods" : [ "GET","HEAD" ],
+              "AllowedMethods" : [ "GET","HEAD","PUT","POST" ],
               "AllowedOrigins" : [{
                 "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
                   "name": {
@@ -414,51 +404,7 @@
         }
       }
     },
-    "S3UploadBucket": {
-      "Type": "AWS::S3::Bucket",
-      "Properties": {
-        "BucketName": {
-          "Fn::Sub": ["${name}-staging-bucket", {
-            "name": {
-              "Ref": "AWS::StackName"
-            }
-          }]
-        },
-        "Tags": [{
-            "Key": "contact",
-            "Value": {
-              "Ref": "Contact"
-            }
-          },
-          {
-            "Key": "billing-category",
-            "Value": "presales"
-          },
-          {
-            "Key": "billing-subcategory",
-            "Value": {
-              "Ref": "Customer"
-            }
-          }
-        ],
-        "CorsConfiguration": {
-          "CorsRules" : [
-            {
-              "AllowedHeaders" : [ "*" ],
-              "AllowedMethods" : [ "PUT","POST" ],
-              "AllowedOrigins" : [{
-                "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
-                  "name": {
-                    "Ref": "AWS::StackName"
-                  }
-                }]
-              }],
-              "ExposedHeaders" : [ "ETag"]
-            }
-          ]
-        }
-      }
-    },
+
     "HostRecord": {
       "Type": "AWS::Route53::RecordSet",
       "Properties": {
@@ -475,6 +421,7 @@
         }]
       }
     },
+
     "KibanaRecord": {
       "Type": "AWS::Route53::RecordSet",
       "Properties": {
