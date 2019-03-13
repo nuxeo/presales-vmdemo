@@ -198,7 +198,7 @@ alias dir='ls -alFGh'
 alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
-figlet $STACK_ID.cloud.nuxeo.com
+figlet -t $STACK_ID.cloud.nuxeo.com
 EOF
 chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
 
@@ -211,5 +211,5 @@ alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
-figlet $STACK_ID.cloud.nuxeo.com
+figlet -t $STACK_ID.cloud.nuxeo.com
 EOF
