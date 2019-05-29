@@ -84,7 +84,7 @@ sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 
 #add s3 direct upload config
-sed -i '1inuxeo.s3storage.useDirectUpload=false' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.s3storage.useDirectUpload=true' /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.transient.roleArn='$UPLOAD_ROLE_ARN /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.transient.bucket='$STACK_ID-bucket /etc/nuxeo/nuxeo.conf
 sed -i '1inuxeo.s3storage.transient.bucket_prefix=upload/' /etc/nuxeo/nuxeo.conf
