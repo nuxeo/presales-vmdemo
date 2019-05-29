@@ -31,7 +31,7 @@ apt-get -q -y install openssh-server openssh-client vim
 apt-get -q -y install fonts-takao
 
 # Install Java 8
-apt-get -q -y install openjdk-8-jdk
+apt-get -q -y install openjdk-11-jdk
 
 #install elasticsearch
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
