@@ -97,31 +97,31 @@
     },
     "AWSRegionArch2AMI": {
       "us-west-1": {
-        "64": "ami-73f7da13"
+        "64": "ami-063aa838bd7631e0b"
       },
       "us-west-2": {
-        "64": "ami-835b4efa"
+        "64": "ami-0bbe6b35405ecebdb"
       },
       "us-east-1": {
-        "64": "ami-d15a75c7"
+        "64": "ami-0ac019f4fcb7cb7e6"
       },
       "eu-west-1": {
-        "64": "ami-6d48500b"
+        "64": "ami-00035f41c82244dab"
       },
       "eu-central-1": {
-        "64": "ami-1c45e273"
+        "64": "ami-0bdf93799014acdc4"
       },
       "ap-northeast-1": {
-        "64": "ami-785c491f"
+        "64": "ami-07ad4b1c3af1ea214"
       },
       "ap-southeast-1": {
-        "64": "ami-2378f540"
+        "64": "ami-0c5199d385b432989"
       },
       "ap-southeast-2": {
-        "64": "ami-e94e5e8a"
+        "64": "ami-07a3bd4944eb120a0"
       },
       "sa-east-1": {
-        "64": "ami-34afc458"
+        "64": "ami-03c6239555bb12112"
       }
     },
     "AWSRegionSubnet": {
