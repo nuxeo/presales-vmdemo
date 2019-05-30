@@ -179,10 +179,10 @@
               "Ref": "Contact"
             }
           },
-    		  {
-    		    "Key": "environment",
-    			"Value": "dev"
-    		  },
+          {
+            "Key": "environment",
+            "Value": "dev"
+          },
           {
             "Key": "billing-category",
             "Value": "presales"
