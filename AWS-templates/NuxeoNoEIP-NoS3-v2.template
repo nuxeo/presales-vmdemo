@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Nuxeo Platform Without S3",
+  "Description": "Nuxeo Platform Without S3 - WARNING: Not using Nuxify",
 
   "Parameters": {
     "InstanceType": {
