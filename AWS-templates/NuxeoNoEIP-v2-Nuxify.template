@@ -5,7 +5,7 @@
 
   "Parameters": {
     "InstanceType": {
-      "Description": "Type of EC2 instance to launch",
+      "Description": "Type of EC2 instance",
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
@@ -17,7 +17,7 @@
     },
     "NuxeoChannel": {
       "Type": "String",
-      "Default": "FastTrack",
+      "Default": "Release",
       "AllowedValues": ["Release", "FastTrack", "Snapshot"],
       "Description": "The channel to use"
     },
