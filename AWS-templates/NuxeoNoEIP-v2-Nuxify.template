@@ -324,6 +324,18 @@
           },
           {
             "Effect": "Allow",
+            "Action": [
+              "textract:DetectDocumentText",
+              "comprehend:*",
+              "rekognition:DetectLabels",
+              "rekognition:DetectText",
+              "rekognition:RecognizeCelebrities",
+              "rekognition:GetCelebrityInfo"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
             "Action": "secretsmanager:GetSecretValue",
             "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"]
           }]
