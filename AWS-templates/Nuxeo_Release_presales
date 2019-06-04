@@ -216,5 +216,6 @@ EOF
 #register the nuxeo instance
 #register the nuxeo instance
 if [ -n "$NX_STUDIO" ]; then
+  apt-get -q -y install jq
   nuxeoctl register nuxeo_presales $NX_STUDIO 'dev' 'aws_instance' `aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq '.SecretString|fromjson|.connect_presales_pwd'`
 fi
