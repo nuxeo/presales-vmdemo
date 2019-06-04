@@ -30,6 +30,10 @@
       "Type": "String",
       "Description": "Prospect name, or 'generic' if this is a generic demo"
     },
+    "StudioProject": {
+      "Type": "String",
+      "Description": "The Nuxeo Studio project name"
+    },
     "Contact": {
       "Type": "String",
       "Default": "presales@nuxeo.com",
@@ -206,7 +210,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export UPLOAD_ROLE_ARN=${uploadRole}\" >> /etc/profile.d/load_env.sh\nexport UPLOAD_ROLE_ARN=${uploadRole}\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\necho \"export NX_CHANNEL=${channel}\" >> /etc/profile.d/load_env.sh\nexport NX_CHANNEL=${channel}\necho \"export NX_BRANCH=${branch}\" >> /etc/profile.d/load_env.sh\nexport NX_BRANCH=${branch}\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\nbash Nuxeo_${channel}_presales\n\n",
+              "#!/bin/bash\n\necho \"export UPLOAD_ROLE_ARN=${uploadRole}\" >> /etc/profile.d/load_env.sh\nexport UPLOAD_ROLE_ARN=${uploadRole}\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\necho \"export NX_CHANNEL=${channel}\" >> /etc/profile.d/load_env.sh\nexport NX_CHANNEL=${channel}\necho \"export NX_BRANCH=${branch}\" >> /etc/profile.d/load_env.sh\nexport NX_BRANCH=${branch}\necho \"export NX_STUDIO=${studio}\" >> /etc/profile.d/load_env.sh\nexport NX_STUDIO=${studio}\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\nbash Nuxeo_${channel}_presales\n\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -219,6 +223,9 @@
                 },
                 "branch": {
                   "Ref": "GitBranch"
+                },
+                "studio": {
+                  "Ref": "StudioProject"
                 },
                 "uploadRole": {
                   "Fn::GetAtt": ["UploadRole", "Arn"]
@@ -259,7 +266,7 @@
     "InstancePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "S3BucketsPolicy",
+        "PolicyName": "InstancePolicy",
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -314,6 +321,11 @@
               "arn:aws:s3:::dam-demo-assets",
               "arn:aws:s3:::dam-demo-assets/*"
             ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"]
           }]
         },
         "Roles": [{
@@ -344,7 +356,7 @@
     "UploadPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "S3BucketsPolicy",
+        "PolicyName": "S3DirectUploadPolicy",
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{

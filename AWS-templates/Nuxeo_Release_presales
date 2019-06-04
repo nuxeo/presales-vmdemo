@@ -212,3 +212,9 @@ alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
 figlet $STACK_ID.cloud.nuxeo.com
 EOF
+
+#register the nuxeo instance
+#register the nuxeo instance
+if [ -n "$NX_STUDIO" ]; then
+  nuxeoctl register nuxeo_presales $NX_STUDIO 'dev' 'aws_instance' `aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq '.SecretString|fromjson|.connect_presales_pwd'`
+fi
