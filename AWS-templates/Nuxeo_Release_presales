@@ -221,3 +221,5 @@ if [ -n "$NX_STUDIO" ]; then
   nuxeoctl mp-install nuxeo-web-ui amazon-s3-online-storage amazon-s3-direct-upload marketplace-disable-studio-snapshot-validation --accept true
   nuxeoctl mp-install $NX_STUDIO-0.0.0-SNAPSHOT --accept true
 fi
+
+echo "Nuxeo Presales Installation Script Complete"

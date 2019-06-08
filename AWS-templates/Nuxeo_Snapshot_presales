@@ -213,3 +213,5 @@ alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
 figlet $STACK_ID.cloud.nuxeo.com
 EOF
+
+echo "Nuxeo Presales Installation Script Complete"
