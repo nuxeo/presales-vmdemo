@@ -184,7 +184,7 @@ apache2ctl -k graceful
 #fix imagemagick Policy
 wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
 
-#set up nuxeo user
+#set up profile for nuxeo user
 cat << EOF > /var/lib/nuxeo/server/.profile
 export NUXEO_CONF=/etc/nuxeo/nuxeo.conf
 cd /var/lib/nuxeo/server/bin
@@ -198,9 +198,17 @@ alias dir='ls -alFGh'
 alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
-figlet $STACK_ID.cloud.nuxeo.com
+figlet -t $STACK_ID.cloud.nuxeo.com
 EOF
 chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
+
+#set up vim for nuxeo user
+cat << EOF > /var/lib/nuxeo/server/.vimrc
+" Set the filetype based on the file's extension, but only if
+" 'filetype' has not already been set
+au BufRead,BufNewFile *.conf setfiletype conf
+EOF
+chown nuxeo:nuxeo /var/lib/nuxeo/server/.vimrc
 
 #set up ubuntu user
 cat << EOF >> /home/ubuntu/.profile
@@ -212,6 +220,13 @@ alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
 figlet $STACK_ID.cloud.nuxeo.com
+EOF
+
+#set up vim for ubuntu user
+cat << EOF > /home/ubuntu/.vimrc
+" Set the filetype based on the file's extension, but only if
+" 'filetype' has not already been set
+au BufRead,BufNewFile *.conf setfiletype conf
 EOF
 
 echo "Nuxeo Presales Installation Script Complete"
