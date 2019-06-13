@@ -266,7 +266,13 @@
     "InstancePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "InstancePolicy",
+        "PolicyName": {
+          "Fn::Sub": ["${name}-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -381,7 +387,13 @@
     "UploadPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "S3DirectUploadPolicy",
+        "PolicyName": {
+          "Fn::Sub": ["${name}-direct-upload-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{
