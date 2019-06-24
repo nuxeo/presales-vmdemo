@@ -168,14 +168,14 @@
         "SecurityGroupIds": [{
           "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
         }],
-        "BlockDeviceMapping": {
+        "BlockDeviceMappings": [{
           "DeviceName": "/dev/nvme0n1",
           "Ebs": {
             "VolumeSize": {
               "Ref": "DiskSize"
             }
           }
-        },
+        }],
         "ImageId": {
           "Fn::FindInMap": ["AWSRegionArch2AMI", {
               "Ref": "AWS::Region"
