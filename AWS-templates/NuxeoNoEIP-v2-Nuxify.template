@@ -169,7 +169,7 @@
           "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
         }],
         "BlockDeviceMappings": [{
-          "DeviceName": "/dev/nvme0n1",
+          "DeviceName": "/dev/sda1",
           "Ebs": {
             "VolumeSize": {
               "Ref": "DiskSize"
