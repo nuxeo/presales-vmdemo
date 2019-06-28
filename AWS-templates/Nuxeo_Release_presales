@@ -100,7 +100,7 @@ fi
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop
+sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop jq
 apt-get -y clean
 
 #download ssl certificates
