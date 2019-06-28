@@ -43,7 +43,6 @@
       "Type": "Number",
       "Default": 8,
       "Description": "Disk size (in GB) for root volume of EC2 instance"
-    },
     }
   },
 
