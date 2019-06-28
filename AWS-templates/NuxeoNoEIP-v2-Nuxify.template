@@ -38,6 +38,12 @@
       "Type": "String",
       "Default": "presales@nuxeo.com",
       "Description": "Contact email address"
+    },
+    "DiskSize": {
+      "Type": "Number",
+      "Default": 8,
+      "Description": "Disk size (in GB) for root volume of EC2 instance"
+    },
     }
   },
 
@@ -163,6 +169,14 @@
         "SecurityGroupIds": [{
           "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
         }],
+        "BlockDeviceMapping": {
+          "DeviceName": "/dev/nvme0n1",
+          "Ebs": {
+            "VolumeSize": {
+              "Ref": "DiskSize"
+            }
+          }
+        },
         "ImageId": {
           "Fn::FindInMap": ["AWSRegionArch2AMI", {
               "Ref": "AWS::Region"
@@ -397,9 +411,9 @@
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{
-            "Effect": "Allow",
-            "Action": "s3:PutObject",
-            "Resource": [{
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "Resource": [{
                 "Fn::Join": ["", ["arn:aws:s3:::", {
                   "Ref": "S3Bucket"
                 }, "/upload/*"]]
