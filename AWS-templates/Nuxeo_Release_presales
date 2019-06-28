@@ -1,5 +1,10 @@
 #!/bin/bash
-ES_VERSION=6.5.4
+
+source /etc/profile.d/load_env.sh
+
+INSTALL_LOG="/var/log/nuxeo_install.log"
+
+ES_VERSION="6.5.4"
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
