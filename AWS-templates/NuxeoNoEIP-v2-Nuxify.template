@@ -9,9 +9,9 @@
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
-        "t3.micro","t3.small","t3.medium","t3.large","t3.xlarge","t3.2xlarge",
-        "m4.large","m4.xlarge",
-        "m5.large","m5.xlarge","m5.2xlarge","m5.4xlarge",
+        "t3.micro", "t3.small", "t3.medium", "t3.large", "t3.xlarge", "t3.2xlarge",
+        "m4.large", "m4.xlarge",
+        "m5.large", "m5.xlarge", "m5.2xlarge", "m5.4xlarge",
         "c5.large", "c5.xlarge", "c5.2xlarge", "c5.4xlarge", "c5.8xlarge"
       ]
     },
@@ -32,7 +32,7 @@
     },
     "StudioProject": {
       "Type": "String",
-      "Description": "The Nuxeo Studio project name"
+      "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
     },
     "Contact": {
       "Type": "String",
@@ -43,6 +43,20 @@
       "Type": "Number",
       "Default": 8,
       "Description": "Disk size (in GB) for root volume of EC2 instance"
+    },
+    "UseS3Bucket": {
+      "AllowedValues": ["true","false"],
+      "Default": "true",
+      "Description": "Create the corresponding S3 Bucket for this stack",
+      "Type": "String"
+    }
+  },
+
+  "Conditions": {
+    "CreateS3Bucket": {
+      "Fn::Equals": [{
+        "Ref": "UseS3Bucket"
+      }, "true"]
     }
   },
 
@@ -188,7 +202,9 @@
           ]
         },
         "SubnetId": {
-          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"subnet"]
+          "Fn::FindInMap": ["AWSRegionSubnet", {
+            "Ref": "AWS::Region"
+          }, "subnet"]
         },
         "Tags": [{
             "Key": "contact",
@@ -223,7 +239,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\necho \"export UPLOAD_ROLE_ARN=${uploadRole}\" >> /etc/profile.d/load_env.sh\nexport UPLOAD_ROLE_ARN=${uploadRole}\necho \"export STACK_ID=${stack}\" >> /etc/profile.d/load_env.sh\necho \"export REGION=${region}\" >> /etc/profile.d/load_env.sh\nexport STACK_ID=${stack}\nexport REGION=${region}\necho \"export NX_CHANNEL=${channel}\" >> /etc/profile.d/load_env.sh\nexport NX_CHANNEL=${channel}\necho \"export NX_BRANCH=${branch}\" >> /etc/profile.d/load_env.sh\nexport NX_BRANCH=${branch}\necho \"export NX_STUDIO=${studio}\" >> /etc/profile.d/load_env.sh\nexport NX_STUDIO=${studio}\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\nbash Nuxeo_${channel}_presales\n\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -234,6 +250,9 @@
                 "channel": {
                   "Ref": "NuxeoChannel"
                 },
+                "bucket": {
+                  "Ref": "UseS3Bucket"
+                },
                 "branch": {
                   "Ref": "GitBranch"
                 },
@@ -241,7 +260,11 @@
                   "Ref": "StudioProject"
                 },
                 "uploadRole": {
-                  "Fn::GetAtt": ["UploadRole", "Arn"]
+                  "Fn::If" : [
+                    "CreateS3Bucket",
+                    {"Fn::GetAtt": ["UploadRole", "Arn"]},
+                    "false"
+                  ]
                 }
               }
             ]
@@ -276,11 +299,11 @@
         "Path": "/"
       }
     },
-    "InstancePolicy": {
+    "InstanceSharedResourcePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": ["${name}-instance-policy", {
+          "Fn::Sub": ["${name}-shared-resource-instance-policy", {
             "name": {
               "Ref": "AWS::StackName"
             }
@@ -288,8 +311,7 @@
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": [{
               "Effect": "Allow",
               "Action": "s3:ListAllMyBuckets",
               "Resource": ["arn:aws:s3:::*"]
@@ -299,16 +321,81 @@
               "Action": [
                 "s3:ListBucket",
                 "s3:GetBucketLocation",
+                "s3:GetObject"
+              ],
+              "Resource": [
+                "arn:aws:s3:::presales-instance-resources",
+                "arn:aws:s3:::presales-instance-resources/*",
+                "arn:aws:s3:::dam-demo-assets",
+                "arn:aws:s3:::dam-demo-assets/*"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "textract:DetectDocumentText",
+                "comprehend:*",
+                "rekognition:DetectLabels",
+                "rekognition:DetectText",
+                "rekognition:RecognizeCelebrities",
+                "rekognition:GetCelebrityInfo"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "secretsmanager:GetSecretValue",
+              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:DescribeImages",
+                "ecr:BatchGetImage"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
+      }
+    },
+
+    "InstancesS3Policy": {
+      "Type": "AWS::IAM::Policy",
+      "Condition": "CreateS3Bucket",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Sub": ["${name}-s3-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
                 "s3:AbortMultipartUpload",
                 "s3:ListMultipartUploadParts",
                 "s3:ListBucketMultipartUploads"
               ],
               "Resource": [{
-                  "Fn::Join": ["", ["arn:aws:s3:::", {
-                    "Ref": "S3Bucket"
-                  }]]
-                }
-              ]
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "S3Bucket"
+                }]]
+              }]
             },
             {
               "Effect": "Allow",
@@ -321,56 +408,13 @@
                 "s3:ListBucketMultipartUploads"
               ],
               "Resource": [{
-                  "Fn::Join": ["", ["arn:aws:s3:::", {
-                    "Ref": "S3Bucket"
-                  }, "/*"]]
-                }
-              ]
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "S3Bucket"
+                }, "/*"]]
+              }]
             },
-            {
-            "Effect": "Allow",
-            "Action": [
-              "s3:ListBucket",
-              "s3:GetBucketLocation",
-              "s3:GetObject"
-            ],
-            "Resource": [
-              "arn:aws:s3:::presales-instance-resources",
-              "arn:aws:s3:::presales-instance-resources/*",
-              "arn:aws:s3:::dam-demo-assets",
-              "arn:aws:s3:::dam-demo-assets/*"
-            ]
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "textract:DetectDocumentText",
-              "comprehend:*",
-              "rekognition:DetectLabels",
-              "rekognition:DetectText",
-              "rekognition:RecognizeCelebrities",
-              "rekognition:GetCelebrityInfo"
-            ],
-            "Resource": "*"
-          },
-          {
-            "Effect": "Allow",
-            "Action": "secretsmanager:GetSecretValue",
-            "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"]
-          },{
-            "Effect": "Allow",
-            "Action": [
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:GetRepositoryPolicy",
-                "ecr:DescribeRepositories",
-                "ecr:ListImages",
-                "ecr:DescribeImages",
-                "ecr:BatchGetImage"
-            ],
-            "Resource": "*"
-        }]
+
+          ]
         },
         "Roles": [{
           "Ref": "InstanceRole"
@@ -379,6 +423,7 @@
     },
     "UploadRole": {
       "Type": "AWS::IAM::Role",
+      "Condition": "CreateS3Bucket",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -399,6 +444,7 @@
     },
     "UploadPolicy": {
       "Type": "AWS::IAM::Policy",
+      "Condition": "CreateS3Bucket",
       "Properties": {
         "PolicyName": {
           "Fn::Sub": ["${name}-direct-upload-policy", {
@@ -410,14 +456,13 @@
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{
-              "Effect": "Allow",
-              "Action": "s3:PutObject",
-              "Resource": [{
-                "Fn::Join": ["", ["arn:aws:s3:::", {
-                  "Ref": "S3Bucket"
-                }, "/upload/*"]]
-              }
-            ]
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": [{
+              "Fn::Join": ["", ["arn:aws:s3:::", {
+                "Ref": "S3Bucket"
+              }, "/upload/*"]]
+            }]
           }]
         },
         "Roles": [{
@@ -429,7 +474,9 @@
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "VpcId": {
-          "Fn::FindInMap": ["AWSRegionSubnet", {"Ref": "AWS::Region"},"vpc"]
+          "Fn::FindInMap": ["AWSRegionSubnet", {
+            "Ref": "AWS::Region"
+          }, "vpc"]
         },
         "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
         "SecurityGroupIngress": [{
@@ -455,6 +502,7 @@
     },
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
+      "Condition": "CreateS3Bucket",
       "Properties": {
         "BucketName": {
           "Fn::Sub": ["${name}-bucket", {
@@ -481,20 +529,18 @@
           }
         ],
         "CorsConfiguration": {
-          "CorsRules" : [
-            {
-              "AllowedHeaders" : [ "*" ],
-              "AllowedMethods" : [ "GET","HEAD","PUT","POST" ],
-              "AllowedOrigins" : [{
-                "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
-                  "name": {
-                    "Ref": "AWS::StackName"
-                  }
-                }]
-              }],
-              "ExposedHeaders" : [ "ETag","Content-Disposition" ]
-            }
-          ]
+          "CorsRules": [{
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["GET", "HEAD", "PUT", "POST"],
+            "AllowedOrigins": [{
+              "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
+                "name": {
+                  "Ref": "AWS::StackName"
+                }
+              }]
+            }],
+            "ExposedHeaders": ["ETag", "Content-Disposition"]
+          }]
         }
       }
     },
