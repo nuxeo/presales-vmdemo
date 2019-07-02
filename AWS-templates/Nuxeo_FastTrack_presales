@@ -1,5 +1,13 @@
 #!/bin/bash
-ES_VERSION=6.5.4
+
+# Installation can take time. You can tail /var/log/nuxeo_install.log
+
+source /etc/profile.d/load_env.sh
+
+INSTALL_LOG="/var/log/nuxeo_install.log"
+echo "Nuxeo Presales Installation Script Starting" > ${INSTALL_LOG}
+
+ES_VERSION="6.5.4"
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
@@ -19,6 +27,7 @@ echo nuxeo nuxeo/http-port select 8080 | debconf-set-selections
 echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selections
 
 # Upgrade packages and install apache, ssh, ...
+echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc." >> ${INSTALL_LOG}
 export DEBIAN_FRONTEND=noninteractive
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
@@ -27,18 +36,22 @@ apt-get -q -y upgrade
 apt-get -q -y install apache2
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 apt-get -q -y install openssh-server openssh-client vim
+echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" >> ${INSTALL_LOG}
 
 # Install JA fonts
 apt-get -q -y install fonts-takao
 
-# Install Java 8
+# Install Java
+echo "Nuxeo Presales Installation Script: Install Java" >> ${INSTALL_LOG}
 apt-get -q -y install openjdk-11-jdk
+echo "Nuxeo Presales Installation Script: Install Java => DONE" >> ${INSTALL_LOG}
 
 #install elasticsearch
+echo "Nuxeo Presales Installation Script: Install Elasticsearch" >> ${INSTALL_LOG}
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get -q -y install apt-transport-https
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb.sha512
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.sha512
 shasum -a 512 -c elasticsearch-$ES_VERSION.deb.sha512
 dpkg -i elasticsearch-$ES_VERSION.deb
 /bin/systemctl daemon-reload
@@ -50,18 +63,23 @@ sed -i 's/Xms2g/Xms1g/g' /etc/elasticsearch/jvm.options
 sed -i 's/Xmx2g/Xmx1g/g' /etc/elasticsearch/jvm.options
 
 service elasticsearch start
+echo "Nuxeo Presales Installation Script: Install Elasticsearch => DONE" >> ${INSTALL_LOG}
 
 #install docker
+echo "Nuxeo Presales Installation Script: Install Docker" >> ${INSTALL_LOG}
 apt-get -q -y remove docker docker-engine docker.io
 apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get update
 apt-get -q -y install docker-ce
+echo "Nuxeo Presales Installation Script: Install Docker => DONE" >> ${INSTALL_LOG}
 
 # Install Nuxeo
+echo "Nuxeo Presales Installation Script: Install Nuxeo" >> ${INSTALL_LOG}
 apt-get -q -y install nuxeo
 service nuxeo stop
+echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" >> ${INSTALL_LOG}
 
 #add nuxeo user to docker group
 sudo usermod -aG docker nuxeo
@@ -76,29 +94,37 @@ sed -i '1ielasticsearch.addressList=localhost:9200' /etc/nuxeo/nuxeo.conf
 #enable remote debugging
 sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 #set nuxeo application public dns
-sed -i '1inuxeo.url='https://$STACK_ID'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
-#add s3 bucket property
-sed -i '1inuxeo.s3storage.bucket='$STACK_ID-bucket /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.bucket_prefix=binary_store/' /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.region='$REGION /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.url='https://${STACK_ID}'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
 
-#add s3 direct upload config
-sed -i '1inuxeo.s3storage.useDirectUpload=true' /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.transient.roleArn='$UPLOAD_ROLE_ARN /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.transient.bucket='$STACK_ID-bucket /etc/nuxeo/nuxeo.conf
-sed -i '1inuxeo.s3storage.transient.bucket_prefix=upload/' /etc/nuxeo/nuxeo.conf
+if [[ "${S3BUCKET}" == "true" ]]; then
+  #add s3 bucket property
+  sed -i '1inuxeo.s3storage.bucket='${STACK_ID}-bucket /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.bucket_prefix=binary_store/' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.region='${REGION} /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
 
+  #add s3 direct upload config
+  sed -i '1inuxeo.s3storage.useDirectUpload=true' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.roleArn='${UPLOAD_ROLE_ARN} /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.bucket='${STACK_ID}-bucket /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.bucket_prefix=upload/' /etc/nuxeo/nuxeo.conf
+fi
+
+
+echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" >> ${INSTALL_LOG}
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop
+sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop jq
 apt-get -y clean
+echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" >> ${INSTALL_LOG}
 
 #download ssl certificates
+echo "Nuxeo Presales Installation Script: Download ssl certificates" >> ${INSTALL_LOG}
 mkdir /etc/ssl/apache
 aws s3 sync s3://presales-instance-resources/ssl/apache /etc/ssl/apache --region eu-west-1
+echo "Nuxeo Presales Installation Script: Download ssl certificates => DONE" >> ${INSTALL_LOG}
 
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
@@ -181,6 +207,9 @@ a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
 
+
+echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." >> ${INSTALL_LOG}
+
 #fix imagemagick Policy
 wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
 
@@ -219,7 +248,7 @@ alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
-figlet -t $STACK_ID.cloud.nuxeo.com
+figlet $STACK_ID.cloud.nuxeo.com
 EOF
 
 #set up vim for ubuntu user
@@ -228,5 +257,22 @@ cat << EOF > /home/ubuntu/.vimrc
 " 'filetype' has not already been set
 au BufRead,BufNewFile *.conf setfiletype conf
 EOF
+echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc. => DONE" >> ${INSTALL_LOG}
 
-echo "Nuxeo Presales Installation Script Complete"
+#register the nuxeo instance
+if [ -n "${NX_STUDIO}" ]; then
+  echo "Nuxeo Presales Installation Script: Install Studio project" >> ${INSTALL_LOG}
+  echo "$(date) Register Nuxeo Instance" | tee -a ${INSTALL_LOG}
+
+  CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq '.SecretString|fromjson|.connect_presales_pwd')
+  nuxeoctl register nuxeo_presales ${NX_STUDIO} "dev" "AWS_${STACK_ID}" "${CREDENTIALS}" | tee -a ${INSTALL_LOG}
+  nuxeoctl mp-hotfix --accept true | tee -a ${INSTALL_LOG}
+  nuxeoctl mp-install nuxeo-web-ui marketplace-disable-studio-snapshot-validation --accept true | tee -a ${INSTALL_LOG}
+  if [[ "${S3BUCKET}" == "true" ]]; then
+    nuxeoctl mp-install amazon-s3-online-storage amazon-s3-direct-upload --accept true | tee -a ${INSTALL_LOG}
+  fi
+  nuxeoctl mp-install ${NX_STUDIO}-0.0.0-SNAPSHOT --accept true | tee -a ${INSTALL_LOG}
+  echo "Nuxeo Presales Installation Script: Install Studio project => DONE" >> ${INSTALL_LOG}
+fi
+
+echo "Nuxeo Presales Installation Script Complete" >> ${INSTALL_LOG}
