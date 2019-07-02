@@ -61,59 +61,6 @@
   },
 
   "Mappings": {
-    "AWSInstanceType2Arch": {
-      "t3.micro": {
-        "Arch": "64"
-      },
-      "t3.small": {
-        "Arch": "64"
-      },
-      "t3.medium": {
-        "Arch": "64"
-      },
-      "t3.large": {
-        "Arch": "64"
-      },
-      "t3.xlarge": {
-        "Arch": "64"
-      },
-      "t3.2xlarge": {
-        "Arch": "64"
-      },
-      "m4.large": {
-        "Arch": "64"
-      },
-      "m4.xlarge": {
-        "Arch": "64"
-      },
-      "m5.large": {
-        "Arch": "64"
-      },
-      "m5.xlarge": {
-        "Arch": "64"
-      },
-      "m5.2xlarge": {
-        "Arch": "64"
-      },
-      "m5.4xlarge": {
-        "Arch": "64"
-      },
-      "c5.large": {
-        "Arch": "64"
-      },
-      "c5.xlarge": {
-        "Arch": "64"
-      },
-      "c5.2xlarge": {
-        "Arch": "64"
-      },
-      "c5.4xlarge": {
-        "Arch": "64"
-      },
-      "c5.8xlarge": {
-        "Arch": "64"
-      }
-    },
     "AWSRegionArch2AMI": {
       "ap-northeast-1": {
         "64": "ami-0bb0cc5e720890c6a"
@@ -194,11 +141,7 @@
           "Fn::FindInMap": ["AWSRegionArch2AMI", {
               "Ref": "AWS::Region"
             },
-            {
-              "Fn::FindInMap": ["AWSInstanceType2Arch", {
-                "Ref": "InstanceType"
-              }, "Arch"]
-            }
+            "64"
           ]
         },
         "SubnetId": {
