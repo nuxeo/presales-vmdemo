@@ -50,7 +50,7 @@ echo "Nuxeo Presales Installation Script: Install Elasticsearch" >> ${INSTALL_LO
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get -q -y install apt-transport-https
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.sha512
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb.sha512
 shasum -a 512 -c elasticsearch-$ES_VERSION.deb.sha512
 dpkg -i elasticsearch-$ES_VERSION.deb
 /bin/systemctl daemon-reload
