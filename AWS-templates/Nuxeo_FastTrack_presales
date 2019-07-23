@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Installation can take time. You can tail /var/log/nuxeo_install.log
+# Installation can take time.
+# You can tail -F /var/log/nuxeo_install.log to see basic install progress
+# You can tail -F /var/log/syslog to see the full startup and check for errors
 
 source /etc/profile.d/load_env.sh
 
