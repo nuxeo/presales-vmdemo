@@ -27,7 +27,7 @@ echo nuxeo nuxeo/http-port select 8080 | debconf-set-selections
 echo nuxeo nuxeo/database select Autoconfigure PostgreSQL | debconf-set-selections
 
 # Upgrade packages and install apache, ssh, ...
-echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc." >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc." | tee ${INSTALL_LOG}
 export DEBIAN_FRONTEND=noninteractive
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
@@ -36,18 +36,18 @@ apt-get -q -y upgrade
 apt-get -q -y install apache2
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 apt-get -q -y install openssh-server openssh-client vim
-echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee ${INSTALL_LOG}
 
 # Install JA fonts
 apt-get -q -y install fonts-takao
 
 # Install Java
-echo "Nuxeo Presales Installation Script: Install Java" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Java" | tee ${INSTALL_LOG}
 apt-get -q -y install openjdk-11-jdk
-echo "Nuxeo Presales Installation Script: Install Java => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Java => DONE" | tee ${INSTALL_LOG}
 
 #install elasticsearch
-echo "Nuxeo Presales Installation Script: Install Elasticsearch" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Elasticsearch" | tee ${INSTALL_LOG}
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get -q -y install apt-transport-https
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb
@@ -63,23 +63,23 @@ sed -i 's/Xms2g/Xms1g/g' /etc/elasticsearch/jvm.options
 sed -i 's/Xmx2g/Xmx1g/g' /etc/elasticsearch/jvm.options
 
 service elasticsearch start
-echo "Nuxeo Presales Installation Script: Install Elasticsearch => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Elasticsearch => DONE" | tee ${INSTALL_LOG}
 
 #install docker
-echo "Nuxeo Presales Installation Script: Install Docker" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Docker" | tee ${INSTALL_LOG}
 apt-get -q -y remove docker docker-engine docker.io
 apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get update
 apt-get -q -y install docker-ce
-echo "Nuxeo Presales Installation Script: Install Docker => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Docker => DONE" | tee ${INSTALL_LOG}
 
 # Install Nuxeo
-echo "Nuxeo Presales Installation Script: Install Nuxeo" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee ${INSTALL_LOG}
 apt-get -q -y install nuxeo
 service nuxeo stop
-echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee ${INSTALL_LOG}
 
 #add nuxeo user to docker group
 sudo usermod -aG docker nuxeo
@@ -112,19 +112,19 @@ if [[ "${S3BUCKET}" == "true" ]]; then
 fi
 
 
-echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee ${INSTALL_LOG}
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
 sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop jq
 apt-get -y clean
-echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" | tee ${INSTALL_LOG}
 
 #download ssl certificates
-echo "Nuxeo Presales Installation Script: Download ssl certificates" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Download ssl certificates" | tee ${INSTALL_LOG}
 mkdir /etc/ssl/apache
 aws s3 sync s3://presales-instance-resources/ssl/apache /etc/ssl/apache --region eu-west-1
-echo "Nuxeo Presales Installation Script: Download ssl certificates => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Download ssl certificates => DONE" | tee ${INSTALL_LOG}
 
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
@@ -208,7 +208,7 @@ a2ensite nuxeo
 apache2ctl -k graceful
 
 
-echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee ${INSTALL_LOG}
 
 #fix imagemagick Policy
 wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
@@ -257,11 +257,11 @@ cat << EOF > /home/ubuntu/.vimrc
 " 'filetype' has not already been set
 au BufRead,BufNewFile *.conf setfiletype conf
 EOF
-echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc. => DONE" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc. => DONE" | tee ${INSTALL_LOG}
 
 #register the nuxeo instance
 if [ -n "${NX_STUDIO}" ]; then
-  echo "Nuxeo Presales Installation Script: Install Studio project" >> ${INSTALL_LOG}
+  echo "Nuxeo Presales Installation Script: Install Studio project" | tee ${INSTALL_LOG}
   echo "$(date) Register Nuxeo Instance" | tee -a ${INSTALL_LOG}
 
   CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq '.SecretString|fromjson|.connect_presales_pwd')
@@ -272,7 +272,7 @@ if [ -n "${NX_STUDIO}" ]; then
     nuxeoctl mp-install amazon-s3-online-storage amazon-s3-direct-upload --accept true | tee -a ${INSTALL_LOG}
   fi
   nuxeoctl mp-install ${NX_STUDIO}-0.0.0-SNAPSHOT --accept true | tee -a ${INSTALL_LOG}
-  echo "Nuxeo Presales Installation Script: Install Studio project => DONE" >> ${INSTALL_LOG}
+  echo "Nuxeo Presales Installation Script: Install Studio project => DONE" | tee ${INSTALL_LOG}
 fi
 
-echo "Nuxeo Presales Installation Script Complete" >> ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script Complete" | tee ${INSTALL_LOG}
