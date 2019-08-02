@@ -38,6 +38,15 @@
       "Type": "String",
       "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
     },
+    "ConnectLogin": {
+      "Type": "String",
+      "Default": "nuxeo_presales",
+      "Description": "Connect account login (to install the Studio project)"
+    },
+    "ConnectPwd": {
+      "Type": "String",
+      "Description": "Connect account password (to install the Studio project)"
+    },
     "Contact": {
       "Type": "String",
       "Default": "presales@nuxeo.com",
@@ -65,59 +74,6 @@
   },
 
   "Mappings": {
-    "AWSInstanceType2Arch": {
-      "t3.micro": {
-        "Arch": "64"
-      },
-      "t3.small": {
-        "Arch": "64"
-      },
-      "ca-central-1": {
-        "64": "ami-0fcbbf37bd9035f1c"
-      },
-      "t3.large": {
-        "Arch": "64"
-      },
-      "t3.xlarge": {
-        "Arch": "64"
-      },
-      "t3.2xlarge": {
-        "Arch": "64"
-      },
-      "m4.large": {
-        "Arch": "64"
-      },
-      "m4.xlarge": {
-        "Arch": "64"
-      },
-      "m5.large": {
-        "Arch": "64"
-      },
-      "m5.xlarge": {
-        "Arch": "64"
-      },
-      "m5.2xlarge": {
-        "Arch": "64"
-      },
-      "m5.4xlarge": {
-        "Arch": "64"
-      },
-      "c5.large": {
-        "Arch": "64"
-      },
-      "c5.xlarge": {
-        "Arch": "64"
-      },
-      "c5.2xlarge": {
-        "Arch": "64"
-      },
-      "c5.4xlarge": {
-        "Arch": "64"
-      },
-      "c5.8xlarge": {
-        "Arch": "64"
-      }
-    },
     "AWSRegionArch2AMI": {
       "us-west-1": {
         "64": "ami-063aa838bd7631e0b"
@@ -195,11 +151,7 @@
           "Fn::FindInMap": ["AWSRegionArch2AMI", {
               "Ref": "AWS::Region"
             },
-            {
-              "Fn::FindInMap": ["AWSInstanceType2Arch", {
-                "Ref": "InstanceType"
-              }, "Arch"]
-            }
+            "64"
           ]
         },
         "SubnetId": {
@@ -240,7 +192,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_LOGIN=${connectLogin} NX_STUDIO_PWD=${connectPwd} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -259,6 +211,12 @@
                 },
                 "studio": {
                   "Ref": "StudioProject"
+                },
+                "connectLogin": {
+                  "Ref": "ConnectLogin"
+                },
+                "connectPwd": {
+                  "Ref": "connectPwd"
                 },
                 "uploadRole": {
                   "Fn::If" : [
