@@ -216,7 +216,7 @@
                   "Ref": "ConnectLogin"
                 },
                 "connectPwd": {
-                  "Ref": "connectPwd"
+                  "Ref": "ConnectPwd"
                 },
                 "uploadRole": {
                   "Fn::If" : [
