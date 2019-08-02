@@ -38,12 +38,12 @@
       "Type": "String",
       "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
     },
-    "ConnectLogin": {
+    "StudioLogin": {
       "Type": "String",
       "Default": "nuxeo_presales",
       "Description": "Connect account login (to install the Studio project)"
     },
-    "ConnectPwd": {
+    "StudioPwd": {
       "Type": "String",
       "Description": "Connect account password (to install the Studio project)"
     },
@@ -213,10 +213,10 @@
                   "Ref": "StudioProject"
                 },
                 "connectLogin": {
-                  "Ref": "ConnectLogin"
+                  "Ref": "StudioLogin"
                 },
                 "connectPwd": {
-                  "Ref": "ConnectPwd"
+                  "Ref": "StudioPwd"
                 },
                 "uploadRole": {
                   "Fn::If" : [
