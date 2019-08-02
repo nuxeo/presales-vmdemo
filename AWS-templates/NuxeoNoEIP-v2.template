@@ -38,15 +38,6 @@
       "Type": "String",
       "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
     },
-    "StudioLogin": {
-      "Type": "String",
-      "Default": "nuxeo_presales",
-      "Description": "Connect account login (to install the Studio project)"
-    },
-    "StudioPwd": {
-      "Type": "String",
-      "Description": "Connect account password (to install the Studio project)"
-    },
     "Contact": {
       "Type": "String",
       "Default": "presales@nuxeo.com",
@@ -192,7 +183,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_LOGIN=${connectLogin} NX_STUDIO_PWD=${connectPwd} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -211,12 +202,6 @@
                 },
                 "studio": {
                   "Ref": "StudioProject"
-                },
-                "connectLogin": {
-                  "Ref": "StudioLogin"
-                },
-                "connectPwd": {
-                  "Ref": "StudioPwd"
                 },
                 "uploadRole": {
                   "Fn::If" : [
