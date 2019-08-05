@@ -117,7 +117,13 @@ echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet awscli atop jq
+sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet atop jq
+
+# Install latest aws cli using pip
+sudo apt-get install -y python3-pip
+pip3 install awscli --upgrade --user
+export PATH=$PATH:~/.local/bin/
+
 apt-get -y clean
 echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" | tee -a ${INSTALL_LOG}
 
