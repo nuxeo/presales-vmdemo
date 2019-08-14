@@ -5,7 +5,7 @@
 
   "Parameters": {
     "InstanceType": {
-      "Description": "Type of EC2 instance",
+      "Description": "Type of EC2 instance.  If you plan to install Arender, t3.medium is too small",
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
@@ -46,7 +46,7 @@
     "DiskSize": {
       "Type": "Number",
       "Default": 8,
-      "Description": "Disk size (in GB) for root volume of EC2 instance"
+      "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install Arender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
       "AllowedValues": ["true","false"],
