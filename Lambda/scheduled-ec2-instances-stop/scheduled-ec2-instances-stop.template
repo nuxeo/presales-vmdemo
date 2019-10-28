@@ -1,0 +1,98 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "Nuxeo Platform - Scheduled EC2 shutdown",
+
+  "Resources": {
+
+    "EC2StopPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "nuxeo-ec2-stop-policy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": "ec2:StopInstances",
+            "Resource": ["arn:aws:ec2:*:*:instance/*"]
+          }]
+        },
+        "Roles": [{
+          "Ref": "LambdaFunctionRole"
+        }]
+      }
+    },
+
+    "LambdaFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": ["lambda.amazonaws.com"]
+            },
+            "Action": [
+              "sts:AssumeRole"
+            ]
+          }]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+        ],
+        "Tags": [{
+            "Key": "billing-category",
+            "Value": "presales"
+          },
+          {
+            "Key": "billing-subcategory",
+            "Value": "generic"
+          }
+        ]
+      }
+    },
+
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async(event) => {}"
+        },
+        "Handler": "index.handler",
+        "Description": "A lambda function to shutdown EC2 instances",
+        "FunctionName": "nuxeo-scheduled-ec2-shutdown",
+        "Role": {
+          "Fn::GetAtt": ["LambdaFunctionRole", "Arn"]
+        },
+        "Runtime": "nodejs8.10",
+        "Tags": [{
+            "Key": "billing-category",
+            "Value": "presales"
+          },
+          {
+            "Key": "billing-subcategory",
+            "Value": "generic"
+          }
+        ],
+        "Timeout": 10
+      }
+    },
+    "Scheduler": {
+      "Type" : "AWS::Events::Rule",
+      "Properties" : {
+          "Description" : "Periodically trigger a lambda function to stop EC2 instances.",
+          "Name" : "nuxeo-scheduled-ec2-shutdown",
+          "ScheduleExpression" : "cron(0 9 ? * * *)",
+          "State" : "DISABLED",
+          "Targets" : [{
+            "Arn": {
+              "Fn::GetAtt": ["LambdaFunction", "Arn"]
+            },
+            "Id" : "Lambda"
+          }]
+        }
+    }
+  }
+}
