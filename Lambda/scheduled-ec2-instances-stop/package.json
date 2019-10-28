@@ -1,0 +1,14 @@
+{
+  "name": "scheduled-ec2-instances-stop",
+  "version": "1.0.0",
+  "description": "Function to stop all EC2 instances",
+  "main": "index.js",
+  "author": "Michael Vachette",
+  "contributors": [
+    "Michael Vachette"
+  ],
+  "license": "GPL",
+  "dependencies": {
+    "aws-sdk": "^2.555.0"
+  }
+}
