@@ -13,6 +13,7 @@ exports.handler = async(event) => {
             event.detail['instance-id']
         ]
     }).promise().then(function(data) {
+        
         const instance = data.Reservations[0].Instances[0];
         console.log('Success getting EC2 instance info', JSON.stringify(instance, null, 2));
 
@@ -33,36 +34,66 @@ exports.handler = async(event) => {
             }).Value;
         }
         console.log('Nuxeo DNS Name', nuxeoDnsName);
-
-        //update records
-        return route53.changeResourceRecordSets({
-            ChangeBatch: {
-                Changes: [{
-                    Action: "UPSERT",
-                    ResourceRecordSet: {
-                        Name: nuxeoDnsName + '.cloud.nuxeo.com.',
-                        ResourceRecords: [{
-                            Value: publicDNS
-                        }],
-                        TTL: 300,
-                        Type: "CNAME"
-                    }
-                }, {
-                    Action: "UPSERT",
-                    ResourceRecordSet: {
-                        Name: 'kibana-' +
-                            nuxeoDnsName + '.cloud.nuxeo.com.',
-                        ResourceRecords: [{
-                            Value: publicDNS
-                        }],
-                        TTL: 300,
-                        Type: "CNAME"
-                    }
-                }],
-                Comment: "Update after instance restart"
-            },
-            HostedZoneId: process.env.HOSTED_ZONE
-        }).promise();
+        if (event.detail['state'] === "running") {
+            //update records
+            return route53.changeResourceRecordSets({
+                ChangeBatch: {
+                    Changes: [{
+                        Action: "UPSERT",
+                        ResourceRecordSet: {
+                            Name: nuxeoDnsName + '.cloud.nuxeo.com.',
+                            ResourceRecords: [{
+                                Value: publicDNS
+                            }],
+                            TTL: 300,
+                            Type: "CNAME"
+                        }
+                    }, {
+                        Action: "UPSERT",
+                        ResourceRecordSet: {
+                            Name: 'kibana-' +
+                                nuxeoDnsName + '.cloud.nuxeo.com.',
+                            ResourceRecords: [{
+                                Value: publicDNS
+                            }],
+                            TTL: 300,
+                            Type: "CNAME"
+                        }
+                    }],
+                    Comment: "Update after instance restart"
+                },
+                HostedZoneId: process.env.HOSTED_ZONE
+            }).promise();
+        } else if (event.detail['state'] === "stopping") {
+            return route53.changeResourceRecordSets({
+                ChangeBatch: {
+                    Changes: [{
+                        Action: "DELETE",
+                        ResourceRecordSet: {
+                            Name: nuxeoDnsName + '.cloud.nuxeo.com.',
+                            ResourceRecords: [{
+                                Value: publicDNS
+                            }],
+                            TTL: 300,
+                            Type: "CNAME"
+                        }
+                    }, {
+                        Action: "DELETE",
+                        ResourceRecordSet: {
+                            Name: 'kibana-' +
+                                nuxeoDnsName + '.cloud.nuxeo.com.',
+                            ResourceRecords: [{
+                                Value: publicDNS
+                            }],
+                            TTL: 300,
+                            Type: "CNAME"
+                        }
+                    }],
+                    Comment: "Delete after instance restart"
+                },
+                HostedZoneId: process.env.HOSTED_ZONE
+            }).promise();
+        }
     }).then(function(data) {
         console.log('Success updating route 53 record', JSON.stringify(data, null, 2));
     }).catch(function(err) {
