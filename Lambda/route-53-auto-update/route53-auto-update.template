@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Nuxeo Platform - Auto-update route 53 record",
+  "Description": "Auto-update route 53 record",
 
   "Resources": {
 

@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Nuxeo Platform - Scheduled EC2 shutdown",
+  "Description": "Scheduled EC2 shutdown",
 
   "Resources": {
 
