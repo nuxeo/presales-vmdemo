@@ -65,7 +65,7 @@
     "CloudWatchRule": {
       "Type" : "AWS::Events::Rule",
       "Properties" : {
-          "Description" : "Update Route53 records when EC2 instances are started",
+          "Description" : "Update Route53 records when EC2 instances are started/stopped",
           "Name" : "nuxeo-route53-auto-update",
           "EventPattern": {
             "source": [
