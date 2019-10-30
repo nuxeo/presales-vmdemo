@@ -1,6 +1,6 @@
 ## Description
 
-AWS resources to auto update route 53 records when an EC2 instance is restarted.
+AWS resources to auto update route 53 records when an EC2 instance is restarted/stopped.
 
 # Installation
 The installation is not completely automated yet and requires a few manual steps

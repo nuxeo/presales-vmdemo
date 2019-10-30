@@ -1,7 +1,7 @@
 {
   "name": "route53-auto-update",
   "version": "1.0.0",
-  "description": "Function to automatically update route 53 records when an EC instance is started",
+  "description": "Function to automatically update route 53 records when an EC instance is started/stopped",
   "main": "index.js",
   "author": "Michel Vachette",
   "contributors": [
