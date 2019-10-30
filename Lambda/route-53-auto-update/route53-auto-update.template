@@ -77,7 +77,8 @@
             "detail": {
               "state": [
                 "running",
-                "stopping"
+                "stopping",
+                "shutting-down"
               ]
             }
           },
