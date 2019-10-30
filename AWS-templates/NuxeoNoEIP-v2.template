@@ -175,6 +175,12 @@
             "Value": {
               "Ref": "AWS::StackName"
             }
+          },
+          {
+            "Key": "dnsName",
+            "Value": {
+              "Ref": "AWS::StackName"
+            }
           }
         ],
         "IamInstanceProfile": {
