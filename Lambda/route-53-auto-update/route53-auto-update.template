@@ -44,7 +44,7 @@
           "ZipFile": "exports.handler = async(event) => {}"
         },
         "Handler": "index.handler",
-        "Description": "A lambda function to shutdown EC2 instances",
+        "Description": "A lambda function to update Route53 records when EC2 instances are started/stopped",
         "FunctionName": "nuxeo-route53-auto-update",
         "Role": {
           "Fn::GetAtt": ["LambdaFunctionRole", "Arn"]
