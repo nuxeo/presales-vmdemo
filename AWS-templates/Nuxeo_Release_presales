@@ -185,11 +185,11 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     RequestHeader   append nuxeo-virtual-host "https://$STACK_ID.cloud.nuxeo.com/"
 
     # Retain TLS1.1 for backwards compatibility until Jan 2020
+    # These must be *after* the Certbot entry
     #XXX SSLProtocol all -SSLv2 -SSLv3 -TLSv1
     # SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
     # Enable high ciphers for 3rd party security scanners
     #XXX SSLCipherSuite HIGH:!aNULL:!MD5:!3DES
-    #XXX SSLHonorCipherOrder on
 
     ## BEGIN SUPINT-655 ##
     <Location "/nuxeo/incl">
@@ -224,9 +224,6 @@ apache2ctl -k graceful
 # Enable SSL certs
 echo "Nuxeo Presales Installation Script: Install Certbot" | tee -a ${INSTALL_LOG}
 certbot -q --apache --redirect --hsts --uir --agree-tos -m presales@nuxeo.com -d $STACK_ID.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
-# Strict SSL settings
-sed 's/#XXX//' /etc/apache2/sites-available/nuxeo.conf
-apache2ctl -k graceful
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
