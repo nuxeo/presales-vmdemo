@@ -66,15 +66,26 @@ sed -i 's/Xmx2g/Xmx1g/g' /etc/elasticsearch/jvm.options
 service elasticsearch start
 echo "Nuxeo Presales Installation Script: Install Elasticsearch => DONE" | tee -a ${INSTALL_LOG}
 
-#install docker
-echo "Nuxeo Presales Installation Script: Install Docker" | tee -a ${INSTALL_LOG}
-apt-get -q -y remove docker docker-engine docker.io
+# Install additional Repos
+echo "Nuxeo Presales Installation Script: Install Repositories" | tee -a ${INSTALL_LOG}
 apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+add-apt-repository -y universe
+add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+add-apt-repository -y ppa:certbot/certbot
 apt-get update
+echo "Nuxeo Presales Installation Script: Install Repositories => DONE" | tee -a ${INSTALL_LOG}
+
+# Install docker
+echo "Nuxeo Presales Installation Script: Install Docker" | tee -a ${INSTALL_LOG}
+apt-get -q -y remove docker docker-engine docker.io
 apt-get -q -y install docker-ce
 echo "Nuxeo Presales Installation Script: Install Docker => DONE" | tee -a ${INSTALL_LOG}
+
+# Install Certbot
+echo "Nuxeo Presales Installation Script: Install Certbot" | tee -a ${INSTALL_LOG}
+apt-get -q -y install certbot python-certbot-apache
+echo "Nuxeo Presales Installation Script: Install Certbot => DONE" | tee -a ${INSTALL_LOG}
 
 # Install Nuxeo
 echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
@@ -127,12 +138,6 @@ export PATH=$PATH:~/.local/bin/
 apt-get -y clean
 echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" | tee -a ${INSTALL_LOG}
 
-#download ssl certificates
-echo "Nuxeo Presales Installation Script: Download ssl certificates" | tee -a ${INSTALL_LOG}
-mkdir /etc/ssl/apache
-aws s3 sync s3://presales-instance-resources/ssl/apache /etc/ssl/apache --region eu-west-1
-echo "Nuxeo Presales Installation Script: Download ssl certificates => DONE" | tee -a ${INSTALL_LOG}
-
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 <VirtualHost _default_:80>
@@ -179,10 +184,12 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 
     RequestHeader   append nuxeo-virtual-host "https://$STACK_ID.cloud.nuxeo.com/"
 
-    SSLEngine   on
-    SSLCertificateFile     /etc/ssl/apache/wildcard_cloud_nuxeo_com_crt.crt
-    SSLCACertificateFile    /etc/ssl/apache/GandiStandardSSLCA2.pem
-    SSLCertificateKeyFile /etc/ssl/apache/cloud.nuxeo.com.key
+    # Retain TLS1.1 for backwards compatibility until Jan 2020
+    SSLProtocol all -SSLv2 -SSLv3 -TLSv1
+    # SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+    # Enable high ciphers for 3rd party security scanners
+    SSLCipherSuite HIGH:!aNULL:!MD5:!3DES
+    SSLHonorCipherOrder on
 
     ## BEGIN SUPINT-655 ##
     <Location "/nuxeo/incl">
@@ -213,6 +220,11 @@ a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
 apache2ctl -k graceful
+
+# Enable SSL certs
+echo "Nuxeo Presales Installation Script: Install Certbot" | tee -a ${INSTALL_LOG}
+certbot -q --apache --redirect --agree-tos -m presales@nuxeo.com -d $STACK_ID.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
+
 
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
