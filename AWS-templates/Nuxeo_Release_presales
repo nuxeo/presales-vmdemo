@@ -293,3 +293,6 @@ if [ -n "${NX_STUDIO}" ]; then
 fi
 
 echo "Nuxeo Presales Installation Script Complete" | tee -a ${INSTALL_LOG}
+
+#decrease nuxeo startup priority
+mv /etc/rc3.d/S*nuxeo /etc/rc3.d/S99nuxeo 
