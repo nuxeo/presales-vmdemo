@@ -22,7 +22,7 @@
     "NuxeoChannel": {
       "Type": "String",
       "Default": "Release",
-      "AllowedValues": ["Release", "FastTrack", "Snapshot"],
+      "AllowedValues": ["Release", "Snapshot"],
       "Description": "The channel to use"
     },
     "GitBranch": {
