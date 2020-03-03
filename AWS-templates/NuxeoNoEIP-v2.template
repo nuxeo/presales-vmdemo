@@ -40,7 +40,7 @@
     },
     "Contact": {
       "Type": "String",
-      "Default": "presales@nuxeo.com",
+      "Default": "wwpresales@nuxeo.com",
       "Description": "Contact email address"
     },
     "DiskSize": {
