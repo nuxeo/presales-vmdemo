@@ -9,6 +9,7 @@ source /etc/profile.d/load_env.sh
 INSTALL_LOG="/var/log/nuxeo_install.log"
 echo "Nuxeo Presales Installation Script Starting" > ${INSTALL_LOG}
 
+ES_MAJOR="6.x" # used for package installation
 ES_VERSION="6.5.4"
 
 # Increase open files limit
@@ -34,9 +35,8 @@ locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
 apt-get update
 apt-get -q -y upgrade
-apt-get -q -y install apache2
+apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
-apt-get -q -y install openssh-server openssh-client vim
 echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Install JA fonts
@@ -47,28 +47,33 @@ echo "Nuxeo Presales Installation Script: Install Java" | tee -a ${INSTALL_LOG}
 apt-get -q -y install openjdk-11-jdk
 echo "Nuxeo Presales Installation Script: Install Java => DONE" | tee -a ${INSTALL_LOG}
 
-#install elasticsearch
-echo "Nuxeo Presales Installation Script: Install Elasticsearch" | tee -a ${INSTALL_LOG}
+# Install elasticsearch
+echo "Nuxeo Presales Installation Script: Install Elasticsearch and Kibana" | tee -a ${INSTALL_LOG}
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-apt-get -q -y install apt-transport-https
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.deb.sha512
-shasum -a 512 -c elasticsearch-$ES_VERSION.deb.sha512
-dpkg -i elasticsearch-$ES_VERSION.deb
+echo "deb https://artifacts.elastic.co/packages/${ES_MAJOR}/apt stable main" > /etc/apt/sources.list.d/elastic-${ES_MAJOR}.list
+apt-get update
+apt-get -y install elasticsearch=${ES_VERSION} kibana=${ES_VERSION} | tee -a ${INSTALL_LOG}
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
+/bin/systemctl enable kibana.service
+
+# ES Plugins
 /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
 /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu
-#set default ES heap to 1G
+# Set default ES heap to 1G
 sed -i 's/Xms2g/Xms1g/g' /etc/elasticsearch/jvm.options
 sed -i 's/Xmx2g/Xmx1g/g' /etc/elasticsearch/jvm.options
 
+# Set Kibana options
+printf '\nserver.basePath: "/kibana"' >> /etc/kibana/kibana.yml
+
 service elasticsearch start
-echo "Nuxeo Presales Installation Script: Install Elasticsearch => DONE" | tee -a ${INSTALL_LOG}
+service kibana start
+echo "Nuxeo Presales Installation Script: Install Elasticsearch and Kibana => DONE" | tee -a ${INSTALL_LOG}
 
 # Install additional Repos
 echo "Nuxeo Presales Installation Script: Install Repositories" | tee -a ${INSTALL_LOG}
-apt-get -q -y install apt-transport-https ca-certificates curl software-properties-common
+apt-get -q -y install ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository -y universe
 add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -166,21 +171,30 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
         Allow from all
      </Proxy>
 
+    <Location /kibana>
+      AuthUserFile /etc/apache2/passwords
+      AuthName authorization
+      AuthType Basic
+      require valid-user
+    </Location>
+
     RewriteEngine   On
     RewriteRule ^/$ /nuxeo/ [R,L]
     RewriteRule ^/nuxeo$ /nuxeo/ [R,L]
 
     ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPass           /ARender/       http://localhost:8080/ARender/
+    ProxyPass           /kibana/        http://localhost:5601/
     ProxyPassReverse    /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPassReverse    /ARender/       http://localhost:8080/ARender/
+    ProxyPassReverse    /kibana/        http://localhost:5601/
     ProxyPreserveHost   On
 
     # WSS
     ProxyPass         /_vti_bin/     http://localhost:8080/_vti_bin/
     ProxyPass         /_vti_inf.html http://localhost:8080/_vti_inf.html
-    ProxyPassReverse /_vti_bin/     http://localhost:8080/_vti_bin/
-    ProxyPassReverse /_vti_inf.html http://localhost:8080/_vti_inf.html
+    ProxyPassReverse  /_vti_bin/     http://localhost:8080/_vti_bin/
+    ProxyPassReverse  /_vti_inf.html http://localhost:8080/_vti_inf.html
 
     RequestHeader   append nuxeo-virtual-host "https://$STACK_ID.cloud.nuxeo.com/"
 
@@ -219,6 +233,7 @@ EOF
 a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
+htpasswd -b -c /etc/apache2/passwords kibana kibana123
 apache2ctl -k graceful
 
 # Enable SSL certs
