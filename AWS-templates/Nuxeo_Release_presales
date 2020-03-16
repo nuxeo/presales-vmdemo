@@ -52,7 +52,7 @@ echo "Nuxeo Presales Installation Script: Install Elasticsearch and Kibana" | te
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 echo "deb https://artifacts.elastic.co/packages/${ES_MAJOR}/apt stable main" > /etc/apt/sources.list.d/elastic-${ES_MAJOR}.list
 apt-get update
-apt-get -y install elasticsearch=${ES_VERSION} kibana=${ES_VERSION} | tee -a ${INSTALL_LOG}
+apt-get -q -y install elasticsearch=${ES_VERSION} kibana=${ES_VERSION}
 /bin/systemctl daemon-reload
 /bin/systemctl enable elasticsearch.service
 /bin/systemctl enable kibana.service
