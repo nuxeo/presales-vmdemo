@@ -111,7 +111,7 @@ sed -i '1ielasticsearch.addressList=localhost:9200' /etc/nuxeo/nuxeo.conf
 #enable remote debugging
 sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 #set nuxeo application public dns
-sed -i '1inuxeo.url='https://${STACK_ID}'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
+sed -i '1inuxeo.url='https://${DNS_NAME}'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
 
 if [[ "${S3BUCKET}" == "true" ]]; then
   #add s3 bucket property
@@ -147,18 +147,18 @@ echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" 
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 <VirtualHost _default_:80>
 
-    ServerName  $STACK_ID.cloud.nuxeo.com
+    ServerName  $DNS_NAME.cloud.nuxeo.com
 
     CustomLog /var/log/apache2/nuxeo_access.log combined
     ErrorLog /var/log/apache2/nuxeo_error.log
 
-    Redirect permanent / https://$STACK_ID.cloud.nuxeo.com/
+    Redirect permanent / https://$DNS_NAME.cloud.nuxeo.com/
 
 </VirtualHost>
 
 <VirtualHost _default_:443 >
 
-    ServerName  $STACK_ID.cloud.nuxeo.com
+    ServerName  $DNS_NAME.cloud.nuxeo.com
 
     CustomLog /var/log/apache2/nuxeo_access.log combined
     ErrorLog /var/log/apache2/nuxeo_error.log
@@ -196,7 +196,7 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     ProxyPassReverse  /_vti_bin/     http://localhost:8080/_vti_bin/
     ProxyPassReverse  /_vti_inf.html http://localhost:8080/_vti_inf.html
 
-    RequestHeader   append nuxeo-virtual-host "https://$STACK_ID.cloud.nuxeo.com/"
+    RequestHeader   append nuxeo-virtual-host "https://$DNS_NAME.cloud.nuxeo.com/"
 
     # Retain TLS1.1 for backwards compatibility until Jan 2020
     # These must be *after* the Certbot entry
@@ -238,7 +238,7 @@ apache2ctl -k graceful
 
 # Enable SSL certs
 echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
-certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d ${STACK_ID}.cloud.nuxeo.com -d kibana-${STACK_ID}.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
+certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d ${DNS_NAME}.cloud.nuxeo.com -d kibana-${DNS_NAME}.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
@@ -259,7 +259,7 @@ alias dir='ls -alFGh'
 alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
-figlet -t $STACK_ID.cloud.nuxeo.com
+figlet -t $DNS_NAME.cloud.nuxeo.com
 EOF
 chown nuxeo:nuxeo /var/lib/nuxeo/server/.profile
 
@@ -280,7 +280,7 @@ alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
-figlet $STACK_ID.cloud.nuxeo.com
+figlet $DNS_NAME.cloud.nuxeo.com
 EOF
 
 #set up vim for ubuntu user
@@ -310,4 +310,4 @@ fi
 echo "Nuxeo Presales Installation Script Complete" | tee -a ${INSTALL_LOG}
 
 #decrease nuxeo startup priority
-mv /etc/rc3.d/S*nuxeo /etc/rc3.d/S99nuxeo 
+mv /etc/rc3.d/S*nuxeo /etc/rc3.d/S99nuxeo
