@@ -238,7 +238,7 @@ apache2ctl -k graceful
 
 # Enable SSL certs
 echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
-certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d ${DNS_NAME}.cloud.nuxeo.com -d kibana-${DNS_NAME}.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
+certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d $DNS_NAME.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
