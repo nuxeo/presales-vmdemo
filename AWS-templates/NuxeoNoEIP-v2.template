@@ -1,9 +1,14 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Nuxeo Platform - Not using Nuxify",
+  "Description": "Nuxeo Presales Demo Template - Not using Nuxify",
 
   "Parameters": {
+    "DnsName": {
+      "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
+      "Type": "String",
+      "AllowedPattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]))*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"
+    },
     "InstanceType": {
       "Description": "Type of EC2 instance.  If you plan to install Arender, t3.medium is too small",
       "Type": "String",
@@ -179,7 +184,7 @@
           {
             "Key": "dnsName",
             "Value": {
-              "Ref": "AWS::StackName"
+              "Ref": "DnsName"
             }
           }
         ],
@@ -189,10 +194,13 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
+                },
+                "dnsName": {
+                  "Ref": "DnsName"
                 },
                 "region": {
                   "Ref": "AWS::Region"
