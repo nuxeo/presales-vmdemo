@@ -492,7 +492,7 @@
             "AllowedOrigins": [{
               "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
                 "name": {
-                  "Ref": "AWS::StackName"
+                  "Ref": "DnsName"
                 }
               }]
             }],
