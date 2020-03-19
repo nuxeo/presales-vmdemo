@@ -1,19 +1,20 @@
+/*jshint esversion: 6 */
 const AWS = require('aws-sdk');
 
-exports.handler = async(event) => {
-    console.log('event:', JSON.stringify(event));
+exports.handler = async (event) => {
+    console.log('Event:', JSON.stringify(event));
 
     const ec2 = new AWS.EC2();
     const route53 = new AWS.Route53();
     const instanceId = event.detail['instance-id'];
 
-    console.log('fetching instance info :', instanceId);
+    console.log('Fetching instance info :', instanceId);
 
     return ec2.describeInstances({
         InstanceIds: [
             instanceId
         ]
-    }).promise().then(function(data) {
+    }).promise().then(function (data) {
 
         const instance = data.Reservations[0].Instances[0];
         console.log('Success getting EC2 instance info', JSON.stringify(instance, null, 2));
@@ -23,15 +24,18 @@ exports.handler = async(event) => {
 
         let nuxeoDnsName;
 
-        let dnsTag = instance.Tags.find(function(tag) {
-            return tag.Key === "dnsName"
+        let templateVer = instance.Tags.find(function (tag) {
+            return tag.Key === "cfTemplateVersion";
+        });
+        let dnsTag = instance.Tags.find(function (tag) {
+            return tag.Key === "dnsName";
         });
 
         if (dnsTag) {
             nuxeoDnsName = dnsTag.Value;
         } else {
-            nuxeoDnsName = instance.Tags.find(function(tag) {
-                return tag.Key === "aws:cloudformation:stack-name"
+            nuxeoDnsName = instance.Tags.find(function (tag) {
+                return tag.Key === "aws:cloudformation:stack-name";
             }).Value;
         }
         console.log('Nuxeo DNS Name', nuxeoDnsName);
@@ -46,39 +50,44 @@ exports.handler = async(event) => {
         } else {
             throw ("Unsupported instance state");
         }
+
+        let dnsChanges = [{
+            Action: action,
+            ResourceRecordSet: {
+                Name: nuxeoDnsName + '.cloud.nuxeo.com.',
+                ResourceRecords: [{
+                    Value: publicDNS
+                }],
+                TTL: 300,
+                Type: "CNAME"
+            }
+        }];
+        if (!templateVer) {
+            // Unversioned templates use kibana DNS name
+            dnsChanges.push({
+                Action: action,
+                ResourceRecordSet: {
+                    Name: 'kibana-' + nuxeoDnsName + '.cloud.nuxeo.com.',
+                    ResourceRecords: [{
+                        Value: publicDNS
+                    }],
+                    TTL: 300,
+                    Type: "CNAME"
+                }
+            });
+        }
         //update records
         return route53.changeResourceRecordSets({
             ChangeBatch: {
-                Changes: [{
-                    Action: action,
-                    ResourceRecordSet: {
-                        Name: nuxeoDnsName + '.cloud.nuxeo.com.',
-                        ResourceRecords: [{
-                            Value: publicDNS
-                        }],
-                        TTL: 300,
-                        Type: "CNAME"
-                    }
-                }, {
-                    Action: action,
-                    ResourceRecordSet: {
-                        Name: 'kibana-' +
-                            nuxeoDnsName + '.cloud.nuxeo.com.',
-                        ResourceRecords: [{
-                            Value: publicDNS
-                        }],
-                        TTL: 300,
-                        Type: "CNAME"
-                    }
-                }],
+                Changes: dnsChanges,
                 Comment: "Update after instance restart"
             },
             HostedZoneId: process.env.HOSTED_ZONE
         }).promise();
 
-    }).then(function(data) {
+    }).then(function (data) {
         console.log('Success updating route 53 record', JSON.stringify(data, null, 2));
-    }).catch(function(err) {
+    }).catch(function (err) {
         console.log('failure', err);
     });
 };
