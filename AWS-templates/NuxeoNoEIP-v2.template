@@ -315,7 +315,7 @@
             {
               "Effect": "Allow",
               "Action": "secretsmanager:GetSecretValue",
-              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"]
+              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT", "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN"]
             },
             {
               "Effect": "Allow",
