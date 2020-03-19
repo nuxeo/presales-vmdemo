@@ -245,7 +245,7 @@ certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
 #fix imagemagick Policy
-wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
+wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${NX_BRANCH}/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
 
 #set up profile for nuxeo user
 cat << EOF > /var/lib/nuxeo/server/.profile
