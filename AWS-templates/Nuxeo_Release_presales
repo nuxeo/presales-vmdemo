@@ -234,8 +234,8 @@ EOF
 a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
-KIBANA_PASS=$(aws secretsmanager get-secret-value --secret-id kibana_default_password --region us-west-2 | jq '.SecretString|fromjson|.kibana_default_password')
-htpasswd -b -c /etc/apache2/passwords kibana ${KIBANA_PASS}
+KIBANA_PASS=$(aws secretsmanager get-secret-value --secret-id kibana_default_password --region us-west-2 | jq -r '.SecretString|fromjson|.kibana_default_password')
+htpasswd -b -c /etc/apache2/passwords kibana "${KIBANA_PASS}"
 apache2ctl -k graceful
 
 # Enable SSL certs
