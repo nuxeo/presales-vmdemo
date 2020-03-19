@@ -54,7 +54,7 @@
       "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install Arender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
-      "AllowedValues": ["true","false"],
+      "AllowedValues": ["true", "false"],
       "Default": "true",
       "Description": "Create the corresponding S3 Bucket for this stack",
       "Type": "String"
@@ -166,6 +166,10 @@
             "Value": "dev"
           },
           {
+            "Key": "cfTemplateVersion",
+            "Value": "1.0.0"
+          },
+          {
             "Key": "billing-category",
             "Value": "presales"
           },
@@ -218,9 +222,11 @@
                   "Ref": "StudioProject"
                 },
                 "uploadRole": {
-                  "Fn::If" : [
+                  "Fn::If": [
                     "CreateS3Bucket",
-                    {"Fn::GetAtt": ["UploadRole", "Arn"]},
+                    {
+                      "Fn::GetAtt": ["UploadRole", "Arn"]
+                    },
                     "false"
                   ]
                 }
