@@ -181,6 +181,7 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     RewriteEngine   On
     RewriteRule ^/$ /nuxeo/ [R,L]
     RewriteRule ^/nuxeo$ /nuxeo/ [R,L]
+    RewriteRule ^/kibana$ /kibana/ [R,L]
 
     ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPass           /ARender/       http://localhost:8080/ARender/
