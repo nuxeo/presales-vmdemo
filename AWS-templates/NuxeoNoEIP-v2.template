@@ -7,7 +7,9 @@
     "DnsName": {
       "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
       "Type": "String",
-      "AllowedPattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]))*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"
+      "AllowedPattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]))*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+      "MinLength": 1,
+      "ConstraintDescription": "Please specify a valid DNS host prefix"
     },
     "InstanceType": {
       "Description": "Type of EC2 instance.  If you plan to install Arender, t3.medium is too small",
@@ -22,7 +24,9 @@
     },
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access",
-      "Type": "String"
+      "Type": "String",
+      "MinLength": 1,
+      "ConstraintDescription": "Please specify a key pair"
     },
     "NuxeoChannel": {
       "Type": "String",
@@ -37,7 +41,9 @@
     },
     "Customer": {
       "Type": "String",
-      "Description": "Prospect name, or 'generic' if this is a generic demo"
+      "Description": "Prospect name, or 'generic' if this is a generic demo",
+      "MinLength": 1,
+      "ConstraintDescription": "Please specify a customer"
     },
     "StudioProject": {
       "Type": "String",
@@ -50,8 +56,8 @@
     },
     "DiskSize": {
       "Type": "Number",
-      "Default": 8,
-      "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install Arender, 40GB should be a minimum"
+      "Default": 10,
+      "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
       "AllowedValues": ["true", "false"],
