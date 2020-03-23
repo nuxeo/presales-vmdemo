@@ -298,7 +298,7 @@ if [ -n "${NX_STUDIO}" ]; then
   echo "Nuxeo Presales Installation Script: Install Studio project" | tee -a ${INSTALL_LOG}
   echo "$(date) Register Nuxeo Instance" | tee -a ${INSTALL_LOG}
 
-  CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq '.SecretString|fromjson|.connect_presales_pwd')
+  CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq -r '.SecretString|fromjson|.connect_presales_pwd')
   nuxeoctl register nuxeo_presales ${NX_STUDIO} "dev" "AWS_${STACK_ID}" "${CREDENTIALS}" | tee -a ${INSTALL_LOG}
   nuxeoctl mp-hotfix --accept true | tee -a ${INSTALL_LOG}
   nuxeoctl mp-install nuxeo-web-ui marketplace-disable-studio-snapshot-validation --accept true | tee -a ${INSTALL_LOG}
