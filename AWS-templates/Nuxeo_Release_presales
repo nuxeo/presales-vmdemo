@@ -9,6 +9,13 @@ source /etc/profile.d/load_env.sh
 INSTALL_LOG="/var/log/nuxeo_install.log"
 echo "Nuxeo Presales Installation Script Starting" > ${INSTALL_LOG}
 
+# Check DNS Name
+if [ -z "${DNS_NAME}" ]
+then
+  DNS_NAME=${STACK_ID}
+  echo "Warning: DNS Name is not set, using stack id: ${STACK_ID}" | tee -a ${INSTALL_LOG}
+fi
+
 ES_MAJOR="6.x" # used for package installation
 ES_VERSION="6.5.4"
 
@@ -99,7 +106,7 @@ service nuxeo stop
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
 #add nuxeo user to docker group
-sudo usermod -aG docker nuxeo
+usermod -aG docker nuxeo
 
 #skip wizard
 sed -i '/nuxeo.wizard.done=false/d' /etc/nuxeo/nuxeo.conf
@@ -133,10 +140,10 @@ echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet atop jq
+apt-get install -q -y mediainfo ffmpeg x264 x265 figlet atop jq
 
 # Install latest aws cli using pip
-sudo apt-get install -y python3-pip
+apt-get install -q -y python3-pip
 pip3 install awscli --upgrade --user
 export PATH=$PATH:~/.local/bin/
 
