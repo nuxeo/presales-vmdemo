@@ -49,10 +49,14 @@ apt-get update
 apt-get -q -y upgrade
 apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
-echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Install JA fonts
-apt-get -q -y install fonts-takao
+apt-get -q -y install fonts-takao python3-pip
+
+# Install latest aws cli using pip
+pip3 install awscli --upgrade --user
+export PATH=$PATH:~/.local/bin/
+echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Install Java
 echo "Nuxeo Presales Installation Script: Install Java" | tee -a ${INSTALL_LOG}
@@ -133,7 +137,7 @@ sed -i '1imail.smtp.ssl.enable=true' /etc/nuxeo/nuxeo.conf
 sed -i '1imail.from=no-reply@nuxeo-demo.awsapps.com' /etc/nuxeo/nuxeo.conf
 sed -i '1imail.transport.auth=true' /etc/nuxeo/nuxeo.conf
 sed -i '1imail.transport.user=no-reply@nuxeo-demo.awsapps.com' /etc/nuxeo/nuxeo.conf
-sed -i '1imail.transport.password=${MAIL_PASS}' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.password='${MAIL_PASS} /etc/nuxeo/nuxeo.conf
 sed -i '1imail.transport.port=465' /etc/nuxeo/nuxeo.conf
 sed -i '1imail.transport.host=smtp.mail.us-east-1.awsapps.com' /etc/nuxeo/nuxeo.conf
 sed -i '1i# Mail Configuration' /etc/nuxeo/nuxeo.conf
@@ -161,11 +165,6 @@ echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a
 update-alternatives --set editor /usr/bin/vim.basic
 
 apt-get install -q -y mediainfo ffmpeg x264 x265 figlet atop
-
-# Install latest aws cli using pip
-apt-get install -q -y python3-pip
-pip3 install awscli --upgrade --user
-export PATH=$PATH:~/.local/bin/
 
 apt-get -y clean
 echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" | tee -a ${INSTALL_LOG}
