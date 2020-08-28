@@ -142,8 +142,8 @@ sed -i '1imail.transport.port=465' /etc/nuxeo/nuxeo.conf
 sed -i '1imail.transport.host=smtp.mail.us-east-1.awsapps.com' /etc/nuxeo/nuxeo.conf
 sed -i '1i# Mail Configuration' /etc/nuxeo/nuxeo.conf
 
-
-if [[ "${S3BUCKET}" == "true" ]]; then
+# Support old style of creating a bucket
+if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" ]]; then
   #add s3 bucket property
   sed -i '1inuxeo.s3storage.bucket='${STACK_ID}-bucket /etc/nuxeo/nuxeo.conf
   sed -i '1inuxeo.s3storage.bucket_prefix=binary_store/' /etc/nuxeo/nuxeo.conf
@@ -159,6 +159,21 @@ if [[ "${S3BUCKET}" == "true" ]]; then
   sed -i '1i# S3 Configuration' /etc/nuxeo/nuxeo.conf
 fi
 
+if [[ "${S3BUCKET}" == "Shared" ]]; then
+  #add s3 bucket property
+  sed -i '1inuxeo.s3storage.bucket='${REGION}-demo-bucket /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.bucket_prefix='${STACK_ID}'/binary_store/' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.region='${REGION} /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.directdownload=true' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.directdownload.expire=3600' /etc/nuxeo/nuxeo.conf
+
+  #add s3 direct upload config
+  sed -i '1inuxeo.s3storage.useDirectUpload=true' /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.roleArn='${UPLOAD_ROLE_ARN} /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.bucket='${REGION}-demo-bucket /etc/nuxeo/nuxeo.conf
+  sed -i '1inuxeo.s3storage.transient.bucket_prefix='${STACK_ID}'/upload/' /etc/nuxeo/nuxeo.conf
+  sed -i '1i# S3 Configuration' /etc/nuxeo/nuxeo.conf
+fi
 
 echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a ${INSTALL_LOG}
 # Update some defaults

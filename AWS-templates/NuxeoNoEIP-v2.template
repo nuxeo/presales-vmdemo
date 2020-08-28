@@ -60,9 +60,9 @@
       "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
-      "AllowedValues": ["true", "false"],
-      "Default": "true",
-      "Description": "Create the corresponding S3 Bucket for this stack",
+      "AllowedValues": ["Shared", "Create", "None"],
+      "Default": "Shared",
+      "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
       "Type": "String"
     }
   },
@@ -71,7 +71,19 @@
     "CreateS3Bucket": {
       "Fn::Equals": [{
         "Ref": "UseS3Bucket"
-      }, "true"]
+      }, "Create"]
+    },
+    "ShareS3Bucket": {
+      "Fn::Equals": [{
+        "Ref": "UseS3Bucket"
+      }, "Shared"]
+    },
+    "UseS3": {
+      "Fn::Or": [{
+        "Condition": "CreateS3Bucket"
+      }, {
+        "Condition": "ShareS3Bucket"
+      }]
     }
   },
 
@@ -128,6 +140,7 @@
       }
     }
   },
+
   "Resources": {
     "NuxeoInstance": {
       "Type": "AWS::EC2::Instance",
@@ -229,7 +242,7 @@
                 },
                 "uploadRole": {
                   "Fn::If": [
-                    "CreateS3Bucket",
+                    "UseS3",
                     {
                       "Fn::GetAtt": ["UploadRole", "Arn"]
                     },
@@ -242,6 +255,38 @@
         }
       }
     },
+
+    "NuxeoSecurity": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Fn::FindInMap": ["AWSRegionSubnet", {
+            "Ref": "AWS::Region"
+          }, "vpc"]
+        },
+        "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
+        "SecurityGroupIngress": [{
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+
     "InstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -251,6 +296,7 @@
         }]
       }
     },
+
     "InstanceRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -269,6 +315,7 @@
         "Path": "/"
       }
     },
+
     "InstanceSharedResourcePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
@@ -315,9 +362,10 @@
             {
               "Effect": "Allow",
               "Action": "secretsmanager:GetSecretValue",
-              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT", 
-                           "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN",
-                           "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ"]
+              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
+                "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN",
+                "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ"
+              ]
             },
             {
               "Effect": "Allow",
@@ -341,7 +389,114 @@
       }
     },
 
-    "InstancesS3Policy": {
+    "UploadRole": {
+      "Type": "AWS::IAM::Role",
+      "Condition": "UseS3",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": [{
+                "Fn::GetAtt": ["InstanceRole", "Arn"]
+              }]
+            },
+            "Action": [
+              "sts:AssumeRole"
+            ]
+          }]
+        },
+        "Path": "/"
+      }
+    },
+
+    "SharedS3Policy": {
+      "Type": "AWS::IAM::Policy",
+      "Condition": "ShareS3Bucket",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Sub": ["${name}-s3-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:ListBucketMultipartUploads"
+              ],
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket"]]
+              }]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:ListBucketMultipartUploads"
+              ],
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket/", {
+                  "Ref": "AWS::StackName"
+                }, "/*"]]
+              }]
+            }
+          ]
+        },
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
+      }
+    },
+
+    "SharedS3UploadPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Condition": "ShareS3Bucket",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Sub": ["${name}-direct-upload-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": [{
+              "Fn::Join": ["", ["arn:aws:s3:::", {
+                "Ref": "AWS::Region"
+              }, "-demo-bucket/", {
+                "Ref": "AWS::StackName"
+              }, "/upload/*"]]
+            }]
+          }]
+        },
+        "Roles": [{
+          "Ref": "UploadRole"
+        }]
+      }
+    },
+
+    "CreateS3Policy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "CreateS3Bucket",
       "Properties": {
@@ -392,28 +547,8 @@
         }]
       }
     },
-    "UploadRole": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "CreateS3Bucket",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-            "Effect": "Allow",
-            "Principal": {
-              "AWS": [{
-                "Fn::GetAtt": ["InstanceRole", "Arn"]
-              }]
-            },
-            "Action": [
-              "sts:AssumeRole"
-            ]
-          }]
-        },
-        "Path": "/"
-      }
-    },
-    "UploadPolicy": {
+
+    "CreateS3UploadPolicy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "CreateS3Bucket",
       "Properties": {
@@ -441,36 +576,7 @@
         }]
       }
     },
-    "NuxeoSecurity": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Properties": {
-        "VpcId": {
-          "Fn::FindInMap": ["AWSRegionSubnet", {
-            "Ref": "AWS::Region"
-          }, "vpc"]
-        },
-        "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
-        "SecurityGroupIngress": [{
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "CidrIp": "0.0.0.0/0"
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "80",
-            "ToPort": "80",
-            "CidrIp": "0.0.0.0/0"
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "443",
-            "ToPort": "443",
-            "CidrIp": "0.0.0.0/0"
-          }
-        ]
-      }
-    },
+
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
       "Condition": "CreateS3Bucket",
