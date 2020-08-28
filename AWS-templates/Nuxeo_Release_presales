@@ -343,7 +343,7 @@ if [ -n "${NX_STUDIO}" ]; then
   nuxeoctl register nuxeo_presales ${NX_STUDIO} "dev" "AWS_${STACK_ID}" "${CREDENTIALS}" | tee -a ${INSTALL_LOG}
   nuxeoctl mp-hotfix --accept true | tee -a ${INSTALL_LOG}
   nuxeoctl mp-install nuxeo-web-ui marketplace-disable-studio-snapshot-validation --accept true | tee -a ${INSTALL_LOG}
-  if [[ "${S3BUCKET}" == "true" ]]; then
+  if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
     nuxeoctl mp-install amazon-s3-online-storage amazon-s3-direct-upload --accept true | tee -a ${INSTALL_LOG}
   fi
   nuxeoctl mp-install ${NX_STUDIO}-0.0.0-SNAPSHOT --accept true | tee -a ${INSTALL_LOG}
