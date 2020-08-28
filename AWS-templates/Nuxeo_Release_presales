@@ -35,7 +35,7 @@ locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
 apt-get update
 apt-get -q -y upgrade
-apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim
+apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
 
@@ -112,6 +112,20 @@ sed -i '1ielasticsearch.addressList=localhost:9200' /etc/nuxeo/nuxeo.conf
 sed -i '1iJAVA_OPTS=$JAVA_OPTS -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n' /etc/nuxeo/nuxeo.conf
 #set nuxeo application public dns
 sed -i '1inuxeo.url='https://${DNS_NAME}'.cloud.nuxeo.com/nuxeo' /etc/nuxeo/nuxeo.conf
+sed -i '1i# Host Configuration' /etc/nuxeo/nuxeo.conf
+
+MAIL_PASS=$(aws secretsmanager get-secret-value --secret-id workmail_default_password --region us-west-2 | jq -r '.SecretString|fromjson|.workmail_default_password')
+sed -i '1inuxeo.notification.eMailSubjectPrefix=[Nuxeo] ' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.protocol=smtps' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.smtp.ssl.enable=true' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.from=no-reply@nuxeo-demo.awsapps.com' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.auth=true' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.user=no-reply@nuxeo-demo.awsapps.com' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.password=${MAIL_PASS}' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.port=465' /etc/nuxeo/nuxeo.conf
+sed -i '1imail.transport.host=smtp.mail.us-east-1.awsapps.com' /etc/nuxeo/nuxeo.conf
+sed -i '1i# Mail Configuration' /etc/nuxeo/nuxeo.conf
+
 
 if [[ "${S3BUCKET}" == "true" ]]; then
   #add s3 bucket property
@@ -126,6 +140,7 @@ if [[ "${S3BUCKET}" == "true" ]]; then
   sed -i '1inuxeo.s3storage.transient.roleArn='${UPLOAD_ROLE_ARN} /etc/nuxeo/nuxeo.conf
   sed -i '1inuxeo.s3storage.transient.bucket='${STACK_ID}-bucket /etc/nuxeo/nuxeo.conf
   sed -i '1inuxeo.s3storage.transient.bucket_prefix=upload/' /etc/nuxeo/nuxeo.conf
+  sed -i '1i# S3 Configuration' /etc/nuxeo/nuxeo.conf
 fi
 
 
@@ -133,7 +148,7 @@ echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 
-sudo apt-get install -y mediainfo ffmpeg x264 x265 figlet atop jq
+apt-get install -q -y mediainfo ffmpeg x264 x265 figlet atop
 
 # Install latest aws cli using pip
 sudo apt-get install -y python3-pip
