@@ -455,6 +455,10 @@
                 }, "-demo-bucket/", {
                   "Ref": "AWS::StackName"
                 }, "/*"]]
+              }, {
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket/s3DirectUpload/*"]]
               }]
             }
           ]
