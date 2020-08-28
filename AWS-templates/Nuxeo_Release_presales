@@ -7,7 +7,7 @@
 source /etc/profile.d/load_env.sh
 
 INSTALL_LOG="/var/log/nuxeo_install.log"
-echo "Nuxeo Presales Installation Script Starting" > ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script Starting [${DNS_NAME}]" > ${INSTALL_LOG}
 
 ES_MAJOR="6.x" # used for package installation
 ES_VERSION="6.5.4"
@@ -22,6 +22,11 @@ echo "deb http://apt.nuxeo.org/ $code releases" > /etc/apt/sources.list.d/nuxeo.
 
 # Register the nuxeo key
 wget -q -O- http://apt.nuxeo.org/nuxeo.key | apt-key add -
+
+# Set the hostname & domain
+echo "${DNS_NAME}" > /etc/hostname
+hostname ${DNS_NAME}
+echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 
 # Pre-accept Sun Java license & set Nuxeo options
 echo nuxeo nuxeo/bind-address select 127.0.0.1 | debconf-set-selections
