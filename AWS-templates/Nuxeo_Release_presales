@@ -6,6 +6,7 @@
 
 source /etc/profile.d/load_env.sh
 
+# Variables for installation
 INSTALL_LOG="/var/log/nuxeo_install.log"
 
 COMPOSE_REPO="https://github.com/nuxeo-sandbox/nuxeo-presales-docker"
@@ -15,18 +16,33 @@ NUXEO_BASE_DIR="/var/lib/nuxeo"
 NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
 NUXEO_DATA_DIR="${NUXEO_BASE_DIR}/data"
 NUXEO_LOG_DIR="${NUXEO_BASE_DIR}/log"
-NUXED_ENV="${NUXEO_BASE_DIR}/env"
+NUXED_ENV="${COMPOSE_DIR}/.env"
 
 STUDIO_USERNAME="nuxeo_presales"
 
-echo "Nuxeo Presales Installation Script Starting [${DNS_NAME}]" > ${INSTALL_LOG}
+TEMPLATES="default,mongodb"
+
+MONGO_VERSION="4.4"
+ELASTIC_VERSION="7.9.3"
+
+# Start of installation script
+
+echo "Nuxeo Presales Installation Script Starting [${STACK_ID}]" > ${INSTALL_LOG}
+
+# Check configured image
+if [ -z "${FROM_IMAGE}" ]; then
+  FROM_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+  echo "Upstream image is not set, using: ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
+fi
 
 # Check DNS Name
-if [ -z "${DNS_NAME}" ]
-then
+if [ -z "${DNS_NAME}" ]; then
   DNS_NAME=${STACK_ID}
   echo "Warning: DNS Name is not set, using stack id: ${STACK_ID}" | tee -a ${INSTALL_LOG}
 fi
+
+# Fully qualified domain name
+FQDN="${DNS_NAME}.cloud.nuxeo.com"
 
 # Increase open files limit
 echo '*       soft    nofile      4096' >> /etc/security/limits.conf
@@ -37,6 +53,10 @@ echo "${DNS_NAME}" > /etc/hostname
 hostname ${DNS_NAME}
 echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 
+# Create nuxeo user - UID 900 comes from the docker image
+groupadd -g 900 nuxeo
+useradd -m -g 900 -G ubuntu -u 900 nuxeo
+
 # Upgrade packages and install apache, ssh, ...
 echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc." | tee -a ${INSTALL_LOG}
 export DEBIAN_FRONTEND=noninteractive
@@ -45,14 +65,12 @@ update-locale LANG=en_US.UTF-8
 apt-get update
 apt-get -q -y upgrade
 apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq git \
-                      ca-certificates curl software-properties-common python3-pip
+                      ca-certificates curl software-properties-common python3-pip figlet \
+                      atop htop ctop
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 
-# Install JA fonts
-# apt-get -q -y install fonts-takao
-
 # Install latest aws cli using pip
-pip3 install awscli --upgrade --user
+pip3 install -q awscli --upgrade --user
 export PATH=$PATH:~/.local/bin/
 echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
 
@@ -69,7 +87,7 @@ echo "Nuxeo Presales Installation Script: Install Repositories => DONE" | tee -a
 echo "Nuxeo Presales Installation Script: Install Docker" | tee -a ${INSTALL_LOG}
 apt-get -q -y remove docker docker-engine docker.io
 apt-get -q -y install docker-ce
-pip3 install --system docker-compose
+pip3 install -q --system docker-compose
 echo "Nuxeo Presales Installation Script: Install Docker => DONE" | tee -a ${INSTALL_LOG}
 
 # Install Certbot
@@ -82,18 +100,16 @@ echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 # Add ubuntu user to docker group
 usermod -aG docker ubuntu
 
+# Make directories and clone compose stack
 mkdir -p ${COMPOSE_DIR} ${NUXEO_CONF_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR}
 git clone ${COMPOSE_REPO} ${COMPOSE_DIR}
-
-chown -R ubuntu:ubuntu ${NUXEO_BASE_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
-echo "Nuxeo Presales Installation Script: Configure Nuxeo
-" | tee -a ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Configure Nuxeo" | tee -a ${INSTALL_LOG}
 # Link old log location to new
 ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
 
-# Add default conf.d files
+# Copy default conf.d files
 cp ${COMPOSE_DIR}/conf.d/*.conf ${NUXEO_CONF_DIR}
 
 # Secrets for instance
@@ -110,11 +126,19 @@ if [[ "${S3BUCKET}" == "Shared" ]]; then
   S3_UPLOAD_PREFIX="${STACK_ID}/upload/"
 fi
 
+AUTO_PACKAGES="nuxeo-web-ui marketplace-disable-studio-snapshot-validation"
+if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
+  AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage amazon-s3-direct-upload"
+fi
+
 # Write system configuration
 cat << EOF > ${NUXEO_CONF_DIR}/system.conf
 # Host Configuration
 session.timeout=600
-nuxeo.url=https://${DNS_NAME}.cloud.nuxeo.com/nuxeo
+nuxeo.url=https://${FQDN}/nuxeo
+
+# Templates
+nuxeo.templates=${TEMPLATES}
 
 # Mail Configuration
 mail.transport.password=${MAIL_PASS}
@@ -139,69 +163,80 @@ nuxeo.s3storage.transient.roleArn=${UPLOAD_ROLE_ARN}
 nuxeo.s3storage.transient.bucket=${S3_BUCKET}
 nuxeo.s3storage.transient.bucket_prefix=${S3_UPLOAD_PREFIX}
 EOF
+# Make env not as hidden
+ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Register the nuxeo instance
+echo "$(date) Configure Studio Project [${NX_STUDIO}]" | tee -a ${INSTALL_LOG}
+
+STUDIO_PACKAGE=""
 if [ -n "${NX_STUDIO}" ]; then
-  echo "Nuxeo Presales Installation Script: Install Studio project" | tee -a ${INSTALL_LOG}
-  echo "$(date) Register Nuxeo Instance ${NX_STUDIO}" | tee -a ${INSTALL_LOG}
+  STUDIO_PACKAGE="${NX_STUDIO}-0.0.0-SNAPSHOT"
+fi
 
-  AUTO_PACKAGES="nuxeo-web-ui marketplace-disable-studio-snapshot-validation"
-  if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
-    AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage amazon-s3-direct-upload"
-  fi
-
-  CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq -r '.SecretString|fromjson|.connect_presales_pwd')
-  cat << EOF > ${NUXEO_ENV}
+# Set working environment
+CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq -r '.SecretString|fromjson|.connect_presales_pwd')
+cat << EOF > ${NUXEO_ENV}
 APPLICATION_NAME=${NX_STUDIO}
-NUXEO_REGISTRY=docker.packages.nuxeo.com
-NUXEO_IMAGE=nuxeo/nuxeo
-NUXEO_VERSION=latest
+NUXEO_IMAGE=${FROM_IMAGE}
+NUXEO_DEV=true
+NUXEO_INSTALL_HOTFIX=true
 NUXEO_PORT=8080
-NUXEO_PACKAGES=${NX_STUDIO}-0.0.0-SNAPSHOT ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
+ADDITIONAL_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
+
+ELASTIC_VERSION=${ELASTIC_VERSION}
+MONGO_VERSION=${MONGO_VERSION}
 
 STUDIO_USERNAME=${STUDIO_USERNAME}
 STUDIO_CREDENTIALS=${CREDENTIALS}
 EOF
-  #nuxeoctl register nuxeo_presales ${NX_STUDIO} "dev" "AWS_${STACK_ID}" "${CREDENTIALS}" | tee -a ${INSTALL_LOG}
-  #nuxeoctl mp-hotfix --accept true | tee -a ${INSTALL_LOG}
-  #nuxeoctl mp-install nuxeo-web-ui marketplace-disable-studio-snapshot-validation --accept true | tee -a ${INSTALL_LOG}
-  #if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
-  #  nuxeoctl mp-install amazon-s3-online-storage amazon-s3-direct-upload --accept true | tee -a ${INSTALL_LOG}
-  #fi
-  #nuxeoctl mp-install ${NX_STUDIO}-0.0.0-SNAPSHOT --accept true | tee -a ${INSTALL_LOG}
-  echo "Starting Nuxeo..." | tee -a ${INSTALL_LOG}
 
-  docker-compose --project-directory ${COMPOSE_DIR} up -d --no-color | tee -a ${INSTALL_LOG}
+# Fix up permissions
+chmod -R g+w ${NUXEO_BASE_DIR}
+chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR}
+chown -R ubuntu:ubuntu ${COMPOSE_DIR}
 
-  echo "Nuxeo Presales Installation Script: Install Studio project => DONE" | tee -a ${INSTALL_LOG}
+# Auto-start if Studio project defined
+if [ -n "${NX_STUDIO}" ]; then
+  echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
+
+  # Use the source image to register the project
+  docker run -it -v /var/lib/nuxeo/:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
+         nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "AWS" "Docker" "${CREDENTIALS}" | tee -a ${INSTALL_LOG}
+  if [ -e /var/lib/nuxeo/instance.clid ]; then
+    echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
+    awk 1 ORS="--" /var/lib/nuxeo/instance.clid >> ${NUXEO_ENV}
+    echo "" >> ${NUXEO_ENV}
+  fi
+
+  # Build and launch images
+  echo "Building Nuxeo image"
+  docker-compose --project-directory ${COMPOSE_DIR} build --progress plain | tee -a ${INSTALL_LOG}
+  echo "Pulling other images (mongo, elasticsearch)"
+  docker-compose --project-directory ${COMPOSE_DIR} pull
+  echo "Starting Nuxeo stack"
+  docker-compose --project-directory ${COMPOSE_DIR} up --detach --no-color | tee -a ${INSTALL_LOG}
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
-echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.)" | tee -a ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Misc." | tee -a ${INSTALL_LOG}
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
-
-#apt-get install -q -y mediainfo ffmpeg x264 x265 figlet atop
-
 apt-get -y clean
-echo "Nuxeo Presales Installation Script: Install Misc. (ffmpeg, etc.) => DONE" | tee -a ${INSTALL_LOG}
+echo "Nuxeo Presales Installation Script: Install Misc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 <VirtualHost _default_:80>
-
-    ServerName  ${DNS_NAME}.cloud.nuxeo.com
-
+    ServerName  ${FQDN}
     CustomLog /var/log/apache2/nuxeo_access.log combined
     ErrorLog /var/log/apache2/nuxeo_error.log
-
-    Redirect permanent / https://${DNS_NAME}.cloud.nuxeo.com/
-
+    Redirect permanent / https://${FQDN}/
 </VirtualHost>
 
 <VirtualHost _default_:443 >
 
-    ServerName  ${DNS_NAME}.cloud.nuxeo.com
+    ServerName  ${FQDN}
 
     CustomLog /var/log/apache2/nuxeo_access.log combined
     ErrorLog /var/log/apache2/nuxeo_error.log
@@ -228,10 +263,10 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
 
     ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPass           /ARender/       http://localhost:8080/ARender/
-    ProxyPass           /kibana/        http://localhost:5601/
+    ProxyPass           /kibana/        http://localhost:5601/kibana/
     ProxyPassReverse    /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPassReverse    /ARender/       http://localhost:8080/ARender/
-    ProxyPassReverse    /kibana/        http://localhost:5601/
+    ProxyPassReverse    /kibana/        http://localhost:5601/kibana/
     ProxyPreserveHost   On
 
     # WSS
@@ -240,7 +275,7 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     ProxyPassReverse  /_vti_bin/     http://localhost:8080/_vti_bin/
     ProxyPassReverse  /_vti_inf.html http://localhost:8080/_vti_inf.html
 
-    RequestHeader   append nuxeo-virtual-host "https://${DNS_NAME}.cloud.nuxeo.com/"
+    RequestHeader   append nuxeo-virtual-host "https://${FQDN}/"
 
     # Retain TLS1.1 for backwards compatibility until Jan 2020
     # These must be *after* the Certbot entry
@@ -277,13 +312,14 @@ EOF
 a2enmod proxy proxy_http rewrite ssl headers
 a2dissite 000-default
 a2ensite nuxeo
+
 KIBANA_PASS=$(aws secretsmanager get-secret-value --secret-id kibana_default_password --region us-west-2 | jq -r '.SecretString|fromjson|.kibana_default_password')
 htpasswd -b -c /etc/apache2/passwords kibana "${KIBANA_PASS}"
 apache2ctl -k graceful
 
 # Enable SSL certs
 echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
-certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d ${DNS_NAME}.cloud.nuxeo.com | tee -a ${INSTALL_LOG}
+certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresales@nuxeo.com -d ${FQDN} | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
@@ -299,6 +335,24 @@ alias hs='history'
 alias mytail='tail -F /var/log/nuxeo/server.log'
 alias vilog='vi /var/log/nuxeo/server.log'
 alias mydu='du -sh */'
+
+alias dcb='docker-compose build'
+alias dcdn='docker-compose down'
+alias dce='docker-compose exec'
+alias dck='docker-compose kill'
+alias dcl='docker-compose logs'
+alias dclf='docker-compose logs -f'
+alias dco=docker-compose
+alias dcps='docker-compose ps'
+alias dcpull='docker-compose pull'
+alias dcr='docker-compose run'
+alias dcrestart='docker-compose restart'
+alias dcrm='docker-compose rm'
+alias dcstart='docker-compose start'
+alias dcstop='docker-compose stop'
+alias dcup='docker-compose up'
+alias dcupd='docker-compose up -d'
+
 figlet $DNS_NAME.cloud.nuxeo.com
 EOF
 
