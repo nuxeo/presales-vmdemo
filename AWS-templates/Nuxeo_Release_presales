@@ -200,7 +200,9 @@ chown -R ubuntu:ubuntu ${COMPOSE_DIR}
 # Auto-start if Studio project defined
 if [ -n "${NX_STUDIO}" ]; then
   echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
-
+  # Home required by 'docker'
+  export HOME="/home/ubuntu"
+  cd ${COMPOSE_DIR}
   # Use the source image to register the project
   docker run -it -v /var/lib/nuxeo/:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
          nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "AWS" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
@@ -211,12 +213,12 @@ if [ -n "${NX_STUDIO}" ]; then
   fi
 
   # Build and launch images
-  echo "Building Nuxeo image"
-  docker-compose --project-directory ${COMPOSE_DIR} build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
-  echo "Pulling other images (mongo, elasticsearch)"
-  docker-compose --project-directory ${COMPOSE_DIR} pull
-  echo "Starting Nuxeo stack"
-  docker-compose --project-directory ${COMPOSE_DIR} up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  echo "Building Nuxeo image" | tee -a ${INSTALL_LOG}
+  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+  echo "Pulling other images (mongo, elasticsearch)" | tee -a ${INSTALL_LOG}
+  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} pull
+  echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
+  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
