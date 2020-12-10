@@ -16,7 +16,7 @@ NUXEO_BASE_DIR="/var/lib/nuxeo"
 NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
 NUXEO_DATA_DIR="${NUXEO_BASE_DIR}/data"
 NUXEO_LOG_DIR="${NUXEO_BASE_DIR}/log"
-NUXED_ENV="${COMPOSE_DIR}/.env"
+NUXEO_ENV="${COMPOSE_DIR}/.env"
 
 STUDIO_USERNAME="nuxeo_presales"
 
@@ -66,7 +66,7 @@ apt-get update
 apt-get -q -y upgrade
 apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq git \
                       ca-certificates curl software-properties-common python3-pip figlet \
-                      atop htop ctop
+                      atop htop ctop make
 echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
 
 # Install latest aws cli using pip
@@ -88,7 +88,6 @@ echo "Nuxeo Presales Installation Script: Install Docker" | tee -a ${INSTALL_LOG
 apt-get -q -y remove docker docker-engine docker.io
 apt-get -q -y install docker-ce
 pip3 install -q --system docker-compose
-service docker start
 echo "Nuxeo Presales Installation Script: Install Docker => DONE" | tee -a ${INSTALL_LOG}
 
 # Install Certbot
@@ -164,8 +163,6 @@ nuxeo.s3storage.transient.roleArn=${UPLOAD_ROLE_ARN}
 nuxeo.s3storage.transient.bucket=${S3_BUCKET}
 nuxeo.s3storage.transient.bucket_prefix=${S3_UPLOAD_PREFIX}
 EOF
-# Make env not as hidden
-ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Register the nuxeo instance
 echo "$(date) Configure Studio Project [${NX_STUDIO}]" | tee -a ${INSTALL_LOG}
@@ -191,6 +188,8 @@ MONGO_VERSION=${MONGO_VERSION}
 STUDIO_USERNAME=${STUDIO_USERNAME}
 STUDIO_CREDENTIALS=${CREDENTIALS}
 EOF
+# Make env not as hidden
+ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Fix up permissions
 chmod -R g+w ${NUXEO_BASE_DIR}
