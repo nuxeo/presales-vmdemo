@@ -128,7 +128,7 @@ fi
 
 AUTO_PACKAGES="nuxeo-web-ui marketplace-disable-studio-snapshot-validation"
 if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
-  AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage amazon-s3-direct-upload"
+  AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage"
 fi
 
 # Write system configuration
@@ -180,7 +180,7 @@ NUXEO_IMAGE=${FROM_IMAGE}
 NUXEO_DEV=true
 NUXEO_INSTALL_HOTFIX=true
 NUXEO_PORT=8080
-ADDITIONAL_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
+NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
 
 ELASTIC_VERSION=${ELASTIC_VERSION}
 MONGO_VERSION=${MONGO_VERSION}
