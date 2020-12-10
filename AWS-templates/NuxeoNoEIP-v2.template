@@ -439,7 +439,8 @@
                 "s3:AbortMultipartUpload",
                 "s3:ListMultipartUploadParts",
                 "s3:ListBucketMultipartUploads",
-                "s3:GetBucketObjectLockConfiguration"
+                "s3:GetBucketObjectLockConfiguration",
+                "s3:GetBucketVersioning"
               ],
               "Resource": [{
                 "Fn::Join": ["", ["arn:aws:s3:::", {
@@ -538,7 +539,8 @@
                 "s3:AbortMultipartUpload",
                 "s3:ListMultipartUploadParts",
                 "s3:ListBucketMultipartUploads",
-                "s3:GetBucketObjectLockConfiguration"
+                "s3:GetBucketObjectLockConfiguration",
+                "s3:GetBucketVersioning"
               ],
               "Resource": [{
                 "Fn::Join": ["", ["arn:aws:s3:::", {
