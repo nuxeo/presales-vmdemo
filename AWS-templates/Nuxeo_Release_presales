@@ -216,11 +216,11 @@ if [ -n "${NX_STUDIO}" ]; then
   echo "Creating Nuxeo Dockerfile" | tee -a ${INSTALL_LOG}
   make Dockerfile NUXEO_IMAGE=${FROM_IMAGE}
   echo "Building Nuxeo image" | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+  docker-compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
   echo "Pulling other images (mongo, elasticsearch)" | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} pull
+  docker-compose --no-ansi pull
   echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi --project-directory ${COMPOSE_DIR} up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  docker-compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
