@@ -218,11 +218,11 @@ if [ -n "${NX_STUDIO}" ]; then
   fi
 
   # Build / Pull images
-  echo "Creating Nuxeo Dockerfile" | tee -a ${INSTALL_LOG}
-  make Dockerfile NUXEO_IMAGE=${FROM_IMAGE}
-  echo "Building Nuxeo image" | tee -a ${INSTALL_LOG}
+  echo "Creating Dockerfile(s)" | tee -a ${INSTALL_LOG}
+  make Dockerfile NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
+  echo "Building images..." | tee -a ${INSTALL_LOG}
   docker-compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
-  echo "Pulling other images (mongo, elasticsearch)" | tee -a ${INSTALL_LOG}
+  echo "Pulling other images..." | tee -a ${INSTALL_LOG}
   docker-compose --no-ansi pull
   if [[ "${AUTO_START}" == "true" ]]; then
     echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
