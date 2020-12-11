@@ -30,9 +30,12 @@ ELASTIC_VERSION="7.9.3"
 echo "Nuxeo Presales Installation Script Starting [${STACK_ID}]" > ${INSTALL_LOG}
 
 # Check configured image
-if [ -z "${FROM_IMAGE}" ]; then
-  FROM_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+FROM_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+if [ -z "${IMAGE_TYPE}" ]; then
   echo "Upstream image is not set, using: ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
+else
+  # TODO - Configure Cloud Image
+  echo "Upstream image: ${IMAGE_TYPE} => ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
 fi
 
 # Check DNS Name
@@ -182,6 +185,8 @@ NUXEO_INSTALL_HOTFIX=true
 NUXEO_PORT=8080
 NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
 
+INSTALL_RPM=${INSTALL_RPM}
+
 ELASTIC_VERSION=${ELASTIC_VERSION}
 MONGO_VERSION=${MONGO_VERSION}
 
@@ -212,15 +217,17 @@ if [ -n "${NX_STUDIO}" ]; then
     echo "" >> ${NUXEO_ENV}
   fi
 
-  # Build and launch images
+  # Build / Pull images
   echo "Creating Nuxeo Dockerfile" | tee -a ${INSTALL_LOG}
   make Dockerfile NUXEO_IMAGE=${FROM_IMAGE}
   echo "Building Nuxeo image" | tee -a ${INSTALL_LOG}
   docker-compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
   echo "Pulling other images (mongo, elasticsearch)" | tee -a ${INSTALL_LOG}
   docker-compose --no-ansi pull
-  echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  if [[ "${AUTO_START}" == "true" ]]; then
+    echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
+    docker-compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  fi
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
@@ -358,6 +365,10 @@ alias dcstart='docker-compose start'
 alias dcstop='docker-compose stop'
 alias dcup='docker-compose up'
 alias dcupd='docker-compose up -d'
+
+alias stack='make -e -f ${COMPOSE_DIR}/Makefile'
+alias nx='stack SERVICE=nuxeo'
+alias nxl='nx logs'
 
 figlet $DNS_NAME.cloud.nuxeo.com
 EOF
