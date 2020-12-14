@@ -171,8 +171,11 @@ EOF
 echo "$(date) Configure Studio Project [${NX_STUDIO}]" | tee -a ${INSTALL_LOG}
 
 STUDIO_PACKAGE=""
+if [ -z "${NX_STUDIO_VER}" ]; then
+  NX_STUDIO_VER="0.0.0-SNAPSHOT"
+fi
 if [ -n "${NX_STUDIO}" ]; then
-  STUDIO_PACKAGE="${NX_STUDIO}-0.0.0-SNAPSHOT"
+  STUDIO_PACKAGE="${NX_STUDIO}-${NX_STUDIO_VER}"
 fi
 
 # Set working environment

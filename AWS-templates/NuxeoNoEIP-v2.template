@@ -49,6 +49,11 @@
       "Type": "String",
       "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
     },
+    "StudioVersion": {
+      "Type": "String",
+      "Default": "0.0.0-SNAPSHOT",
+      "Description": "The Nuxeo Studio version (used with Release in Studio to install a different version)"
+    },
     "AutoStart": {
       "AllowedValues": [ "true", "false" ],
       "Default": "true",
@@ -233,7 +238,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -255,6 +260,9 @@
                 },
                 "studio": {
                   "Ref": "StudioProject"
+                },
+                "studioVer": {
+                  "Ref": "StudioVersion"
                 },
                 "autoStart": {
                   "Ref": "AutoStart"
