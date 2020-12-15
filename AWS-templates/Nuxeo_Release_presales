@@ -47,61 +47,13 @@ fi
 # Fully qualified domain name
 FQDN="${DNS_NAME}.cloud.nuxeo.com"
 
-# Increase open files limit
-echo '*       soft    nofile      4096' >> /etc/security/limits.conf
-echo '*       hard    nofile      8192' >> /etc/security/limits.conf
-
 # Set the hostname & domain
 echo "${DNS_NAME}" > /etc/hostname
 hostname ${DNS_NAME}
 echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 
-# Create nuxeo user - UID 900 comes from the docker image
-groupadd -g 900 nuxeo
-useradd -m -g 900 -G ubuntu -u 900 nuxeo
-
-# Upgrade packages and install apache, ssh, ...
-echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc." | tee -a ${INSTALL_LOG}
-export DEBIAN_FRONTEND=noninteractive
-locale-gen en_US.UTF-8
-update-locale LANG=en_US.UTF-8
-apt-get update
-apt-get -q -y upgrade
-apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq git \
-                      ca-certificates curl software-properties-common python3-pip figlet \
-                      atop htop ctop make
-echo "Please wait a few minutes for you instance installation to complete" > /var/www/html/index.html
-
-# Install latest aws cli using pip
-pip3 install -q awscli --upgrade --user
-export PATH=$PATH:~/.local/bin/
-echo "Nuxeo Presales Installation Script: Apache, upgrade packages, etc. => DONE" | tee -a ${INSTALL_LOG}
-
-# Install additional Repos
-echo "Nuxeo Presales Installation Script: Install Repositories" | tee -a ${INSTALL_LOG}
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository -y universe
-add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-add-apt-repository -y ppa:certbot/certbot
-apt-get update
-echo "Nuxeo Presales Installation Script: Install Repositories => DONE" | tee -a ${INSTALL_LOG}
-
-# Install docker
-echo "Nuxeo Presales Installation Script: Install Docker" | tee -a ${INSTALL_LOG}
-apt-get -q -y remove docker docker-engine docker.io
-apt-get -q -y install docker-ce
-pip3 install -q --system docker-compose
-echo "Nuxeo Presales Installation Script: Install Docker => DONE" | tee -a ${INSTALL_LOG}
-
-# Install Certbot
-echo "Nuxeo Presales Installation Script: Install Certbot" | tee -a ${INSTALL_LOG}
-apt-get -q -y install certbot python-certbot-apache
-echo "Nuxeo Presales Installation Script: Install Certbot => DONE" | tee -a ${INSTALL_LOG}
-
 # Install Nuxeo
 echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
-# Add ubuntu user to docker group
-usermod -aG docker ubuntu
 
 # Make directories and clone compose stack
 mkdir -p ${COMPOSE_DIR} ${NUXEO_CONF_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR}
@@ -237,7 +189,6 @@ echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${IN
 echo "Nuxeo Presales Installation Script: Install Misc." | tee -a ${INSTALL_LOG}
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
-apt-get -y clean
 echo "Nuxeo Presales Installation Script: Install Misc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Configure reverse-proxy
