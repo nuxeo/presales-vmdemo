@@ -25,16 +25,21 @@ TEMPLATES="default,mongodb"
 MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
 
+CLOUD_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021.x"
+
 # Start of installation script
 
 echo "Nuxeo Presales Installation Script Starting [${STACK_ID}]" > ${INSTALL_LOG}
 
 # Check configured image
-FROM_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+FROM_IMAGE="${CLOUD_IMAGE}"
 if [ -z "${IMAGE_TYPE}" ]; then
   echo "Upstream image is not set, using: ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
 else
-  # TODO - Configure Cloud Image
+  if [ "${IMAGE_TYPE}" == "LTS" ]; then
+    FROM_IMAGE="${LTS_IMAGE}"
+  fi
   echo "Upstream image: ${IMAGE_TYPE} => ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
 fi
 
@@ -122,6 +127,17 @@ EOF
 # Register the nuxeo instance
 echo "$(date) Configure Studio Project [${NX_STUDIO}]" | tee -a ${INSTALL_LOG}
 
+# Home required by 'docker'
+export HOME="/home/ubuntu"
+
+# Get credentials for Studio & Repository
+aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 > /root/creds.json
+
+# Log in to docker
+DOCKER_USER=$(jq -r '.SecretString|fromjson|.docker_presales_user' < /root/creds.json)
+DOCKER_PASS=$(jq -r '.SecretString|fromjson|.docker_presales_pwd' < /root/creds.json)
+echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin docker-private.packages.nuxeo.com 2>&1 | tee -a ${INSTALL_LOG}
+
 STUDIO_PACKAGE=""
 if [ -z "${NX_STUDIO_VER}" ]; then
   NX_STUDIO_VER="0.0.0-SNAPSHOT"
@@ -131,10 +147,14 @@ if [ -n "${NX_STUDIO}" ]; then
 fi
 
 # Set working environment
-CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id connect_shared_presales_credential --region us-west-2 | jq -r '.SecretString|fromjson|.connect_presales_pwd')
+CREDENTIALS=$(jq -r '.SecretString|fromjson|.connect_presales_pwd' < /root/creds.json)
 cat << EOF > ${NUXEO_ENV}
 APPLICATION_NAME=${NX_STUDIO}
+
+# Cloud Image: ${CLOUD_IMAGE}
+# LTS Image  : ${LTS_IMAGE}
 NUXEO_IMAGE=${FROM_IMAGE}
+
 NUXEO_DEV=true
 NUXEO_INSTALL_HOTFIX=true
 NUXEO_PORT=8080
@@ -152,15 +172,14 @@ EOF
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Fix up permissions
+rm -f /root/creds.json
 chmod -R g+w ${NUXEO_BASE_DIR}
 chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR}
-chown -R ubuntu:ubuntu ${COMPOSE_DIR}
+chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
 
 # Auto-start if Studio project defined
 if [ -n "${NX_STUDIO}" ]; then
   echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
-  # Home required by 'docker'
-  export HOME="/home/ubuntu"
   cd ${COMPOSE_DIR}
   # Use the source image to register the project
   docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
