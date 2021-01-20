@@ -376,7 +376,11 @@
                 "rekognition:DetectLabels",
                 "rekognition:DetectText",
                 "rekognition:RecognizeCelebrities",
-                "rekognition:GetCelebrityInfo"
+                "rekognition:GetCelebrityInfo",
+                "transcribe:Get*",
+                "transcribe:List*",
+                "transcribe:DeleteTranscriptionJob",
+                "transcribe:StartTranscriptionJob"
               ],
               "Resource": "*"
             },
