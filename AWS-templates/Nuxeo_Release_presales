@@ -11,6 +11,7 @@ INSTALL_LOG="/var/log/nuxeo_install.log"
 
 COMPOSE_REPO="https://github.com/nuxeo-sandbox/nuxeo-presales-docker"
 COMPOSE_DIR="/home/ubuntu/nuxeo-presales-docker"
+CONF_DIR="${COMPOSE_DIR}/conf"
 
 NUXEO_BASE_DIR="/var/lib/nuxeo"
 NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
@@ -63,16 +64,18 @@ echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 
 # Make directories and clone compose stack
-mkdir -p ${COMPOSE_DIR} ${NUXEO_CONF_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
+mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
 git clone ${COMPOSE_REPO} ${COMPOSE_DIR}
+mkdir -p ${CONF_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Configure Nuxeo" | tee -a ${INSTALL_LOG}
 # Link old log location to new
 ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
+ln -s ${NUXEO_CONF_DIR} ${CONF_DIR}
 
 # Copy default conf.d files
-cp ${COMPOSE_DIR}/conf.d/*.conf ${NUXEO_CONF_DIR}
+cp ${COMPOSE_DIR}/conf.d/*.conf ${CONF_DIR}
 
 # Secrets for instance
 MAIL_PASS=$(aws secretsmanager get-secret-value --secret-id workmail_default_password --region us-west-2 | jq -r '.SecretString|fromjson|.workmail_default_password')
@@ -94,7 +97,7 @@ if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "
 fi
 
 # Write system configuration
-cat << EOF > ${NUXEO_CONF_DIR}/system.conf
+cat << EOF > ${CONF_DIR}/system.conf
 # Host Configuration
 session.timeout=600
 nuxeo.url=https://${FQDN}/nuxeo
@@ -167,6 +170,7 @@ INSTALL_RPM=${INSTALL_RPM}
 ELASTIC_VERSION=${ELASTIC_VERSION}
 MONGO_VERSION=${MONGO_VERSION}
 
+FQDN=${FQDN}
 STUDIO_USERNAME=${STUDIO_USERNAME}
 STUDIO_CREDENTIALS=${CREDENTIALS}
 EOF
