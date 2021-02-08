@@ -27,7 +27,7 @@ MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
 
 CLOUD_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
-LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021.x"
+LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021"
 
 TMP_DIR="/tmp/nuxeo"
 
