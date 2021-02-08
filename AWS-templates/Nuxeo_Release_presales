@@ -150,11 +150,13 @@ fi
 if [ -n "${NX_STUDIO}" ]; then
   STUDIO_PACKAGE="${NX_STUDIO}-${NX_STUDIO_VER}"
 fi
+PROJECT_NAME=$(echo "${NX_STUDIO}" | awk '{print tolower($0)}')
 
 # Set working environment
 CREDENTIALS=$(jq -r '.SecretString|fromjson|.connect_presales_pwd' < /root/creds.json)
 cat << EOF > ${NUXEO_ENV}
 APPLICATION_NAME=${NX_STUDIO}
+PROJECT_NAME=${PROJECT_NAME}
 
 # Cloud Image: ${CLOUD_IMAGE}
 # LTS Image  : ${LTS_IMAGE}
