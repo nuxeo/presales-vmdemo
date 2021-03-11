@@ -355,7 +355,9 @@
                 "rekognition:DetectLabels",
                 "rekognition:DetectText",
                 "rekognition:RecognizeCelebrities",
-                "rekognition:GetCelebrityInfo"
+                "rekognition:GetCelebrityInfo",
+                "rekognition:DetectModerationLabels",
+                "rekognition:DetectFaces"
               ],
               "Resource": "*"
             },
