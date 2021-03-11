@@ -377,7 +377,12 @@
               "Action": [
                 "textract:*",
                 "comprehend:*",
-                "rekognition:*",
+                "rekognition:DetectLabels",
+                "rekognition:DetectText",
+                "rekognition:RecognizeCelebrities",
+                "rekognition:GetCelebrityInfo",
+                "rekognition:DetectModerationLabels",
+                "rekognition:DetectFaces",
                 "transcribe:*"
               ],
               "Resource": "*"
