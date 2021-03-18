@@ -127,6 +127,18 @@ nuxeo.s3storage.region=${REGION}
 nuxeo.s3storage.transient.roleArn=${UPLOAD_ROLE_ARN}
 nuxeo.s3storage.transient.bucket=${S3_BUCKET}
 nuxeo.s3storage.transient.bucket_prefix=${S3_UPLOAD_PREFIX}
+
+# Rekognition Configuration
+nuxeo.enrichment.save.facets=true
+nuxeo.enrichment.raiseEvent=true
+nuxeo.ai.images.enabled=true
+nuxeo.enrichment.aws.images=true
+nuxeo.ai.video.enabled=true
+nuxeo.enrichment.aws.video=true
+nuxeo.ai.aws.rekognition.role.arn=${REKOGNITION_ROLE_ARN}
+nuxeo.enrichment.aws.sns.topic.arn=${SNS_TOPIC_ARN}
+nuxeo.enrichment.aws.transcribe.enabled=true
+
 EOF
 
 # Register the nuxeo instance

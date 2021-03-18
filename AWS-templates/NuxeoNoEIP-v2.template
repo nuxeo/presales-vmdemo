@@ -226,7 +226,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -269,7 +269,11 @@
                     },
                     "false"
                   ]
-                }
+                },
+                "rekognitionRole": {
+                      "Fn::GetAtt": ["RekognitionRole", "Arn"]
+                },
+                "snsTopic": { "Ref" : "RekognitionSns" }
               }
             ]
           }
@@ -371,16 +375,15 @@
             {
               "Effect": "Allow",
               "Action": [
-                "textract:DetectDocumentText",
+                "textract:*",
                 "comprehend:*",
                 "rekognition:DetectLabels",
                 "rekognition:DetectText",
                 "rekognition:RecognizeCelebrities",
                 "rekognition:GetCelebrityInfo",
-                "transcribe:Get*",
-                "transcribe:List*",
-                "transcribe:DeleteTranscriptionJob",
-                "transcribe:StartTranscriptionJob"
+                "rekognition:DetectModerationLabels",
+                "rekognition:DetectFaces",
+                "transcribe:*"
               ],
               "Resource": "*"
             },
@@ -433,6 +436,38 @@
           }]
         },
         "Path": "/"
+      }
+    },
+
+    "RekognitionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "rekognition.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "publishToSns",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "sns:Publish",
+                  "Resource": { "Ref" : "RekognitionSns" }
+                }
+              ]
+            }
+          }
+        ]
       }
     },
 
@@ -628,6 +663,43 @@
       }
     },
 
+    "RekognitionInstancePolicy":{
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Sub": ["${name}-ai-rekognition-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sns:GetTopicAttributes",
+                "sns:ListSubscriptionsByTopic",
+                "sns:Subscribe"
+              ],
+              "Resource": {"Ref": "RekognitionSns"}
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:GetRole",
+                "iam:PassRole"
+              ],
+              "Resource": {"Fn::GetAtt" : ["RekognitionRole", "Arn"] }
+            }]
+        },
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
+      }
+    },
+
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
       "Condition": "CreateS3Bucket",
@@ -671,6 +743,37 @@
           }]
         }
       }
+    },
+
+    "RekognitionSns": {
+      "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "TopicName" : {
+          "Fn::Sub": ["${name}-rekognition-sns", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "Tags": [{
+          "Key": "contact",
+          "Value": {
+            "Ref": "Contact"
+          }
+        },
+          {
+            "Key": "billing-category",
+            "Value": "presales"
+          },
+          {
+            "Key": "billing-subcategory",
+            "Value": {
+              "Ref": "Customer"
+            }
+          }
+        ]
+      }
     }
+
   }
 }
