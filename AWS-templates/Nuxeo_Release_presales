@@ -55,6 +55,9 @@ fi
 # Fully qualified domain name
 FQDN="${DNS_NAME}.cloud.nuxeo.com"
 
+# TEMP: Install uuid
+apt-get -q -y install uuid
+
 # Set the hostname & domain
 echo "${DNS_NAME}" > /etc/hostname
 hostname ${DNS_NAME}
@@ -105,6 +108,18 @@ nuxeo.url=https://${FQDN}/nuxeo
 # Templates
 nuxeo.templates=${TEMPLATES}
 
+# CORS Configuration (used with AI, Salesforce, others)
+#nuxeo.cors.urls=
+#nuxeo.server.coookies.sameSite=none
+
+# ARender Configuration
+nuxeo.jwt.secret=$(uuid)
+#arender.server.previewer.host=
+#nuxeo.arender.oauth2.client.create=true
+#nuxeo.arender.oauth2.client.id=arender
+#nuxeo.arender.oauth2.client.secret=$(uuid)
+#nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
+
 # Mail Configuration
 mail.transport.password=${MAIL_PASS}
 mail.transport.host=smtp.mail.us-east-1.awsapps.com
@@ -128,16 +143,33 @@ nuxeo.s3storage.transient.roleArn=${UPLOAD_ROLE_ARN}
 nuxeo.s3storage.transient.bucket=${S3_BUCKET}
 nuxeo.s3storage.transient.bucket_prefix=${S3_UPLOAD_PREFIX}
 
+# Nuxeo Insight Configuration
+#nuxeo.ai.insight.client.target.url=https://insight.nuxeocloud.com/nuxeo
+#nuxeo.ai.insight.client.enable=true
+#nuxeo.ai.insight.client.projectid=
+#nuxeo.ai.insight.client.token=
+#nuxeo.ai.insight.datasource.label=
+#nuxeo.ai.images.enabled=true
+#nuxeo.ai.text.enabled=true
+
 # Rekognition Configuration
 nuxeo.enrichment.save.facets=true
+#nuxeo.enrichment.save.tags=true
 nuxeo.enrichment.raiseEvent=true
 nuxeo.ai.images.enabled=true
 nuxeo.enrichment.aws.images=true
 nuxeo.ai.video.enabled=true
 nuxeo.enrichment.aws.video=true
+#nuxeo.enrichment.aws.text=false
+#nuxeo.enrichment.aws.document.text=true
+#nuxeo.enrichment.aws.document.analyze=true
 nuxeo.ai.aws.rekognition.role.arn=${REKOGNITION_ROLE_ARN}
 nuxeo.enrichment.aws.sns.topic.arn=${SNS_TOPIC_ARN}
 nuxeo.enrichment.aws.transcribe.enabled=true
+
+# WOPI Configuration
+nuxeo.wopi.discoveryURL=https://onenote.officeapps.live.com/hosting/discovery
+nuxeo.wopi.baseURL=https://wopi.nuxeo.io/${FQDN}/nuxeo/
 
 EOF
 

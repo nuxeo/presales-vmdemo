@@ -19,7 +19,7 @@ apt-get update
 apt-get -q -y upgrade
 apt-get -q -y install apache2 apt-transport-https openssh-server openssh-client vim jq git \
                       ca-certificates curl software-properties-common python3-pip figlet \
-                      atop htop ctop make
+                      atop htop ctop make uuid
 
 #Additional modules and config for apache                      
 a2enmod proxy proxy_http rewrite ssl headers
