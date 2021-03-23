@@ -154,13 +154,13 @@ nuxeo.s3storage.transient.bucket_prefix=${S3_UPLOAD_PREFIX}
 
 # Rekognition Configuration
 nuxeo.enrichment.save.facets=true
-#nuxeo.enrichment.save.tags=true
+nuxeo.enrichment.save.tags=true
 nuxeo.enrichment.raiseEvent=true
 nuxeo.ai.images.enabled=true
 nuxeo.enrichment.aws.images=true
 nuxeo.ai.video.enabled=true
 nuxeo.enrichment.aws.video=true
-#nuxeo.enrichment.aws.text=false
+#nuxeo.enrichment.aws.text=true
 #nuxeo.enrichment.aws.document.text=true
 #nuxeo.enrichment.aws.document.analyze=true
 nuxeo.ai.aws.rekognition.role.arn=${REKOGNITION_ROLE_ARN}
