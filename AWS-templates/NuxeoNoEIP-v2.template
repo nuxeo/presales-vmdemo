@@ -62,7 +62,7 @@
     },
     "ImageType": {
       "AllowedValues": [ "Cloud", "LTS" ],
-      "Default": "Cloud",
+      "Default": "LTS",
       "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
       "Type": "String"
     },
