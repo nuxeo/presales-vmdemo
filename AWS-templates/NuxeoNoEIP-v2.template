@@ -77,7 +77,7 @@
     },
     "DiskSize": {
       "Type": "Number",
-      "Default": 10,
+      "Default": 20,
       "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
