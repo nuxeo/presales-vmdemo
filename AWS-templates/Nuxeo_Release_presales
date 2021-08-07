@@ -206,6 +206,8 @@ PROJECT_NAME=${PROJECT_NAME}
 # LTS Image  : ${LTS_IMAGE}
 NUXEO_IMAGE=${FROM_IMAGE}
 
+JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787 -Djava.security.properties=/etc/nuxeo/conf.d/java.security
+
 NUXEO_DEV=true
 NUXEO_INSTALL_HOTFIX=false
 NUXEO_PORT=8080
