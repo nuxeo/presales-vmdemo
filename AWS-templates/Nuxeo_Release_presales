@@ -331,6 +331,9 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
       RewriteRule .* - [R=404,L,NC]
     </Location>
     ## END SUPINT-655 ##
+
+    Header edit Set-Cookie ^(.*)$ $1;SameSite=None;Secure
+
 </VirtualHost>
 EOF
 
