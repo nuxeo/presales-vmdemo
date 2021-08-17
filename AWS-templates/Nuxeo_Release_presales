@@ -332,7 +332,7 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     </Location>
     ## END SUPINT-655 ##
 
-    Header edit Set-Cookie ^(.*)$ $1;SameSite=None;Secure
+    Header edit Set-Cookie ^(.*)$ \$1;SameSite=None;Secure
 
 </VirtualHost>
 EOF
