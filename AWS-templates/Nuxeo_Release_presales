@@ -78,7 +78,7 @@ ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
 ln -s ${NUXEO_CONF_DIR} ${CONF_DIR}
 
 # Copy default conf.d files
-cp ${COMPOSE_DIR}/conf.d/*.conf ${CONF_DIR}
+cp ${COMPOSE_DIR}/conf.d/* ${CONF_DIR}
 
 # Secrets for instance
 MAIL_PASS=$(aws secretsmanager get-secret-value --secret-id workmail_default_password --region us-west-2 | jq -r '.SecretString|fromjson|.workmail_default_password')
