@@ -383,7 +383,19 @@
                 "rekognition:GetCelebrityInfo",
                 "rekognition:DetectModerationLabels",
                 "rekognition:DetectFaces",
-                "transcribe:*"
+                "transcribe:*",
+                "translate:TranslateText",
+                "rekognition:StartLabelDetection",
+                "rekognition:GetLabelDetection",
+                "rekognition:StartCelebrityRecognition",
+                "rekognition:GetCelebrityRecognition",
+                "rekognition:StartContentModeration",
+                "rekognition:GetContentModeration",
+                "rekognition:StartFaceDetection",
+                "rekognition:GetFaceDetection",
+                "rekognition:StartTextDetection",
+                "rekognition:GetTextDetection"
+
               ],
               "Resource": "*"
             },
