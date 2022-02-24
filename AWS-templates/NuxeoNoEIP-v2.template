@@ -72,7 +72,7 @@
     },
     "Contact": {
       "Type": "String",
-      "Default": "wwpresales@nuxeo.com",
+      "Default": "OpenSourceLowCode@hyland.com",
       "Description": "Contact email address"
     },
     "DiskSize": {
