@@ -111,7 +111,7 @@ session.timeout=600
 nuxeo.url=https://${FQDN}/nuxeo
 
 # Templates
-nuxeo.templates=${TEMPLATES}
+nuxeo.append.templates.system=${TEMPLATES}
 
 # CORS Configuration (used with AI, Salesforce, others)
 #nuxeo.cors.urls=
