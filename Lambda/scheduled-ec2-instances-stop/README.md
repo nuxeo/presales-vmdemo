@@ -10,10 +10,10 @@ The installation is not completely automated yet and requires a few manual steps
 - Create a new stack using the template scheduled-ec2-instances-stop.template
 - Once the stack is created, go to the lambda console
 - Open the nuxeo-scheduled-ec2-shutdown function
-- Set the runtime to node.js 10x
+- Set the runtime to node.js 16x
 - Copy paste the content of index.js in the inline editor
-- Save
-- Go the CloudWatch page
+- Save and deploy
+- Go the CloudWatch page and open the Events > Rules
 - open the nuxeo-scheduled-ec2-shutdown rule, configure the CRON expression for your timezone and enable it
 
 These are provided for inspiration and we encourage developers to use them as code samples and learning resources.
