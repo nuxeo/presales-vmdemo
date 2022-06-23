@@ -10,12 +10,13 @@ The installation is not completely automated yet and requires a few manual steps
 - Create a new stack using the template route53-auto-update.template
 - Once the stack is created, go to the lambda console
 - Open the nuxeo-route53-auto-update function
-- Set the runtime to node.js 10x
+- Set the runtime to node.js 16x
 - Copy paste the content of index.js in the inline editor
-- Add an Environment variable HOSTED_ZONE which value is the ID of the target route53 hosted zone (which can be found on the route53 page)
+- Add an Environment variable HOSTED_ZONE which value is the ID of the target route53 hosted zone (which can be found on the route53 page). It is `Z1Z5JJ6G4B6J7L` for `cloud.nuxeo.com`, but check it is still OK.
 - Save
 - Go the CloudWatch console
-- open the nuxeo-route53-auto-update rule and enable it
+- Open the nuxeo-route53-auto-update rule and enable it
+- Back to Lambda, if there is no trigger displayed, create one, bind it to the rule (the drop down helps find your rule)
 
 These are provided for inspiration and we encourage developers to use them as code samples and learning resources.
 
