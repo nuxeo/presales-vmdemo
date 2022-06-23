@@ -66,7 +66,7 @@
         "Role": {
           "Fn::GetAtt": ["LambdaFunctionRole", "Arn"]
         },
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs16.x",
         "Tags": [{
             "Key": "billing-category",
             "Value": "presales"
