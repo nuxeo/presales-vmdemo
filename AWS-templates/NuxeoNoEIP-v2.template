@@ -124,6 +124,9 @@
       },
       "ap-northeast-1": {
         "64": "ami-0113602ade1a985e7"
+      },
+      "sa-east-1": {
+        "64": "ami-048a5cff572cc2466"
       }
     },
     "AWSRegionSubnet": {
@@ -146,6 +149,10 @@
       "us-west-2": {
         "vpc": "vpc-0e6cdc3402852ec63",
         "subnet": "subnet-070006c83fad19822"
+      },
+      "sa-east-1": {
+        "vpc": "vpc-0d2362c5f3e332f13",
+        "subnet": "subnet-00c372f7bb8d17f3f"
       }
     }
   },
