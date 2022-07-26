@@ -394,7 +394,7 @@ alias stack='make -e -f ${COMPOSE_DIR}/Makefile'
 
 # Extras for AWS usage
 alias nxenv='vim ${COMPOSE_DIR}/.env'
-alias nxconf='vim ${NUXEO_CONF_DIR}/system.conf'
+alias nxconf='vim ${CONF_DIR}/system.conf'
 
 figlet $DNS_NAME.cloud.nuxeo.com
 EOF
