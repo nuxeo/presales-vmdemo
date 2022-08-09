@@ -117,6 +117,9 @@ nuxeo.append.templates.system=${TEMPLATES}
 #nuxeo.cors.urls=
 #nuxeo.server.coookies.sameSite=none
 
+# Webui
+nuxeo.selection.selectAllEnabled=true
+
 # ARender Configuration
 nuxeo.jwt.secret=$(uuid)
 #arender.server.previewer.host=
