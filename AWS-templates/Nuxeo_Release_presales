@@ -402,6 +402,10 @@ alias nxconf='vim ${CONF_DIR}/system.conf'
 figlet $DNS_NAME.cloud.nuxeo.com
 EOF
 
+# Add newDNS script
+curl https://raw.githubusercontent.com/wordmunch/presales-vmdemo/newDNS/AWS-templates/newDNS.sh > /usr/local/sbin/newDoDNS.sh 
+chmod +x /usr/local/sbin/newDoDNS.sh
+
 # Set up vim for ubuntu user
 cat << EOF > /home/ubuntu/.vimrc
 " Set the filetype based on the file's extension, but only if
