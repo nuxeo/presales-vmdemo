@@ -403,8 +403,9 @@ figlet $DNS_NAME.cloud.nuxeo.com
 EOF
 
 # Add newDNS script
-curl https://raw.githubusercontent.com/wordmunch/presales-vmdemo/newDNS/AWS-templates/newDNS.sh > /usr/local/sbin/newDoDNS.sh 
-chmod +x /usr/local/sbin/newDoDNS.sh
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh 
+chmod +x ${TMP_DIR}/newDNS.sh
+mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
 # Set up vim for ubuntu user
 cat << EOF > /home/ubuntu/.vimrc
