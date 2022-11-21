@@ -232,6 +232,11 @@ EOF
 # Make env not as hidden
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
+# Add newDNS script
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh 
+chmod +x ${TMP_DIR}/newDNS.sh
+mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
+
 # Fix up permissions
 rm -f /root/creds.json
 chmod -R g+w ${NUXEO_BASE_DIR}
@@ -401,11 +406,6 @@ alias nxconf='vim ${CONF_DIR}/system.conf'
 
 figlet $DNS_NAME.cloud.nuxeo.com
 EOF
-
-# Add newDNS script
-curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh 
-chmod +x ${TMP_DIR}/newDNS.sh
-mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
 # Set up vim for ubuntu user
 cat << EOF > /home/ubuntu/.vimrc
