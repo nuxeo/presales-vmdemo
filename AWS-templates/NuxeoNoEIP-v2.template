@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Nuxeo Presales Demo Template - Not using Nuxify",
+  "Description": "Nuxeo Presales Demo Template",
 
   "Parameters": {
     "DnsName": {
