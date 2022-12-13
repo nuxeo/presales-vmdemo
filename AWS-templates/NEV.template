@@ -79,34 +79,6 @@
             "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         }
     },
-    "Conditions": {
-        "CreateS3Bucket": {
-            "Fn::Equals": [
-                {
-                    "Ref": "UseS3Bucket"
-                },
-                "Create"
-            ]
-        },
-        "ShareS3Bucket": {
-            "Fn::Equals": [
-                {
-                    "Ref": "UseS3Bucket"
-                },
-                "Shared"
-            ]
-        },
-        "UseS3": {
-            "Fn::Or": [
-                {
-                    "Condition": "CreateS3Bucket"
-                },
-                {
-                    "Condition": "ShareS3Bucket"
-                }
-            ]
-        }
-    },
     "Mappings": {
         "AWSRegionArch2AMI": {
             "us-west-1": {
