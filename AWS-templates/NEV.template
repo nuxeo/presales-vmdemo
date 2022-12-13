@@ -40,15 +40,6 @@
             "Default": "2.2.0",
             "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
         },
-        "AutoStart": {
-            "Type": "String",
-            "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
-            "AllowedValues": [
-                "true",
-                "false"
-            ],
-            "Default": "true"
-        },
         "NuxeoSecret": {
             "Type": "String",
             "Description": "Value for ARENDERSRV_NUXEO_SERVER_ARENDER_SECRET; use for nuxeo.arender.oauth2.client.secret in nuxeo.conf",
@@ -69,6 +60,15 @@
             "Default": "Shared",
             "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
             "Type": "String"
+        },
+        "AutoStart": {
+            "Type": "String",
+            "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "true"
         },
         "GitBranch": {
             "Type": "String",
