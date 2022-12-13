@@ -24,11 +24,6 @@
             "MinLength": 1,
             "ConstraintDescription": "Please specify a key pair"
         },
-        "GitBranch": {
-            "Type": "String",
-            "Default": "master",
-            "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
-        },
         "Customer": {
             "Type": "String",
             "Description": "Prospect name, or 'generic' if this is a generic demo",
@@ -78,6 +73,11 @@
             "Default": "Shared",
             "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
             "Type": "String"
+        },
+        "GitBranch": {
+            "Type": "String",
+            "Default": "master",
+            "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         }
     },
     "Conditions": {
