@@ -39,10 +39,10 @@
             "Type": "String",
             "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
         },
-        "StudioVersion": {
+        "NEVVersion": {
             "Type": "String",
-            "Default": "0.0.0-SNAPSHOT",
-            "Description": "The Nuxeo Studio version (used with Release in Studio to install a different version)"
+            "Default": "2.2.0",
+            "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
         },
         "AutoStart": {
             "AllowedValues": [
@@ -50,7 +50,7 @@
                 "false"
             ],
             "Default": "true",
-            "Description": "Auto-start the Nuxeo runtime; if false, log into your instance to start Nuxeo",
+            "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
             "Type": "String"
         },
         "ImageType": {
@@ -249,7 +249,7 @@
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Sub": [
-                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NEV_VERSION=${nevVersion} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
                             {
                                 "stack": {
                                     "Ref": "AWS::StackName"
@@ -269,8 +269,8 @@
                                 "studio": {
                                     "Ref": "StudioProject"
                                 },
-                                "studioVer": {
-                                    "Ref": "StudioVersion"
+                                "nevVersion": {
+                                    "Ref": "NEVVersion"
                                 },
                                 "autoStart": {
                                     "Ref": "AutoStart"
