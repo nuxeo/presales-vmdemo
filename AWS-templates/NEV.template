@@ -45,22 +45,19 @@
             "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
         },
         "AutoStart": {
+            "Type": "String",
+            "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
             "AllowedValues": [
                 "true",
                 "false"
             ],
-            "Default": "true",
-            "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
-            "Type": "String"
+            "Default": "true"
         },
-        "ImageType": {
-            "AllowedValues": [
-                "Cloud",
-                "LTS"
-            ],
-            "Default": "LTS",
-            "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
-            "Type": "String"
+        "NuxeoSecret": {
+            "Type": "String",
+            "Description": "Value for ARENDERSRV_NUXEO_SERVER_ARENDER_SECRET; use for nuxeo.arender.oauth2.client.secret in nuxeo.conf",
+            "MinLength": 1,
+            "ConstraintDescription": "Please specify a secret"
         }
         "Contact": {
             "Type": "String",
@@ -249,7 +246,7 @@
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Sub": [
-                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NEV_VERSION=${nevVersion} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NEV_VERSION=${nevVersion} AUTO_START=${autoStart} NUXEO_SECRET=${nuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
                             {
                                 "stack": {
                                     "Ref": "AWS::StackName"
@@ -275,8 +272,8 @@
                                 "autoStart": {
                                     "Ref": "AutoStart"
                                 },
-                                "imageType": {
-                                    "Ref": "ImageType"
+                                "nuxeoSecret": {
+                                    "Ref": "NuxeoSecret"
                                 }
                             }
                         ]
