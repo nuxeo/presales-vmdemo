@@ -9,27 +9,13 @@
             "ConstraintDescription": "Please specify a valid DNS host prefix"
         },
         "InstanceType": {
-            "Description": "Type of EC2 instance.  If you plan to install Arender, t3.medium is too small",
+            "Description": "t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
             "Type": "String",
             "Default": "t3.medium",
             "AllowedValues": [
-                "t3.micro",
-                "t3.small",
                 "t3.medium",
-                "t3.large",
-                "t3.xlarge",
-                "t3.2xlarge",
-                "m4.large",
-                "m4.xlarge",
-                "m5.large",
-                "m5.xlarge",
-                "m5.2xlarge",
-                "m5.4xlarge",
-                "c5.large",
-                "c5.xlarge",
-                "c5.2xlarge",
-                "c5.4xlarge",
-                "c5.8xlarge"
+                "m6g.large",
+                "m6g.xlarge"
             ]
         },
         "KeyName": {
