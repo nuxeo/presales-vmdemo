@@ -22,7 +22,7 @@
             ]
         },
         "KeyName": {
-            "Description": "Name of an existing EC2 KeyPair to enable SSH access",
+            "Description": "Name of your EC2 KeyPair to enable SSH access",
             "Type": "String",
             "MinLength": 1,
             "ConstraintDescription": "Please specify a key pair"
@@ -49,11 +49,6 @@
             "MinLength": 1,
             "ConstraintDescription": "Please specify a secret"
         },
-        "DiskSize": {
-            "Type": "Number",
-            "Default": 20,
-            "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
-        },
         "NuxeoURL": {
             "Description": "Value for ARENDERSRV_NUXEO_SERVER_URL (e.g. 'https://mynuxeo.cloud.nuxeo.com/nuxeo')",
             "Type": "String",
@@ -63,6 +58,11 @@
             "Metadata": {
                 "Comment": "Reminder: regex stored in JSON so you need to escape backslash with double-backslash."
             }
+        },
+        "DiskSize": {
+            "Type": "Number",
+            "Default": 40,
+            "Description": "Disk size (in GB) for root volume of EC2 instance."
         },
         "AutoStart": {
             "Type": "String",
