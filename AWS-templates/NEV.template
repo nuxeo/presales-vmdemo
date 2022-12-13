@@ -30,9 +30,10 @@
             "MinLength": 1,
             "ConstraintDescription": "Please specify a customer"
         },
-        "StudioProject": {
+        "Contact": {
             "Type": "String",
-            "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
+            "Default": "wwpresalesdemos@hyland.com",
+            "Description": "Contact email address"
         },
         "NEVVersion": {
             "Type": "String",
@@ -53,11 +54,6 @@
             "Description": "Value for ARENDERSRV_NUXEO_SERVER_ARENDER_SECRET; use for nuxeo.arender.oauth2.client.secret in nuxeo.conf",
             "MinLength": 1,
             "ConstraintDescription": "Please specify a secret"
-        },
-        "Contact": {
-            "Type": "String",
-            "Default": "wwpresalesdemos@hyland.com",
-            "Description": "Contact email address"
         },
         "DiskSize": {
             "Type": "Number",
@@ -262,9 +258,6 @@
                                 },
                                 "branch": {
                                     "Ref": "GitBranch"
-                                },
-                                "studio": {
-                                    "Ref": "StudioProject"
                                 },
                                 "nevVersion": {
                                     "Ref": "NEVVersion"
