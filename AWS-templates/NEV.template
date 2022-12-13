@@ -27,7 +27,7 @@
         "GitBranch": {
             "Type": "String",
             "Default": "master",
-            "Description": "https://github.com/nuxeo/presales-vmdemo repository branch"
+            "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         },
         "Customer": {
             "Type": "String",
