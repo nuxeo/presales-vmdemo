@@ -24,15 +24,6 @@
             "MinLength": 1,
             "ConstraintDescription": "Please specify a key pair"
         },
-        "NuxeoChannel": {
-            "Type": "String",
-            "Default": "Release",
-            "AllowedValues": [
-                "Release",
-                "Snapshot"
-            ],
-            "Description": "The channel to use"
-        },
         "GitBranch": {
             "Type": "String",
             "Default": "master",
@@ -70,11 +61,7 @@
             "Default": "LTS",
             "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
             "Type": "String"
-        },
-        "RPMs": {
-            "Type": "String",
-            "Description": "Additional RPM packages that should be installed, ok to leave empty"
-        },
+        }
         "Contact": {
             "Type": "String",
             "Default": "wwpresalesdemos@hyland.com",
@@ -273,9 +260,6 @@
                                 "region": {
                                     "Ref": "AWS::Region"
                                 },
-                                "channel": {
-                                    "Ref": "NuxeoChannel"
-                                },
                                 "bucket": {
                                     "Ref": "UseS3Bucket"
                                 },
@@ -293,9 +277,6 @@
                                 },
                                 "imageType": {
                                     "Ref": "ImageType"
-                                },
-                                "rpms": {
-                                    "Ref": "RPMs"
                                 }
                             }
                         ]
