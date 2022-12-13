@@ -1,0 +1,464 @@
+{
+    "Description": "Nuxeo Presales NEV Template",
+    "Parameters": {
+        "DnsName": {
+            "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
+            "Type": "String",
+            "AllowedPattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]))*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+            "MinLength": 1,
+            "ConstraintDescription": "Please specify a valid DNS host prefix"
+        },
+        "InstanceType": {
+            "Description": "Type of EC2 instance.  If you plan to install Arender, t3.medium is too small",
+            "Type": "String",
+            "Default": "t3.medium",
+            "AllowedValues": [
+                "t3.micro",
+                "t3.small",
+                "t3.medium",
+                "t3.large",
+                "t3.xlarge",
+                "t3.2xlarge",
+                "m4.large",
+                "m4.xlarge",
+                "m5.large",
+                "m5.xlarge",
+                "m5.2xlarge",
+                "m5.4xlarge",
+                "c5.large",
+                "c5.xlarge",
+                "c5.2xlarge",
+                "c5.4xlarge",
+                "c5.8xlarge"
+            ]
+        },
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access",
+            "Type": "String",
+            "MinLength": 1,
+            "ConstraintDescription": "Please specify a key pair"
+        },
+        "NuxeoChannel": {
+            "Type": "String",
+            "Default": "Release",
+            "AllowedValues": [
+                "Release",
+                "Snapshot"
+            ],
+            "Description": "The channel to use"
+        },
+        "GitBranch": {
+            "Type": "String",
+            "Default": "master",
+            "Description": "https://github.com/nuxeo/presales-vmdemo repository branch"
+        },
+        "Customer": {
+            "Type": "String",
+            "Description": "Prospect name, or 'generic' if this is a generic demo",
+            "MinLength": 1,
+            "ConstraintDescription": "Please specify a customer"
+        },
+        "StudioProject": {
+            "Type": "String",
+            "Description": "The Nuxeo Studio project name (MUST be accessible by 'nuxeo_presales' user)"
+        },
+        "StudioVersion": {
+            "Type": "String",
+            "Default": "0.0.0-SNAPSHOT",
+            "Description": "The Nuxeo Studio version (used with Release in Studio to install a different version)"
+        },
+        "AutoStart": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "true",
+            "Description": "Auto-start the Nuxeo runtime; if false, log into your instance to start Nuxeo",
+            "Type": "String"
+        },
+        "ImageType": {
+            "AllowedValues": [
+                "Cloud",
+                "LTS"
+            ],
+            "Default": "LTS",
+            "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
+            "Type": "String"
+        },
+        "RPMs": {
+            "Type": "String",
+            "Description": "Additional RPM packages that should be installed, ok to leave empty"
+        },
+        "Contact": {
+            "Type": "String",
+            "Default": "wwpresalesdemos@hyland.com",
+            "Description": "Contact email address"
+        },
+        "DiskSize": {
+            "Type": "Number",
+            "Default": 20,
+            "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
+        },
+        "UseS3Bucket": {
+            "AllowedValues": [
+                "Shared",
+                "Create",
+                "None"
+            ],
+            "Default": "Shared",
+            "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
+            "Type": "String"
+        }
+    },
+    "Conditions": {
+        "CreateS3Bucket": {
+            "Fn::Equals": [
+                {
+                    "Ref": "UseS3Bucket"
+                },
+                "Create"
+            ]
+        },
+        "ShareS3Bucket": {
+            "Fn::Equals": [
+                {
+                    "Ref": "UseS3Bucket"
+                },
+                "Shared"
+            ]
+        },
+        "UseS3": {
+            "Fn::Or": [
+                {
+                    "Condition": "CreateS3Bucket"
+                },
+                {
+                    "Condition": "ShareS3Bucket"
+                }
+            ]
+        }
+    },
+    "Mappings": {
+        "AWSRegionArch2AMI": {
+            "us-west-1": {
+                "64": "ami-0b6246086351c53ed"
+            },
+            "us-west-2": {
+                "64": "ami-0bedf48efbb8f047d"
+            },
+            "us-east-1": {
+                "64": "ami-02cbdfc5aa4c3433b"
+            },
+            "eu-west-1": {
+                "64": "ami-03e733ee9c2f6e1ec"
+            },
+            "ap-northeast-1": {
+                "64": "ami-0113602ade1a985e7"
+            },
+            "sa-east-1": {
+                "64": "ami-048a5cff572cc2466"
+            }
+        },
+        "AWSRegionSubnet": {
+            "ap-northeast-1": {
+                "vpc": "vpc-73016014",
+                "subnet": "subnet-f3daebba"
+            },
+            "eu-west-1": {
+                "vpc": "vpc-5420e830",
+                "subnet": "subnet-dbc879bf"
+            },
+            "us-east-1": {
+                "vpc": "vpc-01311a6a321841d60",
+                "subnet": "subnet-0d192be7ed6d2faa2"
+            },
+            "us-west-1": {
+                "vpc": "vpc-420fa925",
+                "subnet": "subnet-5d71ff06"
+            },
+            "us-west-2": {
+                "vpc": "vpc-0e6cdc3402852ec63",
+                "subnet": "subnet-070006c83fad19822"
+            },
+            "sa-east-1": {
+                "vpc": "vpc-0d2362c5f3e332f13",
+                "subnet": "subnet-00c372f7bb8d17f3f"
+            }
+        }
+    },
+    "Resources": {
+        "NEVInstance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "SecurityGroupIds": [
+                    {
+                        "Fn::GetAtt": [
+                            "NuxeoSecurity",
+                            "GroupId"
+                        ]
+                    }
+                ],
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "VolumeSize": {
+                                "Ref": "DiskSize"
+                            }
+                        }
+                    }
+                ],
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "64"
+                    ]
+                },
+                "SubnetId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionSubnet",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "subnet"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "contact",
+                        "Value": {
+                            "Ref": "Contact"
+                        }
+                    },
+                    {
+                        "Key": "environment",
+                        "Value": "dev"
+                    },
+                    {
+                        "Key": "cfTemplateVersion",
+                        "Value": "1.0.0"
+                    },
+                    {
+                        "Key": "billing-category",
+                        "Value": "presales"
+                    },
+                    {
+                        "Key": "billing-subcategory",
+                        "Value": {
+                            "Ref": "Customer"
+                        }
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "dnsName",
+                        "Value": {
+                            "Ref": "DnsName"
+                        }
+                    }
+                ],
+                "IamInstanceProfile": {
+                    "Ref": "InstanceProfile"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Sub": [
+                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+                            {
+                                "stack": {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "dnsName": {
+                                    "Ref": "DnsName"
+                                },
+                                "region": {
+                                    "Ref": "AWS::Region"
+                                },
+                                "channel": {
+                                    "Ref": "NuxeoChannel"
+                                },
+                                "bucket": {
+                                    "Ref": "UseS3Bucket"
+                                },
+                                "branch": {
+                                    "Ref": "GitBranch"
+                                },
+                                "studio": {
+                                    "Ref": "StudioProject"
+                                },
+                                "studioVer": {
+                                    "Ref": "StudioVersion"
+                                },
+                                "autoStart": {
+                                    "Ref": "AutoStart"
+                                },
+                                "imageType": {
+                                    "Ref": "ImageType"
+                                },
+                                "rpms": {
+                                    "Ref": "RPMs"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e3152d23-45c2-4149-bb2a-4b1dae72264d"
+                }
+            }
+        },
+        "NuxeoSecurity": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionSubnet",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "vpc"
+                    ]
+                },
+                "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "c9c05daa-ed6e-42b7-9100-358963a600f4"
+                }
+            }
+        },
+        "InstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "b939a11b-a704-4e6a-9ad6-69721bbac922"
+                }
+            }
+        },
+        "InstanceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "5f90ca67-c464-4e21-b50f-d565ef688ee3"
+                }
+            }
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "5f90ca67-c464-4e21-b50f-d565ef688ee3": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -200,
+                    "y": 310
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "b939a11b-a704-4e6a-9ad6-69721bbac922": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -200,
+                    "y": 410
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "c9c05daa-ed6e-42b7-9100-358963a600f4": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -200,
+                    "y": 500
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "e3152d23-45c2-4149-bb2a-4b1dae72264d": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -370,
+                    "y": 410
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "c9c05daa-ed6e-42b7-9100-358963a600f4"
+                ]
+            }
+        }
+    }
+}
