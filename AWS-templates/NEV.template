@@ -51,15 +51,15 @@
             "Default": 20,
             "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
         },
-        "UseS3Bucket": {
-            "AllowedValues": [
-                "Shared",
-                "Create",
-                "None"
-            ],
-            "Default": "Shared",
-            "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
-            "Type": "String"
+        "NuxeoURL": {
+            "Description": "Value for ARENDERSRV_NUXEO_SERVER_URL (e.g. 'https://mynuxeo.cloud.nuxeo.com/nuxeo')",
+            "Type": "String",
+            "AllowedPattern": "^https?:\\/\\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\\/=]*)\/nuxeo$",
+            "MinLength": 1,
+            "ConstraintDescription": "Please specify a valid Nuxeo URL (don't forget '/nuxeo')",
+            "Metadata": {
+                "Comment": "Reminder: regex stored in JSON so you need to escape backslash with double-backslash."
+            }
         },
         "AutoStart": {
             "Type": "String",
@@ -253,8 +253,8 @@
                                 "region": {
                                     "Ref": "AWS::Region"
                                 },
-                                "bucket": {
-                                    "Ref": "UseS3Bucket"
+                                "nuxeoUrl": {
+                                    "Ref": "NuxeoURL"
                                 },
                                 "branch": {
                                     "Ref": "GitBranch"
