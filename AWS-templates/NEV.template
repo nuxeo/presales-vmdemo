@@ -51,10 +51,7 @@
             "Type": "String",
             "AllowedPattern": "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)\/nuxeo$",
             "MinLength": 1,
-            "ConstraintDescription": "Please specify a valid Nuxeo URL (don't forget '/nuxeo')",
-            "Metadata": {
-                "Comment": "Reminder: regex stored in JSON so you need to escape backslash with double-backslash."
-            }
+            "ConstraintDescription": "Please specify a valid Nuxeo URL (don't forget '/nuxeo')"
         },
         "DiskSize": {
             "Type": "Number",
