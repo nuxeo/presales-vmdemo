@@ -6,10 +6,7 @@
             "Type": "String",
             "AllowedPattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]))*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
             "MinLength": 1,
-            "ConstraintDescription": "Please specify a valid DNS host prefix",
-            "Metadata": {
-                "Comment": "Reminder: regex stored in JSON so you need to escape backslash with double-backslash."
-            }
+            "ConstraintDescription": "Please specify a valid DNS host prefix"
         },
         "InstanceType": {
             "Description": "t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
