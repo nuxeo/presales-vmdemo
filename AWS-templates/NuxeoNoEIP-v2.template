@@ -144,7 +144,7 @@
       "CreateNestedNEV": {
         "Fn::Equals": [{
           "Ref": "MakeNEV"
-        }, "True"]
+        }, "true"]
     }
   },
 
@@ -846,11 +846,13 @@
           "Customer": { "Ref": "Customer" },
           "Contact": { "Ref": "Contact" },
           "NEVVersion": { "Ref": "NEVVersion" },
-          "NuxeoURL": { "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
-            "name": {
-              "Ref": "DnsName"
-            }
-          }] },
+          "NuxeoURL": { 
+            "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
+              "name": {
+                "Ref": "DnsName"
+              }
+            }] 
+          },
           "DiskSize": { "Ref": "NEVDiskSize" },
           "AutoStart": { "Ref": "NEVAutoStart" }
         },
