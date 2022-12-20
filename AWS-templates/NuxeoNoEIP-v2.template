@@ -85,6 +85,41 @@
       "Default": "Shared",
       "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
       "Type": "String"
+    },
+    "MakeNEV": {
+      "AllowedValues": [ "true", "false" ],
+      "Default": "false",
+      "Description": "Use to create a child NEV stack; false = do not create a NEV stack",
+      "Type": "String"
+    },
+    "NEVInstanceType": {
+      "Description": "(NEV ONLY) t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
+      "Type": "String",
+      "Default": "t3.medium",
+      "AllowedValues": [
+          "t3.medium",
+          "m6g.large",
+          "m6g.xlarge"
+      ]
+    },
+    "NEVVersion": {
+      "Type": "String",
+      "Default": "2.2.0",
+      "Description": "(NEV ONLY) https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
+    },
+    "NEVDiskSize": {
+      "Type": "Number",
+      "Default": 40,
+      "Description": "(NEV ONLY) Disk size (in GB) for root volume of EC2 instance."
+    },
+    "NEVAutoStart": {
+      "Type": "String",
+      "Description": "(NEV ONLY) Auto-start NEV; if false, you need to log into your instance to start NEV",
+      "AllowedValues": [
+          "true",
+          "false"
+      ],
+      "Default": "true"
     }
   },
 
@@ -105,6 +140,11 @@
       }, {
         "Condition": "ShareS3Bucket"
       }]
+    },
+      "CreateNestedNEV": {
+        "Fn::Equals": [{
+          "Ref": "MakeNEV"
+        }, "True"]
     }
   },
 
@@ -792,7 +832,32 @@
           }
         ]
       }
+    },
+
+    "NestedStackNEV": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Condition": "CreateNestedNEV",
+      "Properties": {
+        "TemplateURL": "https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/NEV.template",
+        "Parameters": {
+          "DnsName": { "Ref": "DnsName" },
+          "InstanceType": { "Ref": "NEVInstanceType" },
+          "KeyName": { "Ref": "KeyName" },
+          "Customer": { "Ref": "Customer" },
+          "Contact": { "Ref": "Contact" },
+          "NEVVersion": { "Ref": "NEVVersion" },
+          "NuxeoURL": { "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
+            "name": {
+              "Ref": "DnsName"
+            }
+          }] },
+          "DiskSize": { "Ref": "NEVDiskSize" },
+          "AutoStart": { "Ref": "NEVAutoStart" }
+        },
+        "TimeoutInMinutes": "60"
+      }
     }
 
   }
 }
+
