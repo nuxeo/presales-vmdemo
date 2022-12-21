@@ -475,7 +475,8 @@
               "Action": "secretsmanager:GetSecretValue",
               "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
                 "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN",
-                "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ"
+                "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ",
+                { "Ref": "NuxeoSecret" }
               ]
             },
             {
