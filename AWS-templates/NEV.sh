@@ -57,6 +57,7 @@ echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin docker-are
 # If so, retrieve secret and set to NUXEO_SECRET
 if [[ "$NUXEO_SECRET" == *"aws:secretsmanager"* ]]; then
   aws --region ${REGION} secretsmanager get-secret-value --secret-id ${NUXEO_SECRET} --output text | jq -r .password > /home/ubuntu/nxs
+fi
 
 # Set working environment
 cat << EOF > ${NEV_ENV}
