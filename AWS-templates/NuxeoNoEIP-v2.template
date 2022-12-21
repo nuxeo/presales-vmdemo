@@ -120,6 +120,11 @@
           "false"
       ],
       "Default": "true"
+    },
+    "NEVGitBranch": {
+      "Type": "String",
+      "Default": "master",
+      "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
     }
   },
 
@@ -198,6 +203,25 @@
   },
 
   "Resources": {
+    "NuxeoSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": ["${name}-NuxeoSecret", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "GenerateSecretString":{
+          "SecretStringTemplate": "{\"password\":\"${password}\"}",
+          "GenerateStringKey": "password",
+          "PasswordLength": 36,
+          "ExcludeCharacters": "\"@/!#$%^&*()_=+[]{};:?>.<,\\",
+          "ExcludeUppercase": true
+        }
+      }
+    },
     "NuxeoInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
@@ -838,9 +862,14 @@
       "Type": "AWS::CloudFormation::Stack",
       "Condition": "CreateNestedNEV",
       "Properties": {
-        "TemplateURL": "https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/NEV.template",
+        "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template", 
         "Parameters": {
-          "DnsName": { "Ref": "DnsName" },
+          "DnsName": { 
+            "Fn::Sub": ["${name}-nev", {
+              "name": {
+                "Ref": "DnsName"
+              }
+            }]  },
           "InstanceType": { "Ref": "NEVInstanceType" },
           "KeyName": { "Ref": "KeyName" },
           "Customer": { "Ref": "Customer" },
@@ -854,7 +883,9 @@
             }] 
           },
           "DiskSize": { "Ref": "NEVDiskSize" },
-          "AutoStart": { "Ref": "NEVAutoStart" }
+          "AutoStart": { "Ref": "NEVAutoStart" },
+          "NuxeoSecret": { "Ref": "NuxeoSecret" },
+          "GitBranch": { "Ref": "NEVGitBranch" }
         },
         "TimeoutInMinutes": "60"
       }
