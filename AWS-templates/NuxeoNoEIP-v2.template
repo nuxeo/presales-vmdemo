@@ -107,6 +107,11 @@
       "Default": "2.2.0",
       "Description": "(NEV ONLY) https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
     },
+    "ArenderAddon": {
+      "Type": "String",
+      "Default": "nuxeo-arender-2021.3.0",
+      "Description": "(NEV ONLY) The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
+    },
     "NEVDiskSize": {
       "Type": "Number",
       "Default": 40,
@@ -205,6 +210,7 @@
   "Resources": {
     "NuxeoSecret": {
       "Type": "AWS::SecretsManager::Secret",
+      "Condition": "CreateNestedNEV",
       "Properties": {
         "Name": {
           "Fn::Sub": ["${name}-NuxeoSecret", {
@@ -217,7 +223,7 @@
           "SecretStringTemplate": "{\"password\":\"${password}\"}",
           "GenerateStringKey": "password",
           "PasswordLength": 36,
-          "ExcludeCharacters": "\"@/!#$%^&*()_=+[]{};:?>.<,\\",
+          "ExcludeCharacters": "\"`'@/!#$%^&*()_=+[]{};:?>.<,\\",
           "ExcludeUppercase": true
         }
       }
@@ -297,7 +303,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -332,6 +338,12 @@
                 "rpms": {
                   "Ref": "RPMs"
                 },
+                "ArenderAddon": {
+                  "Ref": "ArenderAddon"
+                },
+                "NuxeoSecret": {
+                  "Ref": "NuxeoSecret"
+                },
                 "uploadRole": {
                   "Fn::If": [
                     "UseS3",
@@ -344,7 +356,7 @@
                 "rekognitionRole": {
                       "Fn::GetAtt": ["RekognitionRole", "Arn"]
                 },
-                "snsTopic": { "Ref" : "RekognitionSns" }
+                "snsTopic": { "Ref" : "RekognitionSns" }                
               }
             ]
           }

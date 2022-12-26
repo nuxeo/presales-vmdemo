@@ -56,8 +56,7 @@ echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin docker-are
 # Check if NUXEO_SECRET is a SecretsManager ARN
 # If so, retrieve secret and set to NUXEO_SECRET
 if [[ "$NUXEO_SECRET" == *"aws:secretsmanager"* ]]; then
-  aws --region ${REGION} secretsmanager get-secret-value --secret-id ${NUXEO_SECRET} --query SecretString --output text > /root/nxs.json
-  NUXEO_SECRET=$(jq -r .password < /root/nxs.json)
+  NUXEO_SECRET=$(aws --region ${REGION} secretsmanager get-secret-value --secret-id ${NUXEO_SECRET} --query SecretString --output text | jq -r .password)
 fi
 
 # Set working environment
