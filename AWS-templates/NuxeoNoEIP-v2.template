@@ -3,6 +3,35 @@
 
   "Description": "Nuxeo Presales Demo Template",
 
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
+        {
+          "Label" : { "default" : "General" },
+          "Parameters" : [ "Customer", "DnsName", "KeyName", "Contact" ]
+        },
+        {
+          "Label" : { "default" : "Nuxeo Setup" },
+          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel", 
+            "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
+        },
+        {
+          "Label" : { "default": "NEV Setup (optional)" },
+          "Parameters" : [ "MakeNEV", "NEVInstanceType", "NEVVersion", "NEVArenderAddon",
+            "NEVAutoStart", "NEVGitBranch", ]
+        }
+      ],
+      "ParameterLabels" : {
+        "MakeNEV" : { "default" : "Create a NEV stack?" },
+        "NEVInstanceType" : { "default" : "NEV instance type" },
+        "NEVVersion" : { "default" : "NEV Version" },
+        "NEVArenderAddon" : { "default" : "ARender addon"},
+        "NEVAutoStart" : { "default" : "Autostart" },
+        "NEVGitBranch" : { "default" : "Git branch for NEV stack" }
+      }
+    }
+  },
+
   "Parameters": {
     "DnsName": {
       "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
@@ -93,7 +122,7 @@
       "Type": "String"
     },
     "NEVInstanceType": {
-      "Description": "(NEV ONLY) t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
+      "Description": "t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
@@ -105,21 +134,21 @@
     "NEVVersion": {
       "Type": "String",
       "Default": "2.2.0",
-      "Description": "(NEV ONLY) https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
+      "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
     },
-    "ArenderAddon": {
+    "NEVArenderAddon": {
       "Type": "String",
       "Default": "nuxeo-arender-2021.3.0",
-      "Description": "(NEV ONLY) The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
+      "Description": "The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
     },
     "NEVDiskSize": {
       "Type": "Number",
       "Default": 40,
-      "Description": "(NEV ONLY) Disk size (in GB) for root volume of EC2 instance."
+      "Description": "Disk size (in GB) for root volume of EC2 instance."
     },
     "NEVAutoStart": {
       "Type": "String",
-      "Description": "(NEV ONLY) Auto-start NEV; if false, you need to log into your instance to start NEV",
+      "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
       "AllowedValues": [
           "true",
           "false"
@@ -210,7 +239,6 @@
   "Resources": {
     "NuxeoSecret": {
       "Type": "AWS::SecretsManager::Secret",
-      "Condition": "CreateNestedNEV",
       "Properties": {
         "Name": {
           "Fn::Sub": ["${name}-NuxeoSecret", {
@@ -339,10 +367,10 @@
                   "Ref": "RPMs"
                 },
                 "ArenderAddon": {
-                  "Ref": "ArenderAddon"
+                  "Ref": "NEVArenderAddon"
                 },
                 "NuxeoSecret": {
-                  "Ref": "NuxeoSecret"
+                    "Ref": "NuxeoSecret"
                 },
                 "uploadRole": {
                   "Fn::If": [
