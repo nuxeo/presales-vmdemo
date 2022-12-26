@@ -186,6 +186,7 @@ nuxeo.arender.oauth2.client.create=true
 nuxeo.arender.oauth2.client.id=arender
 nuxeo.arender.oauth2.client.secret=${NUXEO_SECRET}
 nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
+
 EOF
 else
   cat << EOF >> ${CONF_DIR}/system.conf
@@ -195,6 +196,7 @@ else
 # nuxeo.arender.oauth2.client.id=arender
 # nuxeo.arender.oauth2.client.secret=<auto-created, but it must match what you entered above>
 # nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
+
 EOF
 fi
 
