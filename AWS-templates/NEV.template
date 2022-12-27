@@ -73,6 +73,34 @@
             "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         }
     },
+
+    "Conditions": {
+        "CreateNEVSecret": {
+          "Fn::And" : [
+            {
+                "Fn::Not" : [
+                    {
+                    "Fn::Equals" : [
+                        {"Ref" : "NuxeoSecret"}, ""
+                        ]
+                    }
+                ]
+            },
+            {
+                "Fn::Equals" : [
+                    {
+                        "Fn::Select" : [
+                             "0", {"Fn::Split" : [
+                                "arn:aws:secretsmanager", {"Ref" : "NuxeoSecret"}
+                                ]}
+                        ]
+                    }, ""
+                ]
+            }
+          ]
+        }
+    },
+
     "Mappings": {
         "AWSRegionArch2AMI": {
             "us-west-1": {
@@ -329,6 +357,39 @@
                 "AWS::CloudFormation::Designer": {
                     "id": "5f90ca67-c464-4e21-b50f-d565ef688ee3"
                 }
+            }
+        },
+        "InstanceNEVSecretPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Condition": "CreateNEVSecret",
+            "Properties": {
+                "PolicyName": {
+                    "Fn::Sub": [
+                        "${name}-NEV-secret-policy",
+                        {
+                            "name": {
+                                "Ref": "AWS::StackName"
+                            }
+                        }
+                    ]
+                },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "secretsmanager:GetSecretValue",
+                            "Resource": [
+                                {"Ref": "NuxeoSecret"}
+                            ]
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
             }
         },
         "InstanceSharedResourcePolicy": {

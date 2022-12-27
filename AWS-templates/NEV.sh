@@ -53,6 +53,12 @@ DOCKER_USER=$(jq -r '.SecretString|fromjson|.docker_presales_user' < /root/creds
 DOCKER_PASS=$(jq -r '.SecretString|fromjson|.docker_presales_pwd' < /root/creds.json)
 echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin docker-arender.packages.nuxeo.com 2>&1 | tee -a ${INSTALL_LOG}
 
+# Check if NUXEO_SECRET is a SecretsManager ARN
+# If so, retrieve secret and set to NUXEO_SECRET
+if [[ "$NUXEO_SECRET" == *"aws:secretsmanager"* ]]; then
+  NUXEO_SECRET=$(aws --region ${REGION} secretsmanager get-secret-value --secret-id ${NUXEO_SECRET} --query SecretString --output text | jq -r .password)
+fi
+
 # Set working environment
 cat << EOF > ${NEV_ENV}
 # NEV Version

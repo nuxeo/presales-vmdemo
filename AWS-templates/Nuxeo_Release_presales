@@ -120,14 +120,6 @@ nuxeo.append.templates.system=${TEMPLATES}
 # Webui
 nuxeo.selection.selectAllEnabled=true
 
-# ARender Configuration
-nuxeo.jwt.secret=$(uuid)
-#arender.server.previewer.host=
-#nuxeo.arender.oauth2.client.create=true
-#nuxeo.arender.oauth2.client.id=arender
-#nuxeo.arender.oauth2.client.secret=$(uuid)
-#nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
-
 # Mail Configuration
 mail.transport.password=${MAIL_PASS}
 mail.transport.host=smtp.mail.us-east-1.awsapps.com
@@ -181,6 +173,34 @@ nuxeo.wopi.baseURL=https://wopi.nuxeo.io/${FQDN}/nuxeo/
 
 EOF
 
+# NEV setup
+# If NUXEO_SECRET was created, then create arender.conf
+# Else, add commented out arender fields to system.conf
+if [[ ${MAKE_NEV} == "true" ]]
+then
+  NUXEO_SECRET=$(aws --region ${REGION} secretsmanager get-secret-value --secret-id ${NUXEO_SECRET} --query SecretString --output text | jq -r .password)
+  cat << EOF > ${CONF_DIR}/arender.conf
+# ARender Configuration
+arender.server.previewer.host=https://${DNS_NAME}-nev.cloud.nuxeo.com
+nuxeo.arender.oauth2.client.create=true
+nuxeo.arender.oauth2.client.id=arender
+nuxeo.arender.oauth2.client.secret=${NUXEO_SECRET}
+nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
+
+EOF
+else
+  cat << EOF >> ${CONF_DIR}/system.conf
+# ARender Configuration
+# arender.server.previewer.host=https://arender-my-super-demo-nev.cloud.nuxeo.com
+# nuxeo.arender.oauth2.client.create=true
+# nuxeo.arender.oauth2.client.id=arender
+# nuxeo.arender.oauth2.client.secret=<auto-created, but it must match what you entered above>
+# nuxeo.arender.oauth2.client.redirectURI=/login/oauth2/code/nuxeo
+
+EOF
+fi
+
+
 # Register the nuxeo instance
 echo "$(date) Configure Studio Project [${NX_STUDIO}]" | tee -a ${INSTALL_LOG}
 
@@ -218,7 +238,7 @@ JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
 
 NUXEO_DEV=true
 NUXEO_PORT=8080
-NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${NUXEO_PACKAGES}
+NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${ARENDER_ADDON} ${NUXEO_PACKAGES}
 
 INSTALL_RPM=${INSTALL_RPM}
 

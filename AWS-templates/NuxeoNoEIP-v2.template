@@ -3,6 +3,35 @@
 
   "Description": "Nuxeo Presales Demo Template",
 
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
+        {
+          "Label" : { "default" : "General" },
+          "Parameters" : [ "Customer", "DnsName", "KeyName", "Contact" ]
+        },
+        {
+          "Label" : { "default" : "Nuxeo Setup" },
+          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel", 
+            "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
+        },
+        {
+          "Label" : { "default": "NEV Setup (optional)" },
+          "Parameters" : [ "MakeNEV", "NEVInstanceType", "NEVVersion", "NEVArenderAddon",
+            "NEVAutoStart", "NEVGitBranch" ]
+        }
+      ],
+      "ParameterLabels" : {
+        "MakeNEV" : { "default" : "Create a NEV stack?" },
+        "NEVInstanceType" : { "default" : "NEV instance type" },
+        "NEVVersion" : { "default" : "NEV Version" },
+        "NEVArenderAddon" : { "default" : "ARender addon"},
+        "NEVAutoStart" : { "default" : "Autostart" },
+        "NEVGitBranch" : { "default" : "Git branch for NEV stack" }
+      }
+    }
+  },
+
   "Parameters": {
     "DnsName": {
       "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
@@ -85,6 +114,51 @@
       "Default": "Shared",
       "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
       "Type": "String"
+    },
+    "MakeNEV": {
+      "AllowedValues": [ "true", "false" ],
+      "Default": "false",
+      "Description": "Use to create a child NEV stack; false = do not create a NEV stack",
+      "Type": "String"
+    },
+    "NEVInstanceType": {
+      "Description": "t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
+      "Type": "String",
+      "Default": "t3.medium",
+      "AllowedValues": [
+          "t3.medium",
+          "m6g.large",
+          "m6g.xlarge"
+      ]
+    },
+    "NEVVersion": {
+      "Type": "String",
+      "Default": "2.2.0",
+      "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
+    },
+    "NEVArenderAddon": {
+      "Type": "String",
+      "Default": "nuxeo-arender-2021.3.0",
+      "Description": "The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
+    },
+    "NEVDiskSize": {
+      "Type": "Number",
+      "Default": 40,
+      "Description": "Disk size (in GB) for root volume of EC2 instance."
+    },
+    "NEVAutoStart": {
+      "Type": "String",
+      "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
+      "AllowedValues": [
+          "true",
+          "false"
+      ],
+      "Default": "true"
+    },
+    "NEVGitBranch": {
+      "Type": "String",
+      "Default": "master",
+      "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
     }
   },
 
@@ -105,6 +179,11 @@
       }, {
         "Condition": "ShareS3Bucket"
       }]
+    },
+      "CreateNestedNEV": {
+        "Fn::Equals": [{
+          "Ref": "MakeNEV"
+        }, "true"]
     }
   },
 
@@ -158,6 +237,25 @@
   },
 
   "Resources": {
+    "NuxeoSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": ["${name}-NuxeoSecret", {
+            "name": {
+              "Ref": "AWS::StackName"
+            }
+          }]
+        },
+        "GenerateSecretString":{
+          "SecretStringTemplate": "{\"password\":\"${password}\"}",
+          "GenerateStringKey": "password",
+          "PasswordLength": 36,
+          "ExcludeCharacters": "\"`-~'@/!#$%^&*()_=+[]{};:?>.<,\\",
+          "ExcludeUppercase": true
+        }
+      }
+    },
     "NuxeoInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
@@ -233,7 +331,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -268,6 +366,15 @@
                 "rpms": {
                   "Ref": "RPMs"
                 },
+                "ArenderAddon": {
+                  "Ref": "NEVArenderAddon"
+                },
+                "NuxeoSecret": {
+                    "Ref": "NuxeoSecret"
+                },
+                "MakeNEV": {
+                  "Ref": "MakeNEV"
+                },
                 "uploadRole": {
                   "Fn::If": [
                     "UseS3",
@@ -280,7 +387,7 @@
                 "rekognitionRole": {
                       "Fn::GetAtt": ["RekognitionRole", "Arn"]
                 },
-                "snsTopic": { "Ref" : "RekognitionSns" }
+                "snsTopic": { "Ref" : "RekognitionSns" }                
               }
             ]
           }
@@ -411,7 +518,8 @@
               "Action": "secretsmanager:GetSecretValue",
               "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
                 "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN",
-                "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ"
+                "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ",
+                { "Ref": "NuxeoSecret" }
               ]
             },
             {
@@ -792,7 +900,41 @@
           }
         ]
       }
+    },
+
+    "NestedStackNEV": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Condition": "CreateNestedNEV",
+      "Properties": {
+        "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template", 
+        "Parameters": {
+          "DnsName": { 
+            "Fn::Sub": ["${name}-nev", {
+              "name": {
+                "Ref": "DnsName"
+              }
+            }]  },
+          "InstanceType": { "Ref": "NEVInstanceType" },
+          "KeyName": { "Ref": "KeyName" },
+          "Customer": { "Ref": "Customer" },
+          "Contact": { "Ref": "Contact" },
+          "NEVVersion": { "Ref": "NEVVersion" },
+          "NuxeoURL": { 
+            "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
+              "name": {
+                "Ref": "DnsName"
+              }
+            }] 
+          },
+          "DiskSize": { "Ref": "NEVDiskSize" },
+          "AutoStart": { "Ref": "NEVAutoStart" },
+          "NuxeoSecret": { "Ref": "NuxeoSecret" },
+          "GitBranch": { "Ref": "NEVGitBranch" }
+        },
+        "TimeoutInMinutes": "60"
+      }
     }
 
   }
 }
+
