@@ -73,6 +73,34 @@
             "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         }
     },
+
+    "Conditions": {
+        "CreateNEVSecret": {
+          "Fn::And" : [
+            {
+                "Fn::Not" : [
+                    {
+                    "Fn::Equals" : [
+                        {"Ref" : "NuxeoSecret"}, ""
+                        ]
+                    }
+                ]
+            },
+            {
+                "Fn::Equals" : [
+                    {
+                        "Fn::Select" : [
+                             "0", {"Fn::Split" : [
+                                "arn:aws:secretsmanager", {"Ref" : "NuxeoSecret"}
+                                ]}
+                        ]
+                    }, ""
+                ]
+            }
+          ]
+        }
+    },
+
     "Mappings": {
         "AWSRegionArch2AMI": {
             "us-west-1": {
@@ -331,6 +359,39 @@
                 }
             }
         },
+        "InstanceNEVSecretPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Condition": "CreateNEVSecret",
+            "Properties": {
+                "PolicyName": {
+                    "Fn::Sub": [
+                        "${name}-NEV-secret-policy",
+                        {
+                            "name": {
+                                "Ref": "AWS::StackName"
+                            }
+                        }
+                    ]
+                },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "secretsmanager:GetSecretValue",
+                            "Resource": [
+                                {"Ref": "NuxeoSecret"}
+                            ]
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
+            }
+        },
         "InstanceSharedResourcePolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
@@ -351,8 +412,7 @@
                             "Effect": "Allow",
                             "Action": "secretsmanager:GetSecretValue",
                             "Resource": [
-                                "arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
-                                {"Ref": "NuxeoSecret"}
+                                "arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT"
                             ]
                         },
                         {
