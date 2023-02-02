@@ -26,8 +26,8 @@ STUDIO_USERNAME="nuxeo_presales"
 
 TEMPLATES="default,mongodb"
 
-MONGO_VERSION="4.4"
-ELASTIC_VERSION="7.9.3"
+MONGO_VERSION="6.0"
+OPENSEARCH_IMAGE="opensearchproject/opensearch:1.3.7"
 # Used only if, in the CF template, you chose, for nuxeo-presales-docker,
 # a branch that also deploys Kafka
 ZOOKEEPER_VERSION="3.5.8"
@@ -234,8 +234,6 @@ cat << EOF > ${NUXEO_ENV}
 APPLICATION_NAME=${NX_STUDIO}
 PROJECT_NAME=${PROJECT_NAME}
 
-# Cloud Image: ${CLOUD_IMAGE}
-# LTS Image  : ${LTS_IMAGE}
 NUXEO_IMAGE=${FROM_IMAGE}
 
 JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
@@ -246,7 +244,7 @@ NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${ARENDER_ADDON} ${NUXEO_PACKA
 
 INSTALL_RPM=${INSTALL_RPM}
 
-ELASTIC_VERSION=${ELASTIC_VERSION}
+OPENSEARCH_IMAGE=${OPENSEARCH_IMAGE}
 MONGO_VERSION=${MONGO_VERSION}
 ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION}
 KAFKA_VERSION=${KAFKA_VERSION}
@@ -268,11 +266,6 @@ rm -f /root/creds.json
 chmod -R g+w ${NUXEO_BASE_DIR}
 chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR} ${TMP_DIR}
 chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
-
-# Generate input files
-cd ${COMPOSE_DIR}
-echo "Generating Dockerfile(s)" | tee -a ${INSTALL_LOG}
-make dockerfiles NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
 
 # Use the source image to register the project
 docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
