@@ -258,7 +258,7 @@ docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
 # Auto-start if Studio project defined
 if [ -n "${NX_STUDIO}" ]; then
   echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
-  docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
+  docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw -v ${CONF_DIR}:/var/lib/nuxeo/:rw   ${FROM_IMAGE} \
          nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "dev" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
   if [ -e ${TMP_DIR}/instance.clid ]; then
     echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
