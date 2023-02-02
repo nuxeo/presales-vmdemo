@@ -12,7 +12,7 @@
         },
         {
           "Label" : { "default" : "Nuxeo Setup" },
-          "Parameters" : [ "StudioProject", "StudioVersion", "NuxeoChannel",
+          "Parameters" : [ "StudioProject", "StudioVersion",
             "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
         },
         {
@@ -56,12 +56,6 @@
       "Type": "String",
       "MinLength": 1,
       "ConstraintDescription": "Please specify a key pair"
-    },
-    "NuxeoChannel": {
-      "Type": "String",
-      "Default": "Release",
-      "AllowedValues": ["Release", "Snapshot"],
-      "Description": "The channel to use"
     },
     "GitBranch": {
       "Type": "String",
@@ -325,7 +319,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_Release_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_Release_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -335,9 +329,6 @@
                 },
                 "region": {
                   "Ref": "AWS::Region"
-                },
-                "channel": {
-                  "Ref": "NuxeoChannel"
                 },
                 "bucket": {
                   "Ref": "UseS3Bucket"
