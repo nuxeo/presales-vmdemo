@@ -1,74 +1,37 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
+
   "Description": "Nuxeo Presales Demo Template",
-  "Metadata": {
-    "AWS::CloudFormation::Interface": {
-      "ParameterGroups": [
+
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
         {
-          "Label": {
-            "default": "General"
-          },
-          "Parameters": [
-            "Customer",
-            "DnsName",
-            "KeyName",
-            "Contact"
-          ]
+          "Label" : { "default" : "General" },
+          "Parameters" : [ "Customer", "DnsName", "KeyName", "Contact" ]
         },
         {
-          "Label": {
-            "default": "Nuxeo Setup"
-          },
-          "Parameters": [
-            "StudioProject",
-            "StudioVersion",
-            "ImageType",
-            "NuxeoChannel",
-            "InstanceType",
-            "DiskSize",
-            "AutoStart",
-            "GitBranchPresalesDocker",
-            "RPMs",
-            "GitBranch",
-            "UseS3Bucket"
-          ]
+          "Label" : { "default" : "Nuxeo Setup" },
+          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel",
+            "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
         },
         {
-          "Label": {
-            "default": "NEV Setup (optional)"
-          },
-          "Parameters": [
-            "MakeNEV",
-            "NEVInstanceType",
-            "NEVVersion",
-            "NEVArenderAddon",
-            "NEVAutoStart",
-            "NEVGitBranch"
-          ]
+          "Label" : { "default": "NEV Setup (optional)" },
+          "Parameters" : [ "MakeNEV", "NEVInstanceType", "NEVVersion", "NEVArenderAddon",
+            "NEVAutoStart", "NEVGitBranch" ]
         }
       ],
-      "ParameterLabels": {
-        "MakeNEV": {
-          "default": "Create a NEV stack?"
-        },
-        "NEVInstanceType": {
-          "default": "NEV instance type"
-        },
-        "NEVVersion": {
-          "default": "NEV Version"
-        },
-        "NEVArenderAddon": {
-          "default": "ARender addon"
-        },
-        "NEVAutoStart": {
-          "default": "Autostart"
-        },
-        "NEVGitBranch": {
-          "default": "Git branch for NEV stack"
-        }
+      "ParameterLabels" : {
+        "MakeNEV" : { "default" : "Create a NEV stack?" },
+        "NEVInstanceType" : { "default" : "NEV instance type" },
+        "NEVVersion" : { "default" : "NEV Version" },
+        "NEVArenderAddon" : { "default" : "ARender addon"},
+        "NEVAutoStart" : { "default" : "Autostart" },
+        "NEVGitBranch" : { "default" : "Git branch for NEV stack" }
       }
     }
   },
+
   "Parameters": {
     "DnsName": {
       "Description": "(REQUIRED) Host prefix (e.g. you enter 'mydemo', the host will be 'mydemo.cloud.nuxeo.com')",
@@ -82,23 +45,10 @@
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
-        "t3.micro",
-        "t3.small",
-        "t3.medium",
-        "t3.large",
-        "t3.xlarge",
-        "t3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m5.large",
-        "m5.xlarge",
-        "m5.2xlarge",
-        "m5.4xlarge",
-        "c5.large",
-        "c5.xlarge",
-        "c5.2xlarge",
-        "c5.4xlarge",
-        "c5.8xlarge"
+        "t3.micro", "t3.small", "t3.medium", "t3.large", "t3.xlarge", "t3.2xlarge",
+        "m4.large", "m4.xlarge",
+        "m5.large", "m5.xlarge", "m5.2xlarge", "m5.4xlarge",
+        "c5.large", "c5.xlarge", "c5.2xlarge", "c5.4xlarge", "c5.8xlarge"
       ]
     },
     "KeyName": {
@@ -143,21 +93,9 @@
       "Description": "The Nuxeo Studio version (used with Release in Studio to install a different version)"
     },
     "AutoStart": {
-      "AllowedValues": [
-        "true",
-        "false"
-      ],
+      "AllowedValues": [ "true", "false" ],
       "Default": "true",
       "Description": "Auto-start the Nuxeo runtime; if false, log into your instance to start Nuxeo",
-      "Type": "String"
-    },
-    "ImageType": {
-      "AllowedValues": [
-        "Cloud",
-        "LTS"
-      ],
-      "Default": "LTS",
-      "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
       "Type": "String"
     },
     "RPMs": {
@@ -185,10 +123,7 @@
       "Type": "String"
     },
     "MakeNEV": {
-      "AllowedValues": [
-        "true",
-        "false"
-      ],
+      "AllowedValues": [ "true", "false" ],
       "Default": "false",
       "Description": "Use to create a child NEV stack; false = do not create a NEV stack",
       "Type": "String"
@@ -198,9 +133,9 @@
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
-        "t3.medium",
-        "m6g.large",
-        "m6g.xlarge"
+          "t3.medium",
+          "m6g.large",
+          "m6g.xlarge"
       ]
     },
     "NEVVersion": {
@@ -222,8 +157,8 @@
       "Type": "String",
       "Description": "Auto-start NEV; if false, you need to log into your instance to start NEV",
       "AllowedValues": [
-        "true",
-        "false"
+          "true",
+          "false"
       ],
       "Default": "true"
     },
@@ -233,42 +168,32 @@
       "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
     }
   },
+
   "Conditions": {
     "CreateS3Bucket": {
-      "Fn::Equals": [
-        {
-          "Ref": "UseS3Bucket"
-        },
-        "Create"
-      ]
+      "Fn::Equals": [{
+        "Ref": "UseS3Bucket"
+      }, "Create"]
     },
     "ShareS3Bucket": {
-      "Fn::Equals": [
-        {
-          "Ref": "UseS3Bucket"
-        },
-        "Shared"
-      ]
+      "Fn::Equals": [{
+        "Ref": "UseS3Bucket"
+      }, "Shared"]
     },
     "UseS3": {
-      "Fn::Or": [
-        {
-          "Condition": "CreateS3Bucket"
-        },
-        {
-          "Condition": "ShareS3Bucket"
-        }
-      ]
+      "Fn::Or": [{
+        "Condition": "CreateS3Bucket"
+      }, {
+        "Condition": "ShareS3Bucket"
+      }]
     },
-    "CreateNestedNEV": {
-      "Fn::Equals": [
-        {
+      "CreateNestedNEV": {
+        "Fn::Equals": [{
           "Ref": "MakeNEV"
-        },
-        "true"
-      ]
+        }, "true"]
     }
   },
+
   "Mappings": {
     "AWSRegionArch2AMI": {
       "us-west-1": {
@@ -317,21 +242,19 @@
       }
     }
   },
+
   "Resources": {
     "NuxeoSecret": {
       "Type": "AWS::SecretsManager::Secret",
       "Properties": {
         "Name": {
-          "Fn::Sub": [
-            "${name}-NuxeoSecret",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-NuxeoSecret", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
-        "GenerateSecretString": {
+        "GenerateSecretString":{
           "SecretStringTemplate": "{\"password\":\"${password}\"}",
           "GenerateStringKey": "password",
           "PasswordLength": 36,
@@ -346,47 +269,33 @@
         "InstanceType": {
           "Ref": "InstanceType"
         },
-        "SecurityGroupIds": [
-          {
-            "Fn::GetAtt": [
-              "NuxeoSecurity",
-              "GroupId"
-            ]
-          }
-        ],
+        "SecurityGroupIds": [{
+          "Fn::GetAtt": ["NuxeoSecurity", "GroupId"]
+        }],
         "KeyName": {
           "Ref": "KeyName"
         },
-        "BlockDeviceMappings": [
-          {
-            "DeviceName": "/dev/sda1",
-            "Ebs": {
-              "VolumeSize": {
-                "Ref": "DiskSize"
-              }
+        "BlockDeviceMappings": [{
+          "DeviceName": "/dev/sda1",
+          "Ebs": {
+            "VolumeSize": {
+              "Ref": "DiskSize"
             }
           }
-        ],
+        }],
         "ImageId": {
-          "Fn::FindInMap": [
-            "AWSRegionArch2AMI",
-            {
+          "Fn::FindInMap": ["AWSRegionArch2AMI", {
               "Ref": "AWS::Region"
             },
             "64"
           ]
         },
         "SubnetId": {
-          "Fn::FindInMap": [
-            "AWSRegionSubnet",
-            {
-              "Ref": "AWS::Region"
-            },
-            "subnet"
-          ]
+          "Fn::FindInMap": ["AWSRegionSubnet", {
+            "Ref": "AWS::Region"
+          }, "subnet"]
         },
-        "Tags": [
-          {
+        "Tags": [{
             "Key": "contact",
             "Value": {
               "Ref": "Contact"
@@ -461,9 +370,6 @@
                 "autoStart": {
                   "Ref": "AutoStart"
                 },
-                "imageType": {
-                  "Ref": "ImageType"
-                },
                 "rpms": {
                   "Ref": "RPMs"
                 },
@@ -471,7 +377,7 @@
                   "Ref": "NEVArenderAddon"
                 },
                 "NuxeoSecret": {
-                  "Ref": "NuxeoSecret"
+                    "Ref": "NuxeoSecret"
                 },
                 "MakeNEV": {
                   "Ref": "MakeNEV"
@@ -480,44 +386,32 @@
                   "Fn::If": [
                     "UseS3",
                     {
-                      "Fn::GetAtt": [
-                        "UploadRole",
-                        "Arn"
-                      ]
+                      "Fn::GetAtt": ["UploadRole", "Arn"]
                     },
                     "false"
                   ]
                 },
                 "rekognitionRole": {
-                  "Fn::GetAtt": [
-                    "RekognitionRole",
-                    "Arn"
-                  ]
+                      "Fn::GetAtt": ["RekognitionRole", "Arn"]
                 },
-                "snsTopic": {
-                  "Ref": "RekognitionSns"
-                }
+                "snsTopic": { "Ref" : "RekognitionSns" }
               }
             ]
           }
         }
       }
     },
+
     "NuxeoSecurity": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "VpcId": {
-          "Fn::FindInMap": [
-            "AWSRegionSubnet",
-            {
-              "Ref": "AWS::Region"
-            },
-            "vpc"
-          ]
+          "Fn::FindInMap": ["AWSRegionSubnet", {
+            "Ref": "AWS::Region"
+          }, "vpc"]
         },
         "GroupDescription": "Allow ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)",
-        "SecurityGroupIngress": [
-          {
+        "SecurityGroupIngress": [{
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
@@ -538,61 +432,52 @@
         ]
       }
     },
+
     "InstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
         "Path": "/",
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
       }
     },
+
     "InstanceRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "ec2.amazonaws.com"
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ]
-            }
-          ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": ["ec2.amazonaws.com"]
+            },
+            "Action": [
+              "sts:AssumeRole"
+            ]
+          }]
         },
         "Path": "/"
       }
     },
+
     "InstanceSharedResourcePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-shared-resource-instance-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-shared-resource-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": [{
               "Effect": "Allow",
               "Action": "s3:ListAllMyBuckets",
-              "Resource": [
-                "arn:aws:s3:::*"
-              ]
+              "Resource": ["arn:aws:s3:::*"]
             },
             {
               "Effect": "Allow",
@@ -631,19 +516,17 @@
                 "rekognition:GetFaceDetection",
                 "rekognition:StartTextDetection",
                 "rekognition:GetTextDetection"
+
               ],
               "Resource": "*"
             },
             {
               "Effect": "Allow",
               "Action": "secretsmanager:GetSecretValue",
-              "Resource": [
-                "arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
+              "Resource": ["arn:aws:secretsmanager:us-west-2:311032021612:secret:connect_shared_presales_credential-D1gcYT",
                 "arn:aws:secretsmanager:us-west-2:311032021612:secret:kibana_default_password-klGGXN",
                 "arn:aws:secretsmanager:us-west-2:311032021612:secret:workmail_default_password-RLzJRZ",
-                {
-                  "Ref": "NuxeoSecret"
-                }
+                { "Ref": "NuxeoSecret" }
               ]
             },
             {
@@ -662,55 +545,46 @@
             }
           ]
         },
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
       }
     },
+
     "UploadRole": {
       "Type": "AWS::IAM::Role",
       "Condition": "UseS3",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": [
-                  {
-                    "Fn::GetAtt": [
-                      "InstanceRole",
-                      "Arn"
-                    ]
-                  }
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ]
-            }
-          ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": [{
+                "Fn::GetAtt": ["InstanceRole", "Arn"]
+              }]
+            },
+            "Action": [
+              "sts:AssumeRole"
+            ]
+          }]
         },
         "Path": "/"
       }
     },
+
     "RekognitionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "rekognition.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "rekognition.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }]
         },
         "Path": "/",
         "Policies": [
@@ -722,9 +596,7 @@
                 {
                   "Effect": "Allow",
                   "Action": "sns:Publish",
-                  "Resource": {
-                    "Ref": "RekognitionSns"
-                  }
+                  "Resource": { "Ref" : "RekognitionSns" }
                 }
               ]
             }
@@ -732,24 +604,21 @@
         ]
       }
     },
+
     "SharedS3Policy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "ShareS3Bucket",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-s3-instance-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-s3-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": [{
               "Effect": "Allow",
               "Action": [
                 "s3:ListAllMyBuckets"
@@ -767,20 +636,11 @@
                 "s3:GetBucketObjectLockConfiguration",
                 "s3:GetBucketVersioning"
               ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "-demo-bucket"
-                    ]
-                  ]
-                }
-              ]
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket"]]
+              }]
             },
             {
               "Effect": "Allow",
@@ -794,112 +654,71 @@
                 "s3:PutObjectRetention",
                 "s3:PutObjectLegalHold"
               ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "-demo-bucket/",
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      "/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "-demo-bucket/s3DirectUpload/*"
-                    ]
-                  ]
-                }
-              ]
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket/", {
+                  "Ref": "AWS::StackName"
+                }, "/*"]]
+              }, {
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "AWS::Region"
+                }, "-demo-bucket/s3DirectUpload/*"]]
+              }]
             }
           ]
         },
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
       }
     },
+
     "SharedS3UploadPolicy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "ShareS3Bucket",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-direct-upload-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-direct-upload-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": "s3:PutObject",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "-demo-bucket/",
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      "/upload/*"
-                    ]
-                  ]
-                }
-              ]
-            }
-          ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": [{
+              "Fn::Join": ["", ["arn:aws:s3:::", {
+                "Ref": "AWS::Region"
+              }, "-demo-bucket/", {
+                "Ref": "AWS::StackName"
+              }, "/upload/*"]]
+            }]
+          }]
         },
-        "Roles": [
-          {
-            "Ref": "UploadRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "UploadRole"
+        }]
       }
     },
+
     "CreateS3Policy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "CreateS3Bucket",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-s3-instance-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-s3-instance-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": [{
               "Effect": "Allow",
               "Action": [
                 "s3:ListAllMyBuckets"
@@ -917,19 +736,11 @@
                 "s3:GetBucketObjectLockConfiguration",
                 "s3:GetBucketVersioning"
               ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "S3Bucket"
-                      }
-                    ]
-                  ]
-                }
-              ]
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "S3Bucket"
+                }]]
+              }]
             },
             {
               "Effect": "Allow",
@@ -943,86 +754,58 @@
                 "s3:PutObjectRetention",
                 "s3:PutObjectLegalHold"
               ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "S3Bucket"
-                      },
-                      "/*"
-                    ]
-                  ]
-                }
-              ]
+              "Resource": [{
+                "Fn::Join": ["", ["arn:aws:s3:::", {
+                  "Ref": "S3Bucket"
+                }, "/*"]]
+              }]
             }
           ]
         },
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
       }
     },
+
     "CreateS3UploadPolicy": {
       "Type": "AWS::IAM::Policy",
       "Condition": "CreateS3Bucket",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-direct-upload-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-direct-upload-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": "s3:PutObject",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "S3Bucket"
-                      },
-                      "/upload/*"
-                    ]
-                  ]
-                }
-              ]
-            }
-          ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": [{
+              "Fn::Join": ["", ["arn:aws:s3:::", {
+                "Ref": "S3Bucket"
+              }, "/upload/*"]]
+            }]
+          }]
         },
-        "Roles": [
-          {
-            "Ref": "UploadRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "UploadRole"
+        }]
       }
     },
-    "RekognitionInstancePolicy": {
+
+    "RekognitionInstancePolicy":{
       "Type": "AWS::IAM::Policy",
       "Properties": {
         "PolicyName": {
-          "Fn::Sub": [
-            "${name}-ai-rekognition-policy",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-ai-rekognition-policy", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
         "PolicyDocument": {
           "Version": "2012-10-17",
@@ -1034,9 +817,7 @@
                 "sns:ListSubscriptionsByTopic",
                 "sns:Subscribe"
               ],
-              "Resource": {
-                "Ref": "RekognitionSns"
-              }
+              "Resource": {"Ref": "RekognitionSns"}
             },
             {
               "Effect": "Allow",
@@ -1044,38 +825,27 @@
                 "iam:GetRole",
                 "iam:PassRole"
               ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "RekognitionRole",
-                  "Arn"
-                ]
-              }
-            }
-          ]
+              "Resource": {"Fn::GetAtt" : ["RekognitionRole", "Arn"] }
+            }]
         },
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
+        "Roles": [{
+          "Ref": "InstanceRole"
+        }]
       }
     },
+
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
       "Condition": "CreateS3Bucket",
       "Properties": {
         "BucketName": {
-          "Fn::Sub": [
-            "${name}-bucket",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+          "Fn::Sub": ["${name}-bucket", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
-        "Tags": [
-          {
+        "Tags": [{
             "Key": "contact",
             "Value": {
               "Ref": "Contact"
@@ -1093,58 +863,38 @@
           }
         ],
         "CorsConfiguration": {
-          "CorsRules": [
-            {
-              "AllowedHeaders": [
-                "*"
-              ],
-              "AllowedMethods": [
-                "GET",
-                "HEAD",
-                "PUT",
-                "POST"
-              ],
-              "AllowedOrigins": [
-                {
-                  "Fn::Sub": [
-                    "https://${name}.cloud.nuxeo.com",
-                    {
-                      "name": {
-                        "Ref": "DnsName"
-                      }
-                    }
-                  ]
+          "CorsRules": [{
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["GET", "HEAD", "PUT", "POST"],
+            "AllowedOrigins": [{
+              "Fn::Sub": ["https://${name}.cloud.nuxeo.com", {
+                "name": {
+                  "Ref": "DnsName"
                 }
-              ],
-              "ExposedHeaders": [
-                "ETag",
-                "Content-Disposition"
-              ]
-            }
-          ]
+              }]
+            }],
+            "ExposedHeaders": ["ETag", "Content-Disposition"]
+          }]
         }
       }
     },
+
     "RekognitionSns": {
-      "Type": "AWS::SNS::Topic",
-      "Properties": {
-        "TopicName": {
-          "Fn::Sub": [
-            "${name}-rekognition-sns",
-            {
-              "name": {
-                "Ref": "AWS::StackName"
-              }
+      "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "TopicName" : {
+          "Fn::Sub": ["${name}-rekognition-sns", {
+            "name": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }]
         },
-        "Tags": [
-          {
-            "Key": "contact",
-            "Value": {
-              "Ref": "Contact"
-            }
-          },
+        "Tags": [{
+          "Key": "contact",
+          "Value": {
+            "Ref": "Contact"
+          }
+        },
           {
             "Key": "billing-category",
             "Value": "presales"
@@ -1158,6 +908,7 @@
         ]
       }
     },
+
     "NestedStackNEV": {
       "Type": "AWS::CloudFormation::Stack",
       "Condition": "CreateNestedNEV",
@@ -1165,56 +916,32 @@
         "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template",
         "Parameters": {
           "DnsName": {
-            "Fn::Sub": [
-              "${name}-nev",
-              {
-                "name": {
-                  "Ref": "DnsName"
-                }
+            "Fn::Sub": ["${name}-nev", {
+              "name": {
+                "Ref": "DnsName"
               }
-            ]
-          },
-          "InstanceType": {
-            "Ref": "NEVInstanceType"
-          },
-          "KeyName": {
-            "Ref": "KeyName"
-          },
-          "Customer": {
-            "Ref": "Customer"
-          },
-          "Contact": {
-            "Ref": "Contact"
-          },
-          "NEVVersion": {
-            "Ref": "NEVVersion"
-          },
+            }]  },
+          "InstanceType": { "Ref": "NEVInstanceType" },
+          "KeyName": { "Ref": "KeyName" },
+          "Customer": { "Ref": "Customer" },
+          "Contact": { "Ref": "Contact" },
+          "NEVVersion": { "Ref": "NEVVersion" },
           "NuxeoURL": {
-            "Fn::Sub": [
-              "https://${name}.cloud.nuxeo.com/nuxeo",
-              {
-                "name": {
-                  "Ref": "DnsName"
-                }
+            "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
+              "name": {
+                "Ref": "DnsName"
               }
-            ]
+            }]
           },
-          "DiskSize": {
-            "Ref": "NEVDiskSize"
-          },
-          "AutoStart": {
-            "Ref": "NEVAutoStart"
-          },
-          "NuxeoSecret": {
-            "Ref": "NuxeoSecret"
-          },
-          "GitBranch": {
-            "Ref": "NEVGitBranch"
-          }
+          "DiskSize": { "Ref": "NEVDiskSize" },
+          "AutoStart": { "Ref": "NEVAutoStart" },
+          "NuxeoSecret": { "Ref": "NuxeoSecret" },
+          "GitBranch": { "Ref": "NEVGitBranch" }
         },
         "TimeoutInMinutes": "60"
       }
     }
+
   }
 }
 
