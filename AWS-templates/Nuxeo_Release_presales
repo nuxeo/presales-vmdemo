@@ -26,7 +26,6 @@ STUDIO_USERNAME="nuxeo_presales"
 
 TEMPLATES="default,mongodb"
 
-# These are versions compatible with LTS2021
 MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
 # Used only if, in the CF template, you chose, for nuxeo-presales-docker,
@@ -76,8 +75,7 @@ echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 
 # Make directories and clone compose stack
 mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
-git clone -b ${PRESALES_DOCKER_BRANCH} ${COMPOSE_REPO} ${COMPOSE_DIR}
-
+git clone ${COMPOSE_REPO} ${COMPOSE_DIR}
 mkdir -p ${CONF_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
@@ -270,9 +268,51 @@ EOF
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Add newDNS script
-curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh 
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh
 chmod +x ${TMP_DIR}/newDNS.sh
 mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
+
+# Fix up permissions
+rm -f /root/creds.json
+chmod -R g+w ${NUXEO_BASE_DIR}
+chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR} ${TMP_DIR}
+chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
+
+# Generate input files
+cd ${COMPOSE_DIR}
+echo "Generating Dockerfile(s)" | tee -a ${INSTALL_LOG}
+make dockerfiles NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
+
+# Use the source image to register the project
+docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
+
+# Auto-start if Studio project defined
+if [ -n "${NX_STUDIO}" ]; then
+  echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
+  docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
+         nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "dev" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
+  if [ -e ${TMP_DIR}/instance.clid ]; then
+    echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
+    awk 1 ORS="--" ${TMP_DIR}/instance.clid >> ${NUXEO_ENV}
+    echo "" >> ${NUXEO_ENV}
+  fi
+
+  # Build / Pull images
+  echo "Building images..." | tee -a ${INSTALL_LOG}
+  docker compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+  echo "Pulling other images..." | tee -a ${INSTALL_LOG}
+  docker compose --no-ansi pull | tee -a ${INSTALL_LOG}
+  if [[ "${AUTO_START}" == "true" ]]; then
+    echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
+    docker compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  fi
+fi
+echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
+
+echo "Nuxeo Presales Installation Script: Install Misc." | tee -a ${INSTALL_LOG}
+# Update some defaults
+update-alternatives --set editor /usr/bin/vim.basic
+echo "Nuxeo Presales Installation Script: Install Misc. => DONE" | tee -a ${INSTALL_LOG}
 
 # Configure reverse-proxy
 cat << EOF > /etc/apache2/sites-available/nuxeo.conf
@@ -377,59 +417,6 @@ systemctl restart apache2
 echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
 certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hyland.com -d ${FQDN} | tee -a ${INSTALL_LOG}
 
-# Fix up permissions
-rm -f /root/creds.json
-chmod -R g+w ${NUXEO_BASE_DIR}
-chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR} ${TMP_DIR}
-chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
-
-# Generate input files
-cd ${COMPOSE_DIR}
-echo "Generating Dockerfile(s)" | tee -a ${INSTALL_LOG}
-make dockerfiles NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
-
-# Use the source image to register the project
-docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
-
-# Auto-start if Studio project defined
-if [ -n "${NX_STUDIO}" ]; then
-  echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
-  docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
-         nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "dev" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
-  if [ -e ${TMP_DIR}/instance.clid ]; then
-    echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
-    awk 1 ORS="--" ${TMP_DIR}/instance.clid >> ${NUXEO_ENV}
-    echo "" >> ${NUXEO_ENV}
-  fi
-
-  # Build / Pull images
-    # Check if Docker Compose is installed
-  if command -v docker compose >/dev/null 2>&1; then
-      echo "Docker compose (v2) is installed and available."
-      COMPOSE_CMD="docker compose"
-  else
-      echo "Docker compose (v2) is not installed. Using docker-compose instead."
-      COMPOSE_CMD="docker-compose"
-  fi
-  echo "Building images..." | tee -a ${INSTALL_LOG}
-  $COMPOSE_CMD --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
-  echo "Pulling other images..." | tee -a ${INSTALL_LOG}
-  $COMPOSE_CMD --no-ansi pull | tee -a ${INSTALL_LOG}
-  if [[ "${AUTO_START}" == "true" ]]; then
-    echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-    $COMPOSE_CMD --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
-  fi
-fi
-echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
-
-echo "Nuxeo Presales Installation Script: Install Misc." | tee -a ${INSTALL_LOG}
-# Update some defaults
-update-alternatives --set editor /usr/bin/vim.basic
-echo "Nuxeo Presales Installation Script: Install Misc. => DONE" | tee -a ${INSTALL_LOG}
-
-
-
-# Set profile, etc.
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
 #fix imagemagick Policy
