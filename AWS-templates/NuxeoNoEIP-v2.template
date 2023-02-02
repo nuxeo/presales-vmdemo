@@ -12,7 +12,7 @@
         },
         {
           "Label" : { "default" : "Nuxeo Setup" },
-          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel", 
+          "Parameters" : [ "StudioProject", "StudioVersion", "NuxeoChannel",
             "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
         },
         {
@@ -87,12 +87,6 @@
       "AllowedValues": [ "true", "false" ],
       "Default": "true",
       "Description": "Auto-start the Nuxeo runtime; if false, log into your instance to start Nuxeo",
-      "Type": "String"
-    },
-    "ImageType": {
-      "AllowedValues": [ "Cloud", "LTS" ],
-      "Default": "LTS",
-      "Description": "Select which image to use, either Cloud (private/licensed image) or LTS (public image)",
       "Type": "String"
     },
     "RPMs": {
@@ -331,7 +325,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -359,9 +353,6 @@
                 },
                 "autoStart": {
                   "Ref": "AutoStart"
-                },
-                "imageType": {
-                  "Ref": "ImageType"
                 },
                 "rpms": {
                   "Ref": "RPMs"

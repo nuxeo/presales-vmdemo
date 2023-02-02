@@ -26,7 +26,6 @@ TEMPLATES="default,mongodb"
 MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
 
-CLOUD_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
 LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021"
 
 TMP_DIR="/tmp/nuxeo"
@@ -36,15 +35,7 @@ TMP_DIR="/tmp/nuxeo"
 echo "Nuxeo Presales Installation Script Starting [${STACK_ID}]" > ${INSTALL_LOG}
 
 # Check configured image
-FROM_IMAGE="${CLOUD_IMAGE}"
-if [ -z "${IMAGE_TYPE}" ]; then
-  echo "Upstream image is not set, using: ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
-else
-  if [ "${IMAGE_TYPE}" == "LTS" ]; then
-    FROM_IMAGE="${LTS_IMAGE}"
-  fi
-  echo "Upstream image: ${IMAGE_TYPE} => ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
-fi
+FROM_IMAGE="${LTS_IMAGE}"
 
 # Check DNS Name
 if [ -z "${DNS_NAME}" ]; then
