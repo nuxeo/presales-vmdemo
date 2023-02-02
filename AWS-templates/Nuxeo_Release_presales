@@ -26,7 +26,7 @@ TEMPLATES="default,mongodb"
 MONGO_VERSION="6.0"
 OPENSEARCH_IMAGE="opensearchproject/opensearch:1.3.7"
 
-LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021"
+LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2023.0.75"
 
 TMP_DIR="/tmp/nuxeo"
 
