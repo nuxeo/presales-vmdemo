@@ -222,8 +222,8 @@ find "${COMPOSE_DIR}/conf/" -type f -printf '\n%p:\n' -exec sed -i "/${OLD_FQDN}
 echo -e "\nCreating new nuxeo container..."
 if [[ ${APACHE_RESTART} == "0" && ${CERT} == "0" ]]; then
 #    make -e -f ${COMPOSE_DIR}/Makefile SERVICE=nuxeo new
-    docker-compose --project-directory ${COMPOSE_DIR} --file ${COMPOSE_DIR}/docker-compose.yml rm --force --stop nuxeo
-    docker-compose --project-directory ${COMPOSE_DIR} --file ${COMPOSE_DIR}/docker-compose.yml up --detach nuxeo
+    docker compose --project-directory ${COMPOSE_DIR} --file ${COMPOSE_DIR}/docker-compose.yml rm --force --stop nuxeo
+    docker compose --project-directory ${COMPOSE_DIR} --file ${COMPOSE_DIR}/docker-compose.yml up --detach nuxeo
     echo -e "${GREEN}DONE${RESET}: Created new nuxeo container\n"
 else
     echo -e "${RED}FAIL:${RESET}Did not create new nuxeo container\n"

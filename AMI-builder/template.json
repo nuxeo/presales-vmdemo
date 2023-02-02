@@ -9,21 +9,24 @@
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "us-east-1",
-      "ami_regions": ["us-west-1","us-west-2","eu-west-1","ap-northeast-1"],
+      "vpc_id": "vpc-01311a6a321841d60",
+      "subnet_id": "subnet-0d192be7ed6d2faa2",
+      "ami_regions": ["us-west-1","us-west-2","eu-west-1","ap-northeast-1","sa-east-1"],
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-*",
-          "root-device-type": "ebs"
+          "name": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*",
+          "root-device-type": "ebs",
+          "architecture": "x86_64"
         },
         "owners": ["099720109477"],
         "most_recent": true
       },
-      "instance_type": "m3.medium",
+      "instance_type": "t3.large",
       "ssh_username": "ubuntu",
-      "ami_name": "nuxeo-presales-ubuntu-20-4-{{timestamp}}",
+      "ami_name": "nuxeo-presales-ubuntu-22-04-{{timestamp}}",
       "tags": {
-        "Name": "nuxeo-presales-ubuntu-20-4",
+        "Name": "nuxeo-presales-ubuntu-22-04",
         "billing-category":"presales",
         "billing-subcategory": "generic"
       }
