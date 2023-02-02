@@ -12,7 +12,7 @@
         },
         {
           "Label" : { "default" : "Nuxeo Setup" },
-          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel",
+          "Parameters" : [ "StudioProject", "StudioVersion",
             "InstanceType", "DiskSize", "AutoStart", "RPMs", "GitBranch", "UseS3Bucket" ]
         },
         {
@@ -56,16 +56,6 @@
       "Type": "String",
       "MinLength": 1,
       "ConstraintDescription": "Please specify a key pair"
-    },
-    "NuxeoChannel": {
-      "Type": "String",
-      "Default": "Release",
-      "AllowedValues": [
-        "Release",
-        "Snapshot",
-        "Test"
-      ],
-      "Description": "The channel to use"
     },
     "GitBranchPresalesDocker": {
       "Type": "String",
@@ -113,11 +103,7 @@
       "Description": "Disk size (in GB) for root volume of EC2 instance. If you plan to install ARender, 40GB should be a minimum"
     },
     "UseS3Bucket": {
-      "AllowedValues": [
-        "Shared",
-        "Create",
-        "None"
-      ],
+      "AllowedValues": ["Shared", "Create", "None"],
       "Default": "Shared",
       "Description": "Use a 'Shared' bucket or 'Create' a new S3 bucket for this stack, otherwise use 'None' to disable bucket creation",
       "Type": "String"
@@ -145,7 +131,7 @@
     },
     "NEVArenderAddon": {
       "Type": "String",
-      "Default": "nuxeo-arender-2021.3.1",
+      "Default": "nuxeo-arender",
       "Description": "The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
     },
     "NEVDiskSize": {
@@ -338,7 +324,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} PRESALES_DOCKER_BRANCH=${branchForPresalesDocker} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} IMAGE_TYPE=${imageType} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_${channel}_presales\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/AWS-templates/Nuxeo_${channel}_presales\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} PRESALES_DOCKER_BRANCH=${branchForPresalesDocker} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo_Release_presales\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"
@@ -348,9 +334,6 @@
                 },
                 "region": {
                   "Ref": "AWS::Region"
-                },
-                "channel": {
-                  "Ref": "NuxeoChannel"
                 },
                 "bucket": {
                   "Ref": "UseS3Bucket"
