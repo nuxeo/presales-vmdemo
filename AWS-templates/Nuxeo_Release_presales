@@ -391,9 +391,6 @@ certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hylan
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
-#fix imagemagick Policy
-#wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${NX_BRANCH}/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
-
 #set up ubuntu user
 cat << EOF >> /home/ubuntu/.profile
 export TERM="xterm-color"
