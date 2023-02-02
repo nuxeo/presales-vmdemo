@@ -126,7 +126,7 @@
     },
     "NEVArenderAddon": {
       "Type": "String",
-      "Default": "nuxeo-arender-2021.3.0",
+      "Default": "nuxeo-arender",
       "Description": "The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
     },
     "NEVDiskSize": {
