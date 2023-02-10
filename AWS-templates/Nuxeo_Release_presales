@@ -90,11 +90,13 @@ MAIL_PASS=$(aws secretsmanager get-secret-value --secret-id workmail_default_pas
 S3_BUCKET="${STACK_ID}-bucket"
 S3_PREFIX="binary_store/"
 S3_UPLOAD_PREFIX="upload/"
+S3_UPLOAD_TRANSIENT_PREFIX="upload_transient/"
 
 if [[ "${S3BUCKET}" == "Shared" ]]; then
   S3_BUCKET="${REGION}-demo-bucket"
   S3_PREFIX="${STACK_ID}/binary_store/"
   S3_UPLOAD_PREFIX="${STACK_ID}/upload/"
+  S3_UPLOAD_TRANSIENT_PREFIX="${STACK_ID}/upload_transient/"
 fi
 
 AUTO_PACKAGES="nuxeo-web-ui"
@@ -131,6 +133,8 @@ nuxeo.notification.eMailSubjectPrefix=[Nuxeo]
 
 # S3 Configuration
 nuxeo.s3storage.useDirectUpload=true
+nuxeo.s3storage.s3DirectUpload.bucket_prefix=${S3_UPLOAD_TRANSIENT_PREFIX}
+
 nuxeo.s3storage.directdownload.expire=3600
 nuxeo.s3storage.directdownload=true
 
