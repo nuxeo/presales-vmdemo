@@ -264,12 +264,12 @@ if [ -n "${NX_STUDIO}" ]; then
 
   # Build / Pull images
   echo "Building images..." | tee -a ${INSTALL_LOG}
-  docker compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+  docker compose --project-directory ${COMPOSE_DIR} --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
   echo "Pulling other images..." | tee -a ${INSTALL_LOG}
-  docker compose --no-ansi pull | tee -a ${INSTALL_LOG}
+  docker compose --project-directory ${COMPOSE_DIR} --no-ansi pull | tee -a ${INSTALL_LOG}
   if [[ "${AUTO_START}" == "true" ]]; then
     echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-    docker compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+    docker compose --project-directory ${COMPOSE_DIR} --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
   fi
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
