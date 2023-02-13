@@ -318,11 +318,9 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     RewriteRule ^/dashboards$ /dashboards/ [R,L]
 
     ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
-    ProxyPass           /ARender/       http://localhost:8080/ARender/
-    ProxyPass           /dashboards/        http://localhost:5601/dashboards/
+    ProxyPass           /dashboards/    http://localhost:5601/dashboards/
     ProxyPassReverse    /nuxeo/         http://localhost:8080/nuxeo/
-    ProxyPassReverse    /ARender/       http://localhost:8080/ARender/
-    ProxyPassReverse    /dashboards/        http://localhost:5601/dashboards/
+    ProxyPassReverse    /dashboards/    http://localhost:5601/dashboards/
     ProxyPreserveHost   On
 
     # WSS
