@@ -13,10 +13,6 @@ COMPOSE_REPO="https://github.com/nuxeo-sandbox/nuxeo-presales-docker"
 COMPOSE_DIR="/home/ubuntu/nuxeo-presales-docker"
 CONF_DIR="${COMPOSE_DIR}/conf"
 
-NUXEO_BASE_DIR="/var/lib/nuxeo"
-NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
-NUXEO_DATA_DIR="${NUXEO_BASE_DIR}/data"
-NUXEO_LOG_DIR="${NUXEO_BASE_DIR}/log"
 NUXEO_ENV="${COMPOSE_DIR}/.env"
 
 STUDIO_USERNAME="nuxeo_presales"
@@ -61,15 +57,12 @@ echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 
 # Make directories and clone compose stack
-mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
+mkdir -p ${COMPOSE_DIR} ${TMP_DIR}
 git clone --branch lts2023 ${COMPOSE_REPO} ${COMPOSE_DIR}
 mkdir -p ${CONF_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Configure Nuxeo" | tee -a ${INSTALL_LOG}
-# Link old log location to new
-ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
-ln -s ${NUXEO_CONF_DIR} ${CONF_DIR}
 
 # Copy default conf.d files
 cp ${COMPOSE_DIR}/conf.d/* ${CONF_DIR}
@@ -258,8 +251,7 @@ mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
 # Fix up permissions
 rm -f /root/creds.json
-chmod -R g+w ${NUXEO_BASE_DIR}
-chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR} ${TMP_DIR}
+chown -R nuxeo:ubuntu ${TMP_DIR}
 chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
 
 # Use the source image to register the project
