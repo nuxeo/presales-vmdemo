@@ -24,9 +24,12 @@ STUDIO_USERNAME="nuxeo_presales"
 TEMPLATES="default,mongodb"
 
 MONGO_VERSION="6.0"
-OPENSEARCH_IMAGE="opensearchproject/opensearch:1.3.7"
 
-LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2023.0.75"
+OPENSEARCH_VERSION="1.3.7"
+OPENSEARCH_IMAGE="opensearchproject/opensearch:"${OPENSEARCH_VERSION}
+OPENSEARCH__DASHBOARDS_IMAGE="opensearchproject/opensearch-dashboards:"${OPENSEARCH_VERSION}
+
+LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2023.0.85"
 
 TMP_DIR="/tmp/nuxeo"
 
@@ -235,8 +238,9 @@ NUXEO_PACKAGES=${STUDIO_PACKAGE} ${AUTO_PACKAGES} ${ARENDER_ADDON} ${NUXEO_PACKA
 
 INSTALL_RPM=${INSTALL_RPM}
 
-OPENSEARCH_IMAGE=${OPENSEARCH_IMAGE}
 MONGO_VERSION=${MONGO_VERSION}
+OPENSEARCH_IMAGE=${OPENSEARCH_IMAGE}
+OPENSEARCH__DASHBOARDS_IMAGE=${OPENSEARCH__DASHBOARDS_IMAGE}
 
 FQDN=${FQDN}
 STUDIO_USERNAME=${STUDIO_USERNAME}
@@ -311,7 +315,7 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
         Allow from all
      </Proxy>
 
-    <Location /kibana>
+    <Location /dashboards>
       AuthUserFile /etc/apache2/passwords
       AuthName authorization
       AuthType Basic
@@ -321,14 +325,14 @@ cat << EOF > /etc/apache2/sites-available/nuxeo.conf
     RewriteEngine   On
     RewriteRule ^/$ /nuxeo/ [R,L]
     RewriteRule ^/nuxeo$ /nuxeo/ [R,L]
-    RewriteRule ^/kibana$ /kibana/ [R,L]
+    RewriteRule ^/dashboards$ /dashboards/ [R,L]
 
     ProxyPass           /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPass           /ARender/       http://localhost:8080/ARender/
-    ProxyPass           /kibana/        http://localhost:5601/kibana/
+    ProxyPass           /dashboards/        http://localhost:5601/dashboards/
     ProxyPassReverse    /nuxeo/         http://localhost:8080/nuxeo/
     ProxyPassReverse    /ARender/       http://localhost:8080/ARender/
-    ProxyPassReverse    /kibana/        http://localhost:5601/kibana/
+    ProxyPassReverse    /dashboards/        http://localhost:5601/dashboards/
     ProxyPreserveHost   On
 
     # WSS
