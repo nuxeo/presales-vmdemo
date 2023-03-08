@@ -4,6 +4,9 @@
 # You can tail -F /var/log/nuxeo_install.log to see basic install progress
 # You can tail -F /var/log/syslog to see the full startup and check for errors
 
+# If you are looking at env. variable set by the template nd used here,
+# see NuxeoNoEIP-v2.template, "NuxeoInstance" > "userData" and its "Fn::Sub" property.
+
 source /etc/profile.d/load_env.sh
 
 # Variables for installation
@@ -25,6 +28,8 @@ TEMPLATES="default,mongodb"
 
 MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
+ZOOKEEPER_VERSION="3.5.8"
+KAFKA_VERSION="2.13-2.6.0"
 
 CLOUD_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
 LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021"
@@ -68,7 +73,8 @@ echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 
 # Make directories and clone compose stack
 mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
-git clone ${COMPOSE_REPO} ${COMPOSE_DIR}
+git clone -b ${PRESALES_DOCKER_BRANCH} ${COMPOSE_REPO} ${COMPOSE_DIR}
+
 mkdir -p ${CONF_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
