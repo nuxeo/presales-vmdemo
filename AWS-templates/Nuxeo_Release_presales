@@ -183,6 +183,12 @@ nuxeo.wopi.baseURL=https://wopi.nuxeo.io/${FQDN}/nuxeo/
 EOF
 
 # NEV setup
+# If not creating NEV stack, then no need for the ARender Addon
+if [[ ${MAKE_NEV} == "false" ]]
+then
+  unset ARENDER_ADDON
+fi
+
 # If NUXEO_SECRET was created, then create arender.conf
 # Else, add commented out arender fields to system.conf
 if [[ ${MAKE_NEV} == "true" ]]
