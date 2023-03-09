@@ -26,8 +26,11 @@ STUDIO_USERNAME="nuxeo_presales"
 
 TEMPLATES="default,mongodb"
 
+# These are versions compatible with LTS2021
 MONGO_VERSION="4.4"
 ELASTIC_VERSION="7.9.3"
+# Used only if, in the CF template, you chose, for nuxeo-presales-docker,
+# a branch that also deploys Kafka
 ZOOKEEPER_VERSION="3.5.8"
 KAFKA_VERSION="2.13-2.6.0"
 
