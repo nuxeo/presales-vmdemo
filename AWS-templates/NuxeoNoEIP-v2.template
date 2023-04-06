@@ -12,7 +12,7 @@
         },
         {
           "Label" : { "default" : "Nuxeo Setup" },
-          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel", 
+          "Parameters" : [ "StudioProject", "StudioVersion", "ImageType","NuxeoChannel",
             "InstanceType", "DiskSize", "AutoStart", "GitBranchPresalesDocker", "RPMs", "GitBranch", "UseS3Bucket" ]
         },
         {
@@ -65,7 +65,7 @@
     },
     "GitBranchPresalesDocker": {
       "Type": "String",
-      "Default": "master",
+      "Default": "docker-compose-v1",
       "Description": "https://github.com/nuxeo-sandbox/nuxeo-presales-docker repository branch"
     },
     "GitBranch": {
@@ -395,7 +395,7 @@
                 "rekognitionRole": {
                       "Fn::GetAtt": ["RekognitionRole", "Arn"]
                 },
-                "snsTopic": { "Ref" : "RekognitionSns" }                
+                "snsTopic": { "Ref" : "RekognitionSns" }
               }
             ]
           }
@@ -914,9 +914,9 @@
       "Type": "AWS::CloudFormation::Stack",
       "Condition": "CreateNestedNEV",
       "Properties": {
-        "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template", 
+        "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template",
         "Parameters": {
-          "DnsName": { 
+          "DnsName": {
             "Fn::Sub": ["${name}-nev", {
               "name": {
                 "Ref": "DnsName"
@@ -927,12 +927,12 @@
           "Customer": { "Ref": "Customer" },
           "Contact": { "Ref": "Contact" },
           "NEVVersion": { "Ref": "NEVVersion" },
-          "NuxeoURL": { 
+          "NuxeoURL": {
             "Fn::Sub": ["https://${name}.cloud.nuxeo.com/nuxeo", {
               "name": {
                 "Ref": "DnsName"
               }
-            }] 
+            }]
           },
           "DiskSize": { "Ref": "NEVDiskSize" },
           "AutoStart": { "Ref": "NEVAutoStart" },
