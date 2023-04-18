@@ -16,10 +16,10 @@ COMPOSE_REPO="https://github.com/nuxeo-sandbox/nuxeo-presales-docker"
 COMPOSE_DIR="/home/ubuntu/nuxeo-presales-docker"
 CONF_DIR="${COMPOSE_DIR}/conf"
 
-NUXEO_BASE_DIR="/var/lib/nuxeo"
-NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
-NUXEO_DATA_DIR="${NUXEO_BASE_DIR}/data"
-NUXEO_LOG_DIR="${NUXEO_BASE_DIR}/log"
+# NUXEO_BASE_DIR="/var/lib/nuxeo"
+# NUXEO_CONF_DIR="${NUXEO_BASE_DIR}/conf"
+# NUXEO_DATA_DIR="${NUXEO_BASE_DIR}/data"
+# NUXEO_LOG_DIR="${NUXEO_BASE_DIR}/log"
 NUXEO_ENV="${COMPOSE_DIR}/.env"
 
 STUDIO_USERNAME="nuxeo_presales"
@@ -34,7 +34,7 @@ ELASTIC_VERSION="7.9.3"
 ZOOKEEPER_VERSION="3.5.8"
 KAFKA_VERSION="2.13-2.6.0"
 
-CLOUD_IMAGE="docker.packages.nuxeo.com/nuxeo/nuxeo:latest"
+
 LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021"
 
 TMP_DIR="/tmp/nuxeo"
@@ -45,15 +45,8 @@ echo "Nuxeo Presales Installation Script Starting [${STACK_ID}]" > ${INSTALL_LOG
 
 
 # Check configured image
-FROM_IMAGE="${CLOUD_IMAGE}"
-if [ -z "${IMAGE_TYPE}" ]; then
-  echo "Upstream image is not set, using: ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
-else
-  if [ "${IMAGE_TYPE}" == "LTS" ]; then
-    FROM_IMAGE="${LTS_IMAGE}"
-  fi
-  echo "Upstream image: ${IMAGE_TYPE} => ${FROM_IMAGE}" | tee -a ${INSTALL_LOG}
-fi
+FROM_IMAGE="${LTS_IMAGE}"
+
 
 # Check DNS Name
 if [ -z "${DNS_NAME}" ]; then
@@ -76,16 +69,18 @@ echo "Domains=cloud.nuxeo.com" >> /etc/systemd/resolved.conf
 echo "Nuxeo Presales Installation Script: Install Nuxeo" | tee -a ${INSTALL_LOG}
 
 # Make directories and clone compose stack
-mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
-git clone -b ${PRESALES_DOCKER_BRANCH} ${COMPOSE_REPO} ${COMPOSE_DIR}
+### mkdir -p ${COMPOSE_DIR} ${NUXEO_DATA_DIR} ${NUXEO_LOG_DIR} ${TMP_DIR}
+### git clone -b ${PRESALES_DOCKER_BRANCH} ${COMPOSE_REPO} ${COMPOSE_DIR}
+mkdir -p ${COMPOSE_DIR} ${TMP_DIR}
+git clone --branch lts2023 ${COMPOSE_REPO} ${COMPOSE_DIR}
 
 mkdir -p ${CONF_DIR}
 echo "Nuxeo Presales Installation Script: Install Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Configure Nuxeo" | tee -a ${INSTALL_LOG}
-# Link old log location to new
-ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
-ln -s ${NUXEO_CONF_DIR} ${CONF_DIR}
+### # Link old log location to new
+### ln -s ${NUXEO_LOG_DIR} /var/log/nuxeo
+### ln -s ${NUXEO_CONF_DIR} ${CONF_DIR}
 
 # Copy default conf.d files
 cp ${COMPOSE_DIR}/conf.d/* ${CONF_DIR}
@@ -102,11 +97,13 @@ MAIL_PASS=$(aws secretsmanager get-secret-value --secret-id workmail_default_pas
 S3_BUCKET="${STACK_ID}-bucket"
 S3_PREFIX="binary_store/"
 S3_UPLOAD_PREFIX="upload/"
+S3_UPLOAD_TRANSIENT_PREFIX="upload_transient/"
 
 if [[ "${S3BUCKET}" == "Shared" ]]; then
   S3_BUCKET="${REGION}-demo-bucket"
   S3_PREFIX="${STACK_ID}/binary_store/"
   S3_UPLOAD_PREFIX="${STACK_ID}/upload/"
+  S3_UPLOAD_TRANSIENT_PREFIX="${STACK_ID}/upload_transient/"
 fi
 
 AUTO_PACKAGES="nuxeo-web-ui"
@@ -143,6 +140,8 @@ nuxeo.notification.eMailSubjectPrefix=[Nuxeo]
 
 # S3 Configuration
 nuxeo.s3storage.useDirectUpload=true
+nuxeo.s3storage.s3DirectUpload.bucket_prefix=${S3_UPLOAD_TRANSIENT_PREFIX}
+
 nuxeo.s3storage.directdownload.expire=3600
 nuxeo.s3storage.directdownload=true
 
@@ -246,8 +245,6 @@ cat << EOF > ${NUXEO_ENV}
 APPLICATION_NAME=${NX_STUDIO}
 PROJECT_NAME=${PROJECT_NAME}
 
-# Cloud Image: ${CLOUD_IMAGE}
-# LTS Image  : ${LTS_IMAGE}
 NUXEO_IMAGE=${FROM_IMAGE}
 
 JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
@@ -277,14 +274,13 @@ mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
 # Fix up permissions
 rm -f /root/creds.json
-chmod -R g+w ${NUXEO_BASE_DIR}
-chown -R nuxeo:ubuntu ${NUXEO_BASE_DIR} ${TMP_DIR}
+chown -R nuxeo:ubuntu ${TMP_DIR}
 chown -R ubuntu:ubuntu ${COMPOSE_DIR} ${HOME}/.docker
 
-# Generate input files
-cd ${COMPOSE_DIR}
-echo "Generating Dockerfile(s)" | tee -a ${INSTALL_LOG}
-make dockerfiles NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
+### # Generate input files
+### cd ${COMPOSE_DIR}
+### echo "Generating Dockerfile(s)" | tee -a ${INSTALL_LOG}
+### make dockerfiles NUXEO_IMAGE=${FROM_IMAGE} ELASTIC_VERSION=${ELASTIC_VERSION}
 
 # Use the source image to register the project
 docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
@@ -292,22 +288,18 @@ docker pull --quiet ${FROM_IMAGE} 2>&1 | tee -a ${INSTALL_LOG}
 # Auto-start if Studio project defined
 if [ -n "${NX_STUDIO}" ]; then
   echo "Registering Nuxeo..." | tee -a ${INSTALL_LOG}
-  docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
-         nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "dev" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
-  if [ -e ${TMP_DIR}/instance.clid ]; then
-    echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
-    awk 1 ORS="--" ${TMP_DIR}/instance.clid >> ${NUXEO_ENV}
-    echo "" >> ${NUXEO_ENV}
-  fi
+  sh -c "cd ${COMPOSE_DIR} && ./generate_clid.sh"
 
   # Build / Pull images
-  echo "Building images..." | tee -a ${INSTALL_LOG}
-  docker compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
   echo "Pulling other images..." | tee -a ${INSTALL_LOG}
-  docker compose --no-ansi pull | tee -a ${INSTALL_LOG}
+  docker compose --project-directory ${COMPOSE_DIR} --no-ansi pull | tee -a ${INSTALL_LOG}
+
   if [[ "${AUTO_START}" == "true" ]]; then
+    echo "Building images..." | tee -a ${INSTALL_LOG}
+    docker compose --project-directory ${COMPOSE_DIR} --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+
     echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-    docker compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+    docker compose --project-directory ${COMPOSE_DIR} --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
   fi
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
@@ -417,9 +409,6 @@ echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a $
 certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hyland.com -d ${FQDN} | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
-
-#fix imagemagick Policy
-#wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${NX_BRANCH}/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
 
 #set up ubuntu user
 cat << EOF >> /home/ubuntu/.profile
