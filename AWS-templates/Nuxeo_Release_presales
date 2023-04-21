@@ -300,13 +300,21 @@ if [ -n "${NX_STUDIO}" ]; then
   fi
 
   # Build / Pull images
+    # Check if Docker Compose is installed
+  if command -v docker compose >/dev/null 2>&1; then
+      echo "Docker compose (v2) is installed and available."
+      COMPOSE_CMD="docker compose"
+  else
+      echo "Docker compose (v2) is not installed. Using docker-compose instead."
+      COMPOSE_CMD="docker-compose"
+  fi
   echo "Building images..." | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
+  $COMPOSE_CMD --no-ansi build --progress plain 2>&1 | tee -a ${INSTALL_LOG}
   echo "Pulling other images..." | tee -a ${INSTALL_LOG}
-  docker-compose --no-ansi pull | tee -a ${INSTALL_LOG}
+  $COMPOSE_CMD --no-ansi pull | tee -a ${INSTALL_LOG}
   if [[ "${AUTO_START}" == "true" ]]; then
     echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
-    docker-compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+    $COMPOSE_CMD --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
   fi
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
