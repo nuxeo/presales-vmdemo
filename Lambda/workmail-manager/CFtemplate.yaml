@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  WorkMailUserName:
+    Description: 'WorkMail user name. Make one user per demo and create an alias for each user.'
+    Type: String
+    Default: ""
+  WorkMailAliases:
+    Description: 'Comma-separated list of email aliases for the WorkMail user'
+    Type: CommaDelimitedList
+    Default: ""
+  WorkMailDomain:
+    Description: 'Domain to be used'
+    Type: String
+    Default: "nuxeo-demo.awsapps.com"
+  WorkMailPassword:
+    Description: '8-64 characters; must include lowercase, uppercase, number'
+    Type: String
+    NoEcho: True
+
+
+
+
+Resources:
+  WorkMailUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${AWS::StackName}/WorkMailUserPassword'
+      SecretString: !Sub
+        - '${Secret}'
+        - Secret: !Ref WorkMailPassword
+
+  CustomResource:
+    Type: Custom::LambdaFunction
+    Properties:
+      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:workmail-manager"
+      DeletionPolicy: Delete
+      SecretName: !Ref WorkMailUserSecret
+      UserName: !Ref WorkMailUserName
+      Aliases: !Ref WorkMailAliases
+      Domain: !Ref WorkMailDomain
