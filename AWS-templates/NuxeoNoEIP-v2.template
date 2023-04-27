@@ -65,7 +65,7 @@
     },
     "GitBranchPresalesDocker": {
       "Type": "String",
-      "Default": "docker-compose-v1",
+      "Default": "master",
       "Description": "https://github.com/nuxeo-sandbox/nuxeo-presales-docker repository branch"
     },
     "GitBranch": {
