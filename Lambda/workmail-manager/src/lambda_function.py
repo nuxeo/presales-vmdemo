@@ -20,19 +20,19 @@ def lambda_handler(event, context):
         secrets_manager = boto3.client('secretsmanager')
         ssm = boto3.client('ssm')
 
+        # Set variables used for both Create and Delete requests
+        user_name = event['ResourceProperties']['UserName']
+        domain = event['ResourceProperties']['Domain']
 
-        ## TODO use list_organizations() to get org_id
-        ## TODO update policy permissions to allow list orgs
-        # Retrieve org id from param store
-        # org_id_param = "/workmail/demohyland/org_id"
-        # org_id_response = ssm.get_parameter(Name=org_id_param)
-        # org_id = org_id_response['Parameter']['Value']
+        # Retrieve org_id if there is an org with matching domain
+
+        org_response = workmail.list_organizations()
+        all_orgs = org_response.get('OrganizationSummaries', [])
+        org_id = [org['OrganizationId'] for org in all_orgs if org['DefaultMailDomain'] == domain].pop(0)
         
 
         if event['RequestType'] == 'Create':
             logger.info('Create was triggered')
-            user_name = event['ResourceProperties']['UserName']
-            domain = event['ResourceProperties']['Domain']
             email = f"{user_name}@{domain}"
             aliases = event['ResourceProperties'].get('Aliases', [])
             secret_name = event['ResourceProperties']['SecretName']
@@ -77,8 +77,6 @@ def lambda_handler(event, context):
 
         if event['RequestType'] == 'Delete':
             logger.info('Delete was triggered')
-            user_name = event['ResourceProperties']['UserName']
-            domain = event['ResourceProperties']['Domain']
             email = f"{user_name}@{domain}"
             user_id = ""
 
