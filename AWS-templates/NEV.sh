@@ -62,11 +62,11 @@ fi
 # Set working environment
 cat << EOF > ${NEV_ENV}
 # NEV Version
-NEV_VERSION=${NEV_VERSION}
+ENV_NEV_VERSION=${NEV_VERSION}
 # Nuxeo Server URL
-NUXEO_URL=${NUXEO_URL}
+ENV_NUXEO_URL=${NUXEO_URL}
 # Nuxeo Server Oauth token
-NUXEO_SECRET=${NUXEO_SECRET}
+ENV_NUXEO_SECRET=${NUXEO_SECRET}
 EOF
 
 # Fix up permissions
