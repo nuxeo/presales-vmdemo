@@ -204,12 +204,12 @@
     },
     "NEVVersion": {
       "Type": "String",
-      "Default": "2.2.0",
+      "Default": "2.2.1",
       "Description": "https://doc.nuxeo.com/nxdoc/nuxeo-enhanced-viewer-release-notes/"
     },
     "NEVArenderAddon": {
       "Type": "String",
-      "Default": "nuxeo-arender-2021.3.0",
+      "Default": "nuxeo-arender-2021.3.1",
       "Description": "The Nuxeo ARender addon package to install. Must be compatible with NEV Version."
     },
     "NEVDiskSize": {
