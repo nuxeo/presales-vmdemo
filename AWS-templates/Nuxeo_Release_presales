@@ -419,14 +419,15 @@ KIBANA_PASS=$(aws secretsmanager get-secret-value --secret-id kibana_default_pas
 htpasswd -b -c /etc/apache2/passwords kibana "${KIBANA_PASS}"
 apache2ctl -k graceful
 
-# Enable SSL certs
-echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
-certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hyland.com -d ${FQDN} | tee -a ${INSTALL_LOG}
-
 # Restart apache
 echo "Restarting Apache"
 systemctl restart apache2
 
+# Enable SSL certs
+echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a ${INSTALL_LOG}
+certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hyland.com -d ${FQDN} | tee -a ${INSTALL_LOG}
+
+# Set profile, etc.
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc." | tee -a ${INSTALL_LOG}
 
 #fix imagemagick Policy
