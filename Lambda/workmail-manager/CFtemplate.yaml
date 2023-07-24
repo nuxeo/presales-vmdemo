@@ -32,7 +32,7 @@ Resources:
   CustomResource:
     Type: Custom::LambdaFunction
     Properties:
-      ServiceToken: !Sub "arn:aws:lambda:us-east-1:<acct>:function:workMailManager"
+      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:workMailManager"
       DeletionPolicy: Delete
       SecretName: !Ref WorkMailUserSecret
       UserName: !Ref WorkMailUserName
