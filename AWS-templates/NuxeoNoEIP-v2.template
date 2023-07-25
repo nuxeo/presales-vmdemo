@@ -112,7 +112,8 @@
       "Default": "Release",
       "AllowedValues": [
         "Release",
-        "Snapshot"
+        "Snapshot",
+        "Test"
       ],
       "Description": "The channel to use"
     },
