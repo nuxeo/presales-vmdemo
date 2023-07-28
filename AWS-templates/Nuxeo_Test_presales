@@ -375,8 +375,9 @@ echo "Nuxeo Presales Installation Script: Enable Certbot Certificate" | tee -a $
 certbot -q --apache --redirect --hsts --uir --agree-tos -m wwpresalesdemos@hyland.com -d ${FQDN} | tee -a ${INSTALL_LOG}
 
 # Restart apache
-echo "Restarting Apache"
-systemctl restart apache2
+echo "Restarting Apache" | tee -a ${INSTALL_LOG}
+systemctl restart apache2 | tee -a ${INSTALL_LOG}
+
 
 
 # Generate input files
@@ -396,7 +397,12 @@ if [ -n "${NX_STUDIO}" ]; then
     echo -n "NUXEO_CLID=" >> ${NUXEO_ENV}
     awk 1 ORS="--" ${TMP_DIR}/instance.clid >> ${NUXEO_ENV}
     echo "" >> ${NUXEO_ENV}
+  else
+    echo "Retry registering Nuxeo..." | tee -a ${INSTALL_LOG}
+    docker run --rm -v ${TMP_DIR}:/var/lib/nuxeo/:rw ${FROM_IMAGE} \
+           nuxeoctl register "${STUDIO_USERNAME}" "${NX_STUDIO}" "dev" "Docker" "${CREDENTIALS}" 2>&1 | tee -a ${INSTALL_LOG}
   fi
+
 
   # Build / Pull images
     # Check if Docker Compose is installed
@@ -419,6 +425,7 @@ fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script: Install Misc." | tee -a ${INSTALL_LOG}
+
 # Update some defaults
 update-alternatives --set editor /usr/bin/vim.basic
 echo "Nuxeo Presales Installation Script: Install Misc. => DONE" | tee -a ${INSTALL_LOG}
@@ -470,3 +477,4 @@ EOF
 echo "Nuxeo Presales Installation Script: Setup profile, ubuntu, etc. => DONE" | tee -a ${INSTALL_LOG}
 
 echo "Nuxeo Presales Installation Script Complete" | tee -a ${INSTALL_LOG}
+
