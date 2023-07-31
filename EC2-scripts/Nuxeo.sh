@@ -243,7 +243,7 @@ NUXEO_IMAGE=${FROM_IMAGE}
 
 JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
 
-CONNECT_URL=https://nos-preprod-connect.nuxeocloud.com/nuxeo/site/
+CONNECT_URL=https://connect.nuxeo.com/nuxeo/site/
 
 NUXEO_DEV=true
 NUXEO_PORT=8080
