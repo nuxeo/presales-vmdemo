@@ -5,7 +5,7 @@
 # You can tail -F /var/log/syslog to see the full startup and check for errors
 
 # If you are looking at env. variable set by the template nd used here,
-# see NuxeoNoEIP-v2.template, "NuxeoInstance" > "userData" and its "Fn::Sub" property.
+# see Nuxeo.template, "NuxeoInstance" > "userData" and its "Fn::Sub" property.
 
 source /etc/profile.d/load_env.sh
 
@@ -265,7 +265,7 @@ EOF
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Add newDNS script
-curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/Ec2-scripts/newDNS.sh > ${TMP_DIR}/newDNS.sh
 chmod +x ${TMP_DIR}/newDNS.sh
 mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
