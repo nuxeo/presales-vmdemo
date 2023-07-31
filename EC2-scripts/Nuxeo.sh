@@ -293,6 +293,10 @@ if [ -n "${NX_STUDIO}" ]; then
     echo "Starting Nuxeo stack" | tee -a ${INSTALL_LOG}
     docker compose --project-directory ${COMPOSE_DIR} --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
   fi
+
+  # Fix up permissions
+  chown -R ubuntu:ubuntu ${HOME}/.docker
+
 fi
 echo "Nuxeo Presales Installation Script: Configure Nuxeo => DONE" | tee -a ${INSTALL_LOG}
 
