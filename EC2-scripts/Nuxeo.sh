@@ -24,15 +24,15 @@ TEMPLATES="default,mongodb"
 
 MONGO_VERSION="6.0"
 
-OPENSEARCH_VERSION="1.3.7"
+OPENSEARCH_VERSION="1.3.11"
 OPENSEARCH_IMAGE="opensearchproject/opensearch:"${OPENSEARCH_VERSION}
-OPENSEARCH__DASHBOARDS_IMAGE="opensearchproject/opensearch-dashboards:"${OPENSEARCH_VERSION}
+OPENSEARCH_DASHBOARDS_IMAGE="opensearchproject/opensearch-dashboards:"${OPENSEARCH_VERSION}
 # Used only if, in the CF template, you chose, for nuxeo-presales-docker,
 # a branch that also deploys Kafka
 ZOOKEEPER_VERSION="3.5.8"
 KAFKA_VERSION="2.13-2.6.0"
 
-LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2023.0.85"
+LTS_IMAGE="docker-private.packages.nuxeo.com/nuxeo/nuxeo:2023"
 
 TMP_DIR="/tmp/nuxeo"
 
@@ -253,7 +253,7 @@ INSTALL_RPM=${INSTALL_RPM}
 
 MONGO_VERSION=${MONGO_VERSION}
 OPENSEARCH_IMAGE=${OPENSEARCH_IMAGE}
-OPENSEARCH__DASHBOARDS_IMAGE=${OPENSEARCH__DASHBOARDS_IMAGE}
+OPENSEARCH_DASHBOARDS_IMAGE=${OPENSEARCH_DASHBOARDS_IMAGE}
 ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION}
 KAFKA_VERSION=${KAFKA_VERSION}
 
