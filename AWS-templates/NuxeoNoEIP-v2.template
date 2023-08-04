@@ -229,7 +229,7 @@
     },
     "NEVGitBranch": {
       "Type": "String",
-      "Default": "master",
+      "Default": "lts2021",
       "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
     }
   },

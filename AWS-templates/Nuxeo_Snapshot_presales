@@ -182,7 +182,7 @@ a2ensite nuxeo
 apache2ctl -k graceful
 
 #fix imagemagick Policy
-wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
+wget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/lts2021/ImageMagick/policy.xml -O /etc/ImageMagick-6/policy.xml
 
 #set up profile for nuxeo user
 cat << EOF > /var/lib/nuxeo/server/.profile

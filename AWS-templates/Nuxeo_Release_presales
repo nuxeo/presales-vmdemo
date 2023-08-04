@@ -270,7 +270,7 @@ EOF
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Add newDNS script
-curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh 
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/lts2021/AWS-templates/newDNS.sh > ${TMP_DIR}/newDNS.sh
 chmod +x ${TMP_DIR}/newDNS.sh
 mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
