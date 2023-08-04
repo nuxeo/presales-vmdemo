@@ -119,12 +119,12 @@
     },
     "GitBranchPresalesDocker": {
       "Type": "String",
-      "Default": "master",
+      "Default": "lts2021",
       "Description": "https://github.com/nuxeo-sandbox/nuxeo-presales-docker repository branch"
     },
     "GitBranch": {
       "Type": "String",
-      "Default": "master",
+      "Default": "lts2021",
       "Description": "https://github.com/nuxeo/presales-vmdemo repository branch"
     },
     "Customer": {
