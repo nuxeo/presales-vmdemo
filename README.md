@@ -2,6 +2,8 @@
 AWS resources used by the Nuxeo Presales Team.
 These are provided for inspiration and we encourage developers to use them as code samples and learning resources.
 
+The master branch currently deploys a Nuxeo LTS 2023 stack. To deploy a Nuxeo LTS 2021 stack, please use the [lts2021](https://github.com/nuxeo/presales-vmdemo/tree/lts2021) branch 
+
 # Content
 ## AMI
 This repository contains a [packer.io](https://www.packer.io/) [template](https://github.com/nuxeo/presales-vmdemo/tree/master/AMI-builder) to automate the creation of AMI images with all the required OS packages pre-installed
