@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Nuxeo Presales Demo Template",
+  "Description": "Nuxeo Presales Demo Template (LTS2021)",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups" : [
