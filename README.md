@@ -2,6 +2,8 @@
 
 AWS resources used by the Nuxeo Presales Team.
 
+This branch is set to deploy a Nuxeo LTS2021 stack by default. To deploy a more recent version of Nuxeo, please use the [master](https://github.com/nuxeo/presales-vmdemo) branch
+
 These are provided for inspiration and we encourage developers to use them as code samples and learning resources.
 
 ## About Nuxeo
