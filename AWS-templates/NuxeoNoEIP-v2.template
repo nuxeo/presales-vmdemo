@@ -577,7 +577,9 @@
                 "rekognition:StartFaceDetection",
                 "rekognition:GetFaceDetection",
                 "rekognition:StartTextDetection",
-                "rekognition:GetTextDetection"
+                "rekognition:GetTextDetection",
+                "rekognition:StartSegmentDetection",
+                "rekognition:GetSegmentDetection"
               ],
               "Resource": "*"
             },
