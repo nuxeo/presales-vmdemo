@@ -100,7 +100,11 @@ if [[ "${S3BUCKET}" == "Shared" ]]; then
   S3_UPLOAD_TRANSIENT_PREFIX="${STACK_ID}/upload_transient/"
 fi
 
+# Make sure we always have a UI installed
 AUTO_PACKAGES="nuxeo-web-ui"
+# Auto install Nuxeo Explorer because the website is unusable
+AUTO_PACKAGES="${AUTO_PACKAGES} platform-explorer"
+# Make sure to install S3 plugin if needed
 if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
   AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage"
 fi
