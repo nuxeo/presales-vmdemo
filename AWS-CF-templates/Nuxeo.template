@@ -115,13 +115,13 @@
       "Type": "String"
     },
     "NEVInstanceType": {
-      "Description": "t3.medium = 2vCPU/4GB, m6g.large = 2vCPU/8GB, m6g.xlarge = 4vCPU/16GB",
+      "Description": "t3.medium = 2vCPU/4GB, t3.large = 2vCPU/8GB, t3.xlarge = 4vCPU/16GB",
       "Type": "String",
       "Default": "t3.medium",
       "AllowedValues": [
           "t3.medium",
-          "m6g.large",
-          "m6g.xlarge"
+          "t3.large",
+          "t3.xlarge"
       ]
     },
     "NEVVersion": {
