@@ -103,7 +103,9 @@ fi
 # Make sure we always have a UI installed
 AUTO_PACKAGES="nuxeo-web-ui"
 # Auto install Nuxeo Explorer because the website is unusable
-AUTO_PACKAGES="${AUTO_PACKAGES} platform-explorer"
+# Master branch is for LTS2023. As of Sept. 2023, platform-explorer is not available and
+# the nuxeo builds fails. uncomment once plugin is available
+#AUTO_PACKAGES="${AUTO_PACKAGES} platform-explorer"
 # Make sure to install S3 plugin if needed
 if [[ "${S3BUCKET}" == "true" || "${S3BUCKET}" == "Create" || "${S3BUCKET}" == "Shared" ]]; then
   AUTO_PACKAGES="${AUTO_PACKAGES} amazon-s3-online-storage"
