@@ -898,7 +898,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Condition": "CreateNestedNEV",
       "Properties": {
-        "TemplateURL": "https://presales-vmdemo-bucket.s3.amazonaws.com/NEV.template",
+        "TemplateURL": "https://github.com/nuxeo/presales-vmdemo/blob/master/AWS-CF-templates/NEV.template",
         "Parameters": {
           "DnsName": {
             "Fn::Sub": ["${name}-nev", {
