@@ -22,7 +22,7 @@
         }
       ],
       "ParameterLabels" : {
-        "MakeNEV" : { "default" : "Create a NEV stack?" },
+        "MakeNEV" : { "default" : "Create a NEV stack? =====> If yes, make sure latest version of NEV.template has been uploaded to s3 <=====" },
         "NEVInstanceType" : { "default" : "NEV instance type" },
         "NEVVersion" : { "default" : "NEV Version" },
         "NEVArenderAddon" : { "default" : "ARender addon"},
@@ -111,7 +111,7 @@
     "MakeNEV": {
       "AllowedValues": [ "true", "false" ],
       "Default": "false",
-      "Description": "Use to create a child NEV stack; false = do not create a NEV stack",
+      "Description": "Use to create a child NEV stack; false = do not create a NEV stack.",
       "Type": "String"
     },
     "NEVInstanceType": {
