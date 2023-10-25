@@ -1,0 +1,90 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+      "WorkMailCreation": {
+        "Description": "Create a WorkMail User and Aliases?",
+        "Type": "String",
+        "AllowedValues": [
+            "True",
+            "False",
+            ""
+        ],
+        "Default": ""
+      },
+      "WorkMailUserName": {
+        "Description": "WorkMail user name. Make one user per demo and create an alias for each user.",
+        "Type": "String",
+        "Default": ""
+      },
+      "WorkMailAliases": {
+        "Description": "Comma-separated list of email aliases for the WorkMail user",
+        "Type": "CommaDelimitedList",
+        "Default": ""
+      },
+      "WorkMailDomain": {
+        "Description": "Domain to be used",
+        "Type": "String",
+        "Default": "nuxeo-demo.awsapps.com"
+      },
+      "WorkMailPassword": {
+        "Description": "8-64 characters; must include lowercase, uppercase, number",
+        "Type": "String",
+        "NoEcho": true
+      }
+    },
+    "Conditions": {
+      "WorkMailCondition": {
+        "Fn::And": [
+            {
+              "Fn::Equals": [
+                {"Ref": "AWS::Region"},
+                "us-east-1"
+            ]
+            },
+            {
+              "Fn::Equals": [
+                {"Ref": "WorkMailCreation"},
+                "True"
+                ]
+              }
+        ]
+      }
+    },
+    "Resources": {
+      "WorkMailUserSecret": {
+        "Type": "AWS::SecretsManager::Secret",
+        "Condition": "WorkMailCondition",
+        "Properties": {
+          "Name": {
+            "Fn::Sub": "${AWS::StackName}/WorkMailUserPassword"
+          },
+          "SecretString": {
+            "Ref": "WorkMailPassword"
+          }
+        }
+      },
+      "LambdaTrigger": {
+        "Type": "Custom::LambdaFunction",
+        "Condition": "WorkMailCondition",
+        "Properties": {
+          "ServiceToken": {
+            "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfnify-workmail-users"
+          },
+          "DeletionPolicy": "Delete",
+          "SecretName": {
+            "Ref": "WorkMailUserSecret"
+          },
+          "UserName": {
+            "Ref": "WorkMailUserName"
+          },
+          "Aliases": {
+            "Ref": "WorkMailAliases"
+          },
+          "Domain": {
+            "Ref": "WorkMailDomain"
+          }
+        }
+      }
+    }
+  }
+  
