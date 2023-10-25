@@ -65,7 +65,7 @@
     "GitBranch": {
       "Type": "String",
       "Default": "master",
-      "Description": "EC2 instance setup (https://github.com/nuxeo/presales-vmdemo branch)"
+      "Description": "EC2 instance setup (https://github.com/nuxeo-sandbox/presales-vmdemo branch)"
     },
     "Customer": {
       "Type": "String",
@@ -151,7 +151,7 @@
     "NEVGitBranch": {
       "Type": "String",
       "Default": "master",
-      "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
+      "Description": "Branch to use from https://github.com/nuxeo-sandbox/presales-vmdemo"
     }
   },
 
@@ -324,7 +324,7 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Sub": [
-              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/EC2-scripts/Nuxeo.sh\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} PRESALES_DOCKER_BRANCH=${branchForPresalesDocker} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo.sh\n",
+              "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo-sandbox/presales-vmdemo/${branch}/EC2-scripts/Nuxeo.sh\necho export UPLOAD_ROLE_ARN=${uploadRole} REKOGNITION_ROLE_ARN=${rekognitionRole} SNS_TOPIC_ARN=${snsTopic} STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} S3BUCKET=${bucket} NX_BRANCH=${branch} PRESALES_DOCKER_BRANCH=${branchForPresalesDocker} NX_STUDIO=${studio} NX_STUDIO_VER=${studioVer} AUTO_START=${autoStart} INSTALL_RPM=${rpms} MAKE_NEV=${MakeNEV} ARENDER_ADDON=${ArenderAddon} NUXEO_SECRET=${NuxeoSecret} >> /etc/profile.d/load_env.sh\nbash Nuxeo.sh\n",
               {
                 "stack": {
                   "Ref": "AWS::StackName"

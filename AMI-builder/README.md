@@ -8,7 +8,7 @@
 - for nuxeo team members, use okta-aws to set/refresh the AWS credentials on your computer
 
 ```
-git clone https://github.com/nuxeo/presales-vmdemo
+git clone https://github.com/nuxeo-sandbox/presales-vmdemo
 cd AMI-builder
 packer build template.json
 ```
