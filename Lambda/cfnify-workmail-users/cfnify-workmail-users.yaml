@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy lambda called by CFN to control WorkMail users
+
+Resources:
+  WorkMailListPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: nuxeo-workmail-list-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: 'workmail:ListOrganizations'
+            Resource: '*'
+      Roles:
+        - !Ref LambdaFunctionRole
+
+  WorkMailUserMGMTPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: nuxeo-workmail-user-mgmt-policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'workmail:ListAliases'
+              - 'workmail:CreateAlias'
+              - 'workmail:DeregisterFromWorkMail'
+              - 'workmail:ListTagsForResource'
+              - 'workmail:ListUsers'
+              - 'workmail:DeleteAlias'
+              - 'workmail:CreateUser'
+              - 'workmail:TagResource'
+              - 'workmail:DeleteUser'
+              - 'workmail:RegisterToWorkMail'
+            Resource: !Sub 'arn:aws:workmail:*:${AWS::AccountId}:organization/*'
+      Roles: 
+        - !Ref LambdaFunctionRole
+
+  LambdaFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/SecretsManagerReadWrite'
+        - 'arn:aws:iam::aws:policy/AmazonSESFullAccess'
+      Tags:
+        - Key: billing-category
+          Value: presales
+        - Key: billing-subcategory
+          Value: generic
+
+
+
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Create/delete WorkMail users based on CloudFormation.
+      FunctionName: cfnify-workmail-users
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Runtime: python3.11
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Timeout: 240
+      Code:
+        ZipFile: |
+          #Imports
+          import boto3
+          import logging
+          import json
+          import cfnresponse
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+
+          def lambda_handler(event, context):
+              logger.info("Received event: " + json.dumps(event))
+
+              try:
+                  
+                  # Set up clients
+                  workmail = boto3.client('workmail')
+                  secrets_manager = boto3.client('secretsmanager')
+
+
+                  # Set variables used for both Create and Delete requests
+                  user_name = event['ResourceProperties']['UserName']
+                  domain = event['ResourceProperties']['Domain']
+
+                  # Retrieve org_id if there is an org with matching domain
+
+                  org_response = workmail.list_organizations()
+                  all_orgs = org_response.get('OrganizationSummaries', [])
+                  org_id = [org['OrganizationId'] for org in all_orgs if org['DefaultMailDomain'] == domain].pop(0)
+                  
+
+                  if event['RequestType'] == 'Create':
+                      logger.info('Create was triggered')
+                      email = f"{user_name}@{domain}"
+                      aliases = event['ResourceProperties'].get('Aliases', [])
+                      secret_name = event['ResourceProperties']['SecretName']
+
+                      # Get password from secrets manager
+                      sm_response = secrets_manager.get_secret_value(SecretId=secret_name)
+                      pw = sm_response['SecretString']
+
+                      info = f'sm_response: {sm_response}\npw: {pw}\nemail: {email}\naliases: {aliases}'
+                      logger.info(info)
+
+                      # Create the WorkMail user
+                      wm_response = workmail.create_user(
+                          OrganizationId=org_id,
+                          Name=user_name,
+                          DisplayName=user_name,
+                          Password=pw
+                      )
+                      
+                      logger.info(f'wm_response: {json.dumps(wm_response)}')
+                      
+                      user_id = wm_response['UserId']
+                      
+                      # Register the user to the domain
+                      reg_response = workmail.register_to_work_mail(
+                          OrganizationId=org_id,
+                          EntityId=user_id,
+                          Email=email
+                      )
+                      
+                      logger.info(f'reg_response: {json.dumps(reg_response)}')
+                      
+                      
+                      # Create aliases for the user
+                      for alias in aliases:
+                          alias_response = workmail.create_alias(
+                              OrganizationId=org_id,
+                              EntityId=user_id,
+                              Alias=f"{alias}.{user_name}@{domain}"
+                          )
+                          logger.info(json.dumps(alias_response, default=str))
+
+                  if event['RequestType'] == 'Delete':
+                      logger.info('Delete was triggered')
+                      email = f"{user_name}@{domain}"
+                      user_id = ""
+
+                      # Get users
+                      users_response = workmail.list_users(
+                          OrganizationId=org_id,
+                      )
+
+                      logger.info(f'users_response: {json.dumps(users_response, default=str)}')
+
+                      users = users_response.get('Users', [])
+
+                      # Find user by email, if yes, return id
+                      for user in users:
+                          if user.get('Email') == email:
+                              user_id = user.get('Id')
+
+                      if len(user_id) > 0:
+                          
+                          # Delete aliases
+                          aliases_response = workmail.list_aliases(
+                              OrganizationId=org_id,
+                              EntityId=user_id
+                          )
+                          for alias in aliases_response['Aliases']:
+                              if alias != email:
+                                  workmail.delete_alias(
+                                      OrganizationId=org_id,
+                                      EntityId=user_id,
+                                      Alias=alias
+                                  )
+
+                          # Deregister User from WorkMail
+                          dereg_response = workmail.deregister_from_work_mail(
+                              OrganizationId=org_id,
+                              EntityId=user_id
+                          )
+
+                          logger.info(json.dumps(dereg_response, default=str))
+
+                          # Delete the WorkMail user
+                          del_response = workmail.delete_user(
+                              OrganizationId=org_id,
+                              UserId=user_id
+                          )
+
+                          logger.info(json.dumps(del_response, default=str))
+                          
+
+              except Exception as e:
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {}, str(e))
+                  return
+
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})

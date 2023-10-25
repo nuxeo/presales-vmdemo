@@ -18,7 +18,7 @@ def lambda_handler(event, context):
         # Set up clients
         workmail = boto3.client('workmail')
         secrets_manager = boto3.client('secretsmanager')
-        ssm = boto3.client('ssm')
+
 
         # Set variables used for both Create and Delete requests
         user_name = event['ResourceProperties']['UserName']
