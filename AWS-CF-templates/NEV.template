@@ -70,7 +70,7 @@
         "GitBranch": {
             "Type": "String",
             "Default": "master",
-            "Description": "Branch to use from https://github.com/nuxeo-sandbox/presales-vmdemo"
+            "Description": "Branch to use from https://github.com/nuxeo/presales-vmdemo"
         }
     },
 
@@ -239,7 +239,7 @@
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Sub": [
-                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo-sandbox/presales-vmdemo/${branch}/EC2-scripts/NEV.sh\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NEV_VERSION=${nevVersion} NUXEO_URL=${nuxeoUrl} NUXEO_SECRET=${nuxeoSecret} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash NEV.sh\n",
+                            "#!/bin/bash\n\nwget https://raw.githubusercontent.com/nuxeo/presales-vmdemo/${branch}/EC2-scripts/NEV.sh\necho export STACK_ID=${stack} DNS_NAME=${dnsName} REGION=${region} NEV_VERSION=${nevVersion} NUXEO_URL=${nuxeoUrl} NUXEO_SECRET=${nuxeoSecret} AUTO_START=${autoStart} >> /etc/profile.d/load_env.sh\nbash NEV.sh\n",
                             {
                                 "stack": {
                                     "Ref": "AWS::StackName"

@@ -271,7 +271,7 @@ EOF
 ln -s ${NUXEO_ENV} ${COMPOSE_DIR}/env
 
 # Add newDNS script
-curl https://raw.githubusercontent.com/nuxeo-sandbox/presales-vmdemo/master/Ec2-scripts/newDNS.sh > ${TMP_DIR}/newDNS.sh
+curl https://raw.githubusercontent.com/nuxeo/presales-vmdemo/master/Ec2-scripts/newDNS.sh > ${TMP_DIR}/newDNS.sh
 chmod +x ${TMP_DIR}/newDNS.sh
 mv ${TMP_DIR}/newDNS.sh /usr/local/sbin/newDNS.sh
 
