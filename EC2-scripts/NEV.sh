@@ -77,11 +77,11 @@ cd ${COMPOSE_DIR}
 
 #  Pull images
 echo "NPIS: Pulling images..." | tee -a ${INSTALL_LOG}
-docker compose --ansi never pull | tee -a ${INSTALL_LOG}
+docker compose --no-ansi pull | tee -a ${INSTALL_LOG}
 
 if [[ "${AUTO_START}" == "true" ]]; then
   echo "NPIS: Start NEV..." | tee -a ${INSTALL_LOG}
-  docker compose --ansi never up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
+  docker compose --no-ansi up --detach --no-color 2>&1 | tee -a ${INSTALL_LOG}
 fi
 
 echo "NPIS: Install Misc." | tee -a ${INSTALL_LOG}
