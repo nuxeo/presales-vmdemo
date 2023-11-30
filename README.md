@@ -1,3 +1,6 @@
+# 🛑 This repo is no longer maintained 🛑
+# 🛑 Use [nuxeo-sandbox/presales-vmdemo](https://github.com/nuxeo-sandbox/presales-vmdemo) instead 🛑
+
 # Description
 AWS resources used by the Nuxeo Presales Team.
 These are provided for inspiration and we encourage developers to use them as code samples and learning resources.
